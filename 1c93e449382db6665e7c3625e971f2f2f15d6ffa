@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAtH////c\u003d",
+        "filename": "README.ANDROID",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2010-02-24T18:36:08Z",
+      "side": 1,
+      "message": "There\u0027s already a README.android that just has build instructions. This doesn\u0027t make much sense here since we have Git history anyway.",
+      "revId": "1c93e449382db6665e7c3625e971f2f2f15d6ffa",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAtH////k\u003d",
+        "filename": "android-config.mk",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2010-02-24T18:36:08Z",
+      "side": 1,
+      "message": "Changing this format is fine by me, but could you make them tabs? :-)",
+      "revId": "1c93e449382db6665e7c3625e971f2f2f15d6ffa",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAAtH////o\u003d",
+        "filename": "crypto/Android.mk",
+        "patchSetId": 2
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2010-02-24T18:36:08Z",
+      "side": 1,
+      "message": "Could you make this match the format the other ones above have",
+      "revId": "1c93e449382db6665e7c3625e971f2f2f15d6ffa",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
