@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAAvX///+8\u003d",
+        "filename": "android-config.mk",
+        "patchSetId": 3
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1000547
+      },
+      "writtenOn": "2010-03-05T18:45:39Z",
+      "side": 1,
+      "message": "please update the command. remove the no-bf flag",
+      "revId": "5c32aeb9c423e11c5bd836dd7c57d9423fce6397",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
