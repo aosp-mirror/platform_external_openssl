@@ -133,6 +133,7 @@ local_src_files := \
 	bn/bn_add.c \
 	bn/bn_asm.c \
 	bn/bn_blind.c \
+	bn/bn_const.c \
 	bn/bn_ctx.c \
 	bn/bn_div.c \
 	bn/bn_err.c \
