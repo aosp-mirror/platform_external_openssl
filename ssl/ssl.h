@@ -1493,6 +1493,7 @@ const SSL_CIPHER *SSL_get_current_cipher(const SSL *s);
 int	SSL_CIPHER_get_bits(const SSL_CIPHER *c,int *alg_bits);
 char *	SSL_CIPHER_get_version(const SSL_CIPHER *c);
 const char *	SSL_CIPHER_get_name(const SSL_CIPHER *c);
+const char *	SSL_CIPHER_authentication_method(const SSL_CIPHER *c);
 
 int	SSL_get_fd(const SSL *s);
 int	SSL_get_rfd(const SSL *s);
@@ -1501,6 +1502,7 @@ const char  * SSL_get_cipher_list(const SSL *s,int n);
 char *	SSL_get_shared_ciphers(const SSL *s, char *buf, int len);
 int	SSL_get_read_ahead(const SSL * s);
 int	SSL_pending(const SSL *s);
+const char *	SSL_authentication_method(const SSL *c);
 #ifndef OPENSSL_NO_SOCK
 int	SSL_set_fd(SSL *s, int fd);
 int	SSL_set_rfd(SSL *s, int fd);
@@ -1565,6 +1567,7 @@ void	SSL_copy_session_id(SSL *to,const SSL *from);
 SSL_SESSION *SSL_SESSION_new(void);
 const unsigned char *SSL_SESSION_get_id(const SSL_SESSION *s,
 					unsigned int *len);
+const char *	SSL_SESSION_get_version(const SSL_SESSION *s);
 #ifndef OPENSSL_NO_FP_API
 int	SSL_SESSION_print_fp(FILE *fp,const SSL_SESSION *ses);
 #endif

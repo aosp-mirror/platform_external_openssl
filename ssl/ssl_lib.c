@@ -2459,16 +2459,41 @@ SSL_METHOD *ssl_bad_method(int ver)
 	return(NULL);
 	}
 
-const char *SSL_get_version(const SSL *s)
+const char *ssl_get_version(int version)
 	{
-	if (s->version == TLS1_VERSION)
+	if (version == TLS1_VERSION)
 		return("TLSv1");
-	else if (s->version == SSL3_VERSION)
+	else if (version == SSL3_VERSION)
 		return("SSLv3");
-	else if (s->version == SSL2_VERSION)
+	else if (version == SSL2_VERSION)
 		return("SSLv2");
 	else
 		return("unknown");
+	}
+
+const char *SSL_get_version(const SSL *s)
+	{
+		return ssl_get_version(s->version);
+	}
+
+const char *SSL_SESSION_get_version(const SSL_SESSION *s)
+	{
+		return ssl_get_version(s->ssl_version);
+	}
+
+const char* SSL_authentication_method(const SSL* ssl)
+	{
+	switch (ssl->version)
+		{
+	case SSL2_VERSION:
+		return SSL_TXT_RSA;
+	case SSL3_VERSION:
+	case TLS1_VERSION:
+	case DTLS1_VERSION:
+		return SSL_CIPHER_authentication_method(ssl->s3->tmp.new_cipher);
+	default:
+		return "UNKNOWN";
+		}
 	}
 
 SSL *SSL_dup(SSL *s)

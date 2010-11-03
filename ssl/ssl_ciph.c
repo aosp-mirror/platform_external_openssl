@@ -1654,6 +1654,32 @@ int SSL_CIPHER_get_bits(const SSL_CIPHER *c, int *alg_bits)
 	return(ret);
 	}
 
+/* return string version of algorithm_auth */
+const char* SSL_CIPHER_authentication_method(const SSL_CIPHER* cipher)
+	{
+	switch (cipher->algorithm_auth)
+		{
+	case SSL_aRSA:
+		return SSL_TXT_RSA;
+	case SSL_aDSS:
+		return SSL_TXT_DSS;
+        case SSL_aDH:
+		return SSL_TXT_DH;
+        case SSL_aKRB5:
+		return SSL_TXT_KRB5;
+        case SSL_aECDH:
+		return SSL_TXT_ECDH;
+        case SSL_aNULL:
+		return SSL_TXT_NULL;
+        case SSL_aECDSA:
+		return SSL_TXT_ECDSA;
+        case SSL_aPSK:
+		return SSL_TXT_PSK;
+        default:
+		return "UNKNOWN";
+		}
+	}
+
 SSL_COMP *ssl3_comp_find(STACK_OF(SSL_COMP) *sk, int n)
 	{
 	SSL_COMP *ctmp;
