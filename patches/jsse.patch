@@ -281,7 +281,7 @@
  	}
  
 -const char *SSL_get_version(const SSL *s)
-+const char *ssl_get_version(int version)
++static const char *ssl_get_version(int version)
  	{
 -	if (s->version == TLS1_VERSION)
 +	if (version == TLS1_VERSION)

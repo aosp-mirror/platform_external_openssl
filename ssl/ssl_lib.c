@@ -2459,7 +2459,7 @@ SSL_METHOD *ssl_bad_method(int ver)
 	return(NULL);
 	}
 
-const char *ssl_get_version(int version)
+static const char *ssl_get_version(int version)
 	{
 	if (version == TLS1_VERSION)
 		return("TLSv1");
