@@ -124,24 +124,24 @@ AES_encrypt:
 	ldrb	r5,[r12,#1]
 	ldrb	r6,[r12,#0]
 	orr	r0,r0,r4,lsl#8
-	orr	r0,r0,r5,lsl#16
-	orr	r0,r0,r6,lsl#24
 	ldrb	r1,[r12,#7]
+	orr	r0,r0,r5,lsl#16
 	ldrb	r4,[r12,#6]
+	orr	r0,r0,r6,lsl#24
 	ldrb	r5,[r12,#5]
 	ldrb	r6,[r12,#4]
 	orr	r1,r1,r4,lsl#8
-	orr	r1,r1,r5,lsl#16
-	orr	r1,r1,r6,lsl#24
 	ldrb	r2,[r12,#11]
+	orr	r1,r1,r5,lsl#16
 	ldrb	r4,[r12,#10]
+	orr	r1,r1,r6,lsl#24
 	ldrb	r5,[r12,#9]
 	ldrb	r6,[r12,#8]
 	orr	r2,r2,r4,lsl#8
-	orr	r2,r2,r5,lsl#16
-	orr	r2,r2,r6,lsl#24
 	ldrb	r3,[r12,#15]
+	orr	r2,r2,r5,lsl#16
 	ldrb	r4,[r12,#14]
+	orr	r2,r2,r6,lsl#24
 	ldrb	r5,[r12,#13]
 	ldrb	r6,[r12,#12]
 	orr	r3,r3,r4,lsl#8
@@ -156,24 +156,24 @@ AES_encrypt:
 	mov	r6,r0,lsr#8
 	strb	r4,[r12,#0]
 	strb	r5,[r12,#1]
-	strb	r6,[r12,#2]
-	strb	r0,[r12,#3]
 	mov	r4,r1,lsr#24
+	strb	r6,[r12,#2]
 	mov	r5,r1,lsr#16
+	strb	r0,[r12,#3]
 	mov	r6,r1,lsr#8
 	strb	r4,[r12,#4]
 	strb	r5,[r12,#5]
-	strb	r6,[r12,#6]
-	strb	r1,[r12,#7]
 	mov	r4,r2,lsr#24
+	strb	r6,[r12,#6]
 	mov	r5,r2,lsr#16
+	strb	r1,[r12,#7]
 	mov	r6,r2,lsr#8
 	strb	r4,[r12,#8]
 	strb	r5,[r12,#9]
-	strb	r6,[r12,#10]
-	strb	r2,[r12,#11]
 	mov	r4,r3,lsr#24
+	strb	r6,[r12,#10]
 	mov	r5,r3,lsr#16
+	strb	r2,[r12,#11]
 	mov	r6,r3,lsr#8
 	strb	r4,[r12,#12]
 	strb	r5,[r12,#13]
@@ -190,141 +190,137 @@ AES_encrypt:
 .align	2
 _armv4_AES_encrypt:
 	str	lr,[sp,#-4]!		@ push lr
-	ldr	r4,[r11],#16
-	ldr	r5,[r11,#-12]
-	ldr	r6,[r11,#-8]
-	ldr	r7,[r11,#-4]
-	ldr	r12,[r11,#240-16]
+	ldmia	r11!,{r4-r7}
 	eor	r0,r0,r4
+	ldr	r12,[r11,#240-16]
 	eor	r1,r1,r5
 	eor	r2,r2,r6
 	eor	r3,r3,r7
 	sub	r12,r12,#1
 	mov	lr,#255
 
-.Lenc_loop:
+	and	r7,lr,r0
 	and	r8,lr,r0,lsr#8
 	and	r9,lr,r0,lsr#16
-	and	r7,lr,r0
 	mov	r0,r0,lsr#24
+.Lenc_loop:
 	ldr	r4,[r10,r7,lsl#2]	@ Te3[s0>>0]
-	ldr	r0,[r10,r0,lsl#2]	@ Te0[s0>>24]
-	ldr	r5,[r10,r8,lsl#2]	@ Te2[s0>>8]
-	ldr	r6,[r10,r9,lsl#2]	@ Te1[s0>>16]
-
 	and	r7,lr,r1,lsr#16	@ i0
+	ldr	r5,[r10,r8,lsl#2]	@ Te2[s0>>8]
 	and	r8,lr,r1
+	ldr	r6,[r10,r9,lsl#2]	@ Te1[s0>>16]
 	and	r9,lr,r1,lsr#8
+	ldr	r0,[r10,r0,lsl#2]	@ Te0[s0>>24]
 	mov	r1,r1,lsr#24
+
 	ldr	r7,[r10,r7,lsl#2]	@ Te1[s1>>16]
-	ldr	r1,[r10,r1,lsl#2]	@ Te0[s1>>24]
 	ldr	r8,[r10,r8,lsl#2]	@ Te3[s1>>0]
 	ldr	r9,[r10,r9,lsl#2]	@ Te2[s1>>8]
 	eor	r0,r0,r7,ror#8
-	eor	r1,r1,r4,ror#24
-	eor	r5,r5,r8,ror#8
-	eor	r6,r6,r9,ror#8
-
+	ldr	r1,[r10,r1,lsl#2]	@ Te0[s1>>24]
 	and	r7,lr,r2,lsr#8	@ i0
+	eor	r5,r5,r8,ror#8
 	and	r8,lr,r2,lsr#16	@ i1
+	eor	r6,r6,r9,ror#8
 	and	r9,lr,r2
-	mov	r2,r2,lsr#24
+	eor	r1,r1,r4,ror#24
 	ldr	r7,[r10,r7,lsl#2]	@ Te2[s2>>8]
+	mov	r2,r2,lsr#24
+
 	ldr	r8,[r10,r8,lsl#2]	@ Te1[s2>>16]
-	ldr	r2,[r10,r2,lsl#2]	@ Te0[s2>>24]
 	ldr	r9,[r10,r9,lsl#2]	@ Te3[s2>>0]
 	eor	r0,r0,r7,ror#16
-	eor	r1,r1,r8,ror#8
-	eor	r2,r2,r5,ror#16
-	eor	r6,r6,r9,ror#16
-
+	ldr	r2,[r10,r2,lsl#2]	@ Te0[s2>>24]
 	and	r7,lr,r3		@ i0
+	eor	r1,r1,r8,ror#8
 	and	r8,lr,r3,lsr#8	@ i1
+	eor	r6,r6,r9,ror#16
 	and	r9,lr,r3,lsr#16	@ i2
-	mov	r3,r3,lsr#24
+	eor	r2,r2,r5,ror#16
 	ldr	r7,[r10,r7,lsl#2]	@ Te3[s3>>0]
+	mov	r3,r3,lsr#24
+
 	ldr	r8,[r10,r8,lsl#2]	@ Te2[s3>>8]
 	ldr	r9,[r10,r9,lsl#2]	@ Te1[s3>>16]
-	ldr	r3,[r10,r3,lsl#2]	@ Te0[s3>>24]
 	eor	r0,r0,r7,ror#24
+	ldr	r3,[r10,r3,lsl#2]	@ Te0[s3>>24]
 	eor	r1,r1,r8,ror#16
+	ldr	r7,[r11],#16
 	eor	r2,r2,r9,ror#8
+	ldr	r4,[r11,#-12]
 	eor	r3,r3,r6,ror#8
 
-	ldr	r4,[r11],#16
-	ldr	r5,[r11,#-12]
-	ldr	r6,[r11,#-8]
-	ldr	r7,[r11,#-4]
-	eor	r0,r0,r4
-	eor	r1,r1,r5
-	eor	r2,r2,r6
-	eor	r3,r3,r7
+	ldr	r5,[r11,#-8]
+	eor	r0,r0,r7
+	ldr	r6,[r11,#-4]
+	and	r7,lr,r0
+	eor	r1,r1,r4
+	and	r8,lr,r0,lsr#8
+	eor	r2,r2,r5
+	and	r9,lr,r0,lsr#16
+	eor	r3,r3,r6
+	mov	r0,r0,lsr#24
 
 	subs	r12,r12,#1
 	bne	.Lenc_loop
 
 	add	r10,r10,#2
 
-	and	r7,lr,r0
-	and	r8,lr,r0,lsr#8
-	and	r9,lr,r0,lsr#16
-	mov	r0,r0,lsr#24
 	ldrb	r4,[r10,r7,lsl#2]	@ Te4[s0>>0]
-	ldrb	r0,[r10,r0,lsl#2]	@ Te4[s0>>24]
-	ldrb	r5,[r10,r8,lsl#2]	@ Te4[s0>>8]
-	ldrb	r6,[r10,r9,lsl#2]	@ Te4[s0>>16]
-
 	and	r7,lr,r1,lsr#16	@ i0
+	ldrb	r5,[r10,r8,lsl#2]	@ Te4[s0>>8]
 	and	r8,lr,r1
+	ldrb	r6,[r10,r9,lsl#2]	@ Te4[s0>>16]
 	and	r9,lr,r1,lsr#8
+	ldrb	r0,[r10,r0,lsl#2]	@ Te4[s0>>24]
 	mov	r1,r1,lsr#24
+
 	ldrb	r7,[r10,r7,lsl#2]	@ Te4[s1>>16]
-	ldrb	r1,[r10,r1,lsl#2]	@ Te4[s1>>24]
 	ldrb	r8,[r10,r8,lsl#2]	@ Te4[s1>>0]
 	ldrb	r9,[r10,r9,lsl#2]	@ Te4[s1>>8]
 	eor	r0,r7,r0,lsl#8
-	eor	r1,r4,r1,lsl#24
-	eor	r5,r8,r5,lsl#8
-	eor	r6,r9,r6,lsl#8
-
+	ldrb	r1,[r10,r1,lsl#2]	@ Te4[s1>>24]
 	and	r7,lr,r2,lsr#8	@ i0
+	eor	r5,r8,r5,lsl#8
 	and	r8,lr,r2,lsr#16	@ i1
+	eor	r6,r9,r6,lsl#8
 	and	r9,lr,r2
-	mov	r2,r2,lsr#24
+	eor	r1,r4,r1,lsl#24
 	ldrb	r7,[r10,r7,lsl#2]	@ Te4[s2>>8]
+	mov	r2,r2,lsr#24
+
 	ldrb	r8,[r10,r8,lsl#2]	@ Te4[s2>>16]
-	ldrb	r2,[r10,r2,lsl#2]	@ Te4[s2>>24]
 	ldrb	r9,[r10,r9,lsl#2]	@ Te4[s2>>0]
 	eor	r0,r7,r0,lsl#8
-	eor	r1,r1,r8,lsl#16
-	eor	r2,r5,r2,lsl#24
-	eor	r6,r9,r6,lsl#8
-
+	ldrb	r2,[r10,r2,lsl#2]	@ Te4[s2>>24]
 	and	r7,lr,r3		@ i0
+	eor	r1,r1,r8,lsl#16
 	and	r8,lr,r3,lsr#8	@ i1
+	eor	r6,r9,r6,lsl#8
 	and	r9,lr,r3,lsr#16	@ i2
-	mov	r3,r3,lsr#24
+	eor	r2,r5,r2,lsl#24
 	ldrb	r7,[r10,r7,lsl#2]	@ Te4[s3>>0]
+	mov	r3,r3,lsr#24
+
 	ldrb	r8,[r10,r8,lsl#2]	@ Te4[s3>>8]
 	ldrb	r9,[r10,r9,lsl#2]	@ Te4[s3>>16]
-	ldrb	r3,[r10,r3,lsl#2]	@ Te4[s3>>24]
 	eor	r0,r7,r0,lsl#8
+	ldrb	r3,[r10,r3,lsl#2]	@ Te4[s3>>24]
+	ldr	r7,[r11,#0]
 	eor	r1,r1,r8,lsl#8
+	ldr	r4,[r11,#4]
 	eor	r2,r2,r9,lsl#16
+	ldr	r5,[r11,#8]
 	eor	r3,r6,r3,lsl#24
+	ldr	r6,[r11,#12]
 
-	ldr	lr,[sp],#4		@ pop lr
-	ldr	r4,[r11,#0]
-	ldr	r5,[r11,#4]
-	ldr	r6,[r11,#8]
-	ldr	r7,[r11,#12]
-	eor	r0,r0,r4
-	eor	r1,r1,r5
-	eor	r2,r2,r6
-	eor	r3,r3,r7
+	eor	r0,r0,r7
+	eor	r1,r1,r4
+	eor	r2,r2,r5
+	eor	r3,r3,r6
 
 	sub	r10,r10,#2
-	mov	pc,lr			@ return
+	ldr	pc,[sp],#4		@ pop and return
 .size	_armv4_AES_encrypt,.-_armv4_AES_encrypt
 
 .global AES_set_encrypt_key
@@ -359,31 +355,31 @@ AES_set_encrypt_key:
 	ldrb	r5,[r12,#1]
 	ldrb	r6,[r12,#0]
 	orr	r0,r0,r4,lsl#8
-	orr	r0,r0,r5,lsl#16
-	orr	r0,r0,r6,lsl#24
 	ldrb	r1,[r12,#7]
+	orr	r0,r0,r5,lsl#16
 	ldrb	r4,[r12,#6]
+	orr	r0,r0,r6,lsl#24
 	ldrb	r5,[r12,#5]
 	ldrb	r6,[r12,#4]
 	orr	r1,r1,r4,lsl#8
-	orr	r1,r1,r5,lsl#16
-	orr	r1,r1,r6,lsl#24
 	ldrb	r2,[r12,#11]
+	orr	r1,r1,r5,lsl#16
 	ldrb	r4,[r12,#10]
+	orr	r1,r1,r6,lsl#24
 	ldrb	r5,[r12,#9]
 	ldrb	r6,[r12,#8]
 	orr	r2,r2,r4,lsl#8
-	orr	r2,r2,r5,lsl#16
-	orr	r2,r2,r6,lsl#24
 	ldrb	r3,[r12,#15]
+	orr	r2,r2,r5,lsl#16
 	ldrb	r4,[r12,#14]
+	orr	r2,r2,r6,lsl#24
 	ldrb	r5,[r12,#13]
 	ldrb	r6,[r12,#12]
 	orr	r3,r3,r4,lsl#8
-	orr	r3,r3,r5,lsl#16
-	orr	r3,r3,r6,lsl#24
 	str	r0,[r11],#16
+	orr	r3,r3,r5,lsl#16
 	str	r1,[r11,#-12]
+	orr	r3,r3,r6,lsl#24
 	str	r2,[r11,#-8]
 	str	r3,[r11,#-4]
 
@@ -397,27 +393,26 @@ AES_set_encrypt_key:
 .L128_loop:
 	and	r5,lr,r3,lsr#24
 	and	r7,lr,r3,lsr#16
-	and	r8,lr,r3,lsr#8
-	and	r9,lr,r3
 	ldrb	r5,[r10,r5]
+	and	r8,lr,r3,lsr#8
 	ldrb	r7,[r10,r7]
+	and	r9,lr,r3
 	ldrb	r8,[r10,r8]
-	ldrb	r9,[r10,r9]
-	ldr	r4,[r6],#4			@ rcon[i++]
 	orr	r5,r5,r7,lsl#24
+	ldrb	r9,[r10,r9]
 	orr	r5,r5,r8,lsl#16
+	ldr	r4,[r6],#4			@ rcon[i++]
 	orr	r5,r5,r9,lsl#8
 	eor	r5,r5,r4
 	eor	r0,r0,r5			@ rk[4]=rk[0]^...
 	eor	r1,r1,r0			@ rk[5]=rk[1]^rk[4]
-	eor	r2,r2,r1			@ rk[6]=rk[2]^rk[5]
-	eor	r3,r3,r2			@ rk[7]=rk[3]^rk[6]
 	str	r0,[r11],#16
+	eor	r2,r2,r1			@ rk[6]=rk[2]^rk[5]
 	str	r1,[r11,#-12]
+	eor	r3,r3,r2			@ rk[7]=rk[3]^rk[6]
 	str	r2,[r11,#-8]
-	str	r3,[r11,#-4]
-
 	subs	r12,r12,#1
+	str	r3,[r11,#-4]
 	bne	.L128_loop
 	sub	r2,r11,#176
 	b	.Ldone
@@ -428,16 +423,16 @@ AES_set_encrypt_key:
 	ldrb	r5,[r12,#17]
 	ldrb	r6,[r12,#16]
 	orr	r8,r8,r4,lsl#8
-	orr	r8,r8,r5,lsl#16
-	orr	r8,r8,r6,lsl#24
 	ldrb	r9,[r12,#23]
+	orr	r8,r8,r5,lsl#16
 	ldrb	r4,[r12,#22]
+	orr	r8,r8,r6,lsl#24
 	ldrb	r5,[r12,#21]
 	ldrb	r6,[r12,#20]
 	orr	r9,r9,r4,lsl#8
 	orr	r9,r9,r5,lsl#16
-	orr	r9,r9,r6,lsl#24
 	str	r8,[r11],#8
+	orr	r9,r9,r6,lsl#24
 	str	r9,[r11,#-4]
 
 	teq	lr,#192
@@ -451,27 +446,26 @@ AES_set_encrypt_key:
 .L192_loop:
 	and	r5,lr,r9,lsr#24
 	and	r7,lr,r9,lsr#16
-	and	r8,lr,r9,lsr#8
-	and	r9,lr,r9
 	ldrb	r5,[r10,r5]
+	and	r8,lr,r9,lsr#8
 	ldrb	r7,[r10,r7]
+	and	r9,lr,r9
 	ldrb	r8,[r10,r8]
-	ldrb	r9,[r10,r9]
-	ldr	r4,[r6],#4			@ rcon[i++]
 	orr	r5,r5,r7,lsl#24
+	ldrb	r9,[r10,r9]
 	orr	r5,r5,r8,lsl#16
+	ldr	r4,[r6],#4			@ rcon[i++]
 	orr	r5,r5,r9,lsl#8
 	eor	r9,r5,r4
 	eor	r0,r0,r9			@ rk[6]=rk[0]^...
 	eor	r1,r1,r0			@ rk[7]=rk[1]^rk[6]
-	eor	r2,r2,r1			@ rk[8]=rk[2]^rk[7]
-	eor	r3,r3,r2			@ rk[9]=rk[3]^rk[8]
 	str	r0,[r11],#24
+	eor	r2,r2,r1			@ rk[8]=rk[2]^rk[7]
 	str	r1,[r11,#-20]
+	eor	r3,r3,r2			@ rk[9]=rk[3]^rk[8]
 	str	r2,[r11,#-16]
-	str	r3,[r11,#-12]
-
 	subs	r12,r12,#1
+	str	r3,[r11,#-12]
 	subeq	r2,r11,#216
 	beq	.Ldone
 
@@ -489,16 +483,16 @@ AES_set_encrypt_key:
 	ldrb	r5,[r12,#25]
 	ldrb	r6,[r12,#24]
 	orr	r8,r8,r4,lsl#8
-	orr	r8,r8,r5,lsl#16
-	orr	r8,r8,r6,lsl#24
 	ldrb	r9,[r12,#31]
+	orr	r8,r8,r5,lsl#16
 	ldrb	r4,[r12,#30]
+	orr	r8,r8,r6,lsl#24
 	ldrb	r5,[r12,#29]
 	ldrb	r6,[r12,#28]
 	orr	r9,r9,r4,lsl#8
 	orr	r9,r9,r5,lsl#16
-	orr	r9,r9,r6,lsl#24
 	str	r8,[r11],#8
+	orr	r9,r9,r6,lsl#24
 	str	r9,[r11,#-4]
 
 	mov	r12,#14
@@ -510,52 +504,51 @@ AES_set_encrypt_key:
 .L256_loop:
 	and	r5,lr,r9,lsr#24
 	and	r7,lr,r9,lsr#16
-	and	r8,lr,r9,lsr#8
-	and	r9,lr,r9
 	ldrb	r5,[r10,r5]
+	and	r8,lr,r9,lsr#8
 	ldrb	r7,[r10,r7]
+	and	r9,lr,r9
 	ldrb	r8,[r10,r8]
-	ldrb	r9,[r10,r9]
-	ldr	r4,[r6],#4			@ rcon[i++]
 	orr	r5,r5,r7,lsl#24
+	ldrb	r9,[r10,r9]
 	orr	r5,r5,r8,lsl#16
+	ldr	r4,[r6],#4			@ rcon[i++]
 	orr	r5,r5,r9,lsl#8
 	eor	r9,r5,r4
 	eor	r0,r0,r9			@ rk[8]=rk[0]^...
 	eor	r1,r1,r0			@ rk[9]=rk[1]^rk[8]
-	eor	r2,r2,r1			@ rk[10]=rk[2]^rk[9]
-	eor	r3,r3,r2			@ rk[11]=rk[3]^rk[10]
 	str	r0,[r11],#32
+	eor	r2,r2,r1			@ rk[10]=rk[2]^rk[9]
 	str	r1,[r11,#-28]
+	eor	r3,r3,r2			@ rk[11]=rk[3]^rk[10]
 	str	r2,[r11,#-24]
-	str	r3,[r11,#-20]
-
 	subs	r12,r12,#1
+	str	r3,[r11,#-20]
 	subeq	r2,r11,#256
 	beq	.Ldone
 
 	and	r5,lr,r3
 	and	r7,lr,r3,lsr#8
-	and	r8,lr,r3,lsr#16
-	and	r9,lr,r3,lsr#24
 	ldrb	r5,[r10,r5]
+	and	r8,lr,r3,lsr#16
 	ldrb	r7,[r10,r7]
+	and	r9,lr,r3,lsr#24
 	ldrb	r8,[r10,r8]
-	ldrb	r9,[r10,r9]
 	orr	r5,r5,r7,lsl#8
+	ldrb	r9,[r10,r9]
 	orr	r5,r5,r8,lsl#16
+	ldr	r4,[r11,#-48]
 	orr	r5,r5,r9,lsl#24
 
-	ldr	r4,[r11,#-48]
 	ldr	r7,[r11,#-44]
 	ldr	r8,[r11,#-40]
-	ldr	r9,[r11,#-36]
 	eor	r4,r4,r5			@ rk[12]=rk[4]^...
+	ldr	r9,[r11,#-36]
 	eor	r7,r7,r4			@ rk[13]=rk[5]^rk[12]
-	eor	r8,r8,r7			@ rk[14]=rk[6]^rk[13]
-	eor	r9,r9,r8			@ rk[15]=rk[7]^rk[14]
 	str	r4,[r11,#-16]
+	eor	r8,r8,r7			@ rk[14]=rk[6]^rk[13]
 	str	r7,[r11,#-12]
+	eor	r9,r9,r8			@ rk[15]=rk[7]^rk[14]
 	str	r8,[r11,#-8]
 	str	r9,[r11,#-4]
 	b	.L256_loop
@@ -771,24 +764,24 @@ AES_decrypt:
 	ldrb	r5,[r12,#1]
 	ldrb	r6,[r12,#0]
 	orr	r0,r0,r4,lsl#8
-	orr	r0,r0,r5,lsl#16
-	orr	r0,r0,r6,lsl#24
 	ldrb	r1,[r12,#7]
+	orr	r0,r0,r5,lsl#16
 	ldrb	r4,[r12,#6]
+	orr	r0,r0,r6,lsl#24
 	ldrb	r5,[r12,#5]
 	ldrb	r6,[r12,#4]
 	orr	r1,r1,r4,lsl#8
-	orr	r1,r1,r5,lsl#16
-	orr	r1,r1,r6,lsl#24
 	ldrb	r2,[r12,#11]
+	orr	r1,r1,r5,lsl#16
 	ldrb	r4,[r12,#10]
+	orr	r1,r1,r6,lsl#24
 	ldrb	r5,[r12,#9]
 	ldrb	r6,[r12,#8]
 	orr	r2,r2,r4,lsl#8
-	orr	r2,r2,r5,lsl#16
-	orr	r2,r2,r6,lsl#24
 	ldrb	r3,[r12,#15]
+	orr	r2,r2,r5,lsl#16
 	ldrb	r4,[r12,#14]
+	orr	r2,r2,r6,lsl#24
 	ldrb	r5,[r12,#13]
 	ldrb	r6,[r12,#12]
 	orr	r3,r3,r4,lsl#8
@@ -803,24 +796,24 @@ AES_decrypt:
 	mov	r6,r0,lsr#8
 	strb	r4,[r12,#0]
 	strb	r5,[r12,#1]
-	strb	r6,[r12,#2]
-	strb	r0,[r12,#3]
 	mov	r4,r1,lsr#24
+	strb	r6,[r12,#2]
 	mov	r5,r1,lsr#16
+	strb	r0,[r12,#3]
 	mov	r6,r1,lsr#8
 	strb	r4,[r12,#4]
 	strb	r5,[r12,#5]
-	strb	r6,[r12,#6]
-	strb	r1,[r12,#7]
 	mov	r4,r2,lsr#24
+	strb	r6,[r12,#6]
 	mov	r5,r2,lsr#16
+	strb	r1,[r12,#7]
 	mov	r6,r2,lsr#8
 	strb	r4,[r12,#8]
 	strb	r5,[r12,#9]
-	strb	r6,[r12,#10]
-	strb	r2,[r12,#11]
 	mov	r4,r3,lsr#24
+	strb	r6,[r12,#10]
 	mov	r5,r3,lsr#16
+	strb	r2,[r12,#11]
 	mov	r6,r3,lsr#8
 	strb	r4,[r12,#12]
 	strb	r5,[r12,#13]
@@ -837,146 +830,143 @@ AES_decrypt:
 .align	2
 _armv4_AES_decrypt:
 	str	lr,[sp,#-4]!		@ push lr
-	ldr	r4,[r11],#16
-	ldr	r5,[r11,#-12]
-	ldr	r6,[r11,#-8]
-	ldr	r7,[r11,#-4]
-	ldr	r12,[r11,#240-16]
+	ldmia	r11!,{r4-r7}
 	eor	r0,r0,r4
+	ldr	r12,[r11,#240-16]
 	eor	r1,r1,r5
 	eor	r2,r2,r6
 	eor	r3,r3,r7
 	sub	r12,r12,#1
 	mov	lr,#255
 
-.Ldec_loop:
 	and	r7,lr,r0,lsr#16
 	and	r8,lr,r0,lsr#8
 	and	r9,lr,r0
 	mov	r0,r0,lsr#24
+.Ldec_loop:
 	ldr	r4,[r10,r7,lsl#2]	@ Td1[s0>>16]
-	ldr	r0,[r10,r0,lsl#2]	@ Td0[s0>>24]
-	ldr	r5,[r10,r8,lsl#2]	@ Td2[s0>>8]
-	ldr	r6,[r10,r9,lsl#2]	@ Td3[s0>>0]
-
 	and	r7,lr,r1		@ i0
+	ldr	r5,[r10,r8,lsl#2]	@ Td2[s0>>8]
 	and	r8,lr,r1,lsr#16
+	ldr	r6,[r10,r9,lsl#2]	@ Td3[s0>>0]
 	and	r9,lr,r1,lsr#8
+	ldr	r0,[r10,r0,lsl#2]	@ Td0[s0>>24]
 	mov	r1,r1,lsr#24
+
 	ldr	r7,[r10,r7,lsl#2]	@ Td3[s1>>0]
-	ldr	r1,[r10,r1,lsl#2]	@ Td0[s1>>24]
 	ldr	r8,[r10,r8,lsl#2]	@ Td1[s1>>16]
 	ldr	r9,[r10,r9,lsl#2]	@ Td2[s1>>8]
 	eor	r0,r0,r7,ror#24
-	eor	r1,r1,r4,ror#8
-	eor	r5,r8,r5,ror#8
-	eor	r6,r9,r6,ror#8
-
+	ldr	r1,[r10,r1,lsl#2]	@ Td0[s1>>24]
 	and	r7,lr,r2,lsr#8	@ i0
+	eor	r5,r8,r5,ror#8
 	and	r8,lr,r2		@ i1
+	eor	r6,r9,r6,ror#8
 	and	r9,lr,r2,lsr#16
-	mov	r2,r2,lsr#24
+	eor	r1,r1,r4,ror#8
 	ldr	r7,[r10,r7,lsl#2]	@ Td2[s2>>8]
+	mov	r2,r2,lsr#24
+
 	ldr	r8,[r10,r8,lsl#2]	@ Td3[s2>>0]
-	ldr	r2,[r10,r2,lsl#2]	@ Td0[s2>>24]
 	ldr	r9,[r10,r9,lsl#2]	@ Td1[s2>>16]
 	eor	r0,r0,r7,ror#16
-	eor	r1,r1,r8,ror#24
-	eor	r2,r2,r5,ror#8
-	eor	r6,r9,r6,ror#8
-
+	ldr	r2,[r10,r2,lsl#2]	@ Td0[s2>>24]
 	and	r7,lr,r3,lsr#16	@ i0
+	eor	r1,r1,r8,ror#24
 	and	r8,lr,r3,lsr#8	@ i1
+	eor	r6,r9,r6,ror#8
 	and	r9,lr,r3		@ i2
-	mov	r3,r3,lsr#24
+	eor	r2,r2,r5,ror#8
 	ldr	r7,[r10,r7,lsl#2]	@ Td1[s3>>16]
+	mov	r3,r3,lsr#24
+
 	ldr	r8,[r10,r8,lsl#2]	@ Td2[s3>>8]
 	ldr	r9,[r10,r9,lsl#2]	@ Td3[s3>>0]
-	ldr	r3,[r10,r3,lsl#2]	@ Td0[s3>>24]
 	eor	r0,r0,r7,ror#8
+	ldr	r3,[r10,r3,lsl#2]	@ Td0[s3>>24]
 	eor	r1,r1,r8,ror#16
 	eor	r2,r2,r9,ror#24
+	ldr	r7,[r11],#16
 	eor	r3,r3,r6,ror#8
 
-	ldr	r4,[r11],#16
-	ldr	r5,[r11,#-12]
-	ldr	r6,[r11,#-8]
-	ldr	r7,[r11,#-4]
-	eor	r0,r0,r4
-	eor	r1,r1,r5
-	eor	r2,r2,r6
-	eor	r3,r3,r7
+	ldr	r4,[r11,#-12]
+	ldr	r5,[r11,#-8]
+	eor	r0,r0,r7
+	ldr	r6,[r11,#-4]
+	and	r7,lr,r0,lsr#16
+	eor	r1,r1,r4
+	and	r8,lr,r0,lsr#8
+	eor	r2,r2,r5
+	and	r9,lr,r0
+	eor	r3,r3,r6
+	mov	r0,r0,lsr#24
 
 	subs	r12,r12,#1
 	bne	.Ldec_loop
 
 	add	r10,r10,#1024
 
-	ldr	r4,[r10,#0]		@ prefetch Td4
-	ldr	r5,[r10,#32]
-	ldr	r6,[r10,#64]
-	ldr	r7,[r10,#96]
-	ldr	r8,[r10,#128]
-	ldr	r9,[r10,#160]
-	ldr	r4,[r10,#192]
-	ldr	r5,[r10,#224]
+	ldr	r5,[r10,#0]		@ prefetch Td4
+	ldr	r6,[r10,#32]
+	ldr	r4,[r10,#64]
+	ldr	r5,[r10,#96]
+	ldr	r6,[r10,#128]
+	ldr	r4,[r10,#160]
+	ldr	r5,[r10,#192]
+	ldr	r6,[r10,#224]
 
-	and	r7,lr,r0,lsr#16
-	and	r8,lr,r0,lsr#8
-	and	r9,lr,r0
-	ldrb	r0,[r10,r0,lsr#24]	@ Td4[s0>>24]
+	ldrb	r0,[r10,r0]		@ Td4[s0>>24]
 	ldrb	r4,[r10,r7]		@ Td4[s0>>16]
-	ldrb	r5,[r10,r8]		@ Td4[s0>>8]
-	ldrb	r6,[r10,r9]		@ Td4[s0>>0]
-
 	and	r7,lr,r1		@ i0
+	ldrb	r5,[r10,r8]		@ Td4[s0>>8]
 	and	r8,lr,r1,lsr#16
+	ldrb	r6,[r10,r9]		@ Td4[s0>>0]
 	and	r9,lr,r1,lsr#8
+
 	ldrb	r7,[r10,r7]		@ Td4[s1>>0]
 	ldrb	r1,[r10,r1,lsr#24]	@ Td4[s1>>24]
 	ldrb	r8,[r10,r8]		@ Td4[s1>>16]
-	ldrb	r9,[r10,r9]		@ Td4[s1>>8]
 	eor	r0,r7,r0,lsl#24
+	ldrb	r9,[r10,r9]		@ Td4[s1>>8]
 	eor	r1,r4,r1,lsl#8
-	eor	r5,r5,r8,lsl#8
-	eor	r6,r6,r9,lsl#8
-
 	and	r7,lr,r2,lsr#8	@ i0
+	eor	r5,r5,r8,lsl#8
 	and	r8,lr,r2		@ i1
-	and	r9,lr,r2,lsr#16
+	eor	r6,r6,r9,lsl#8
 	ldrb	r7,[r10,r7]		@ Td4[s2>>8]
+	and	r9,lr,r2,lsr#16
+
 	ldrb	r8,[r10,r8]		@ Td4[s2>>0]
 	ldrb	r2,[r10,r2,lsr#24]	@ Td4[s2>>24]
-	ldrb	r9,[r10,r9]		@ Td4[s2>>16]
 	eor	r0,r0,r7,lsl#8
+	ldrb	r9,[r10,r9]		@ Td4[s2>>16]
 	eor	r1,r8,r1,lsl#16
-	eor	r2,r5,r2,lsl#16
-	eor	r6,r6,r9,lsl#16
-
 	and	r7,lr,r3,lsr#16	@ i0
+	eor	r2,r5,r2,lsl#16
 	and	r8,lr,r3,lsr#8	@ i1
-	and	r9,lr,r3		@ i2
+	eor	r6,r6,r9,lsl#16
 	ldrb	r7,[r10,r7]		@ Td4[s3>>16]
+	and	r9,lr,r3		@ i2
+
 	ldrb	r8,[r10,r8]		@ Td4[s3>>8]
 	ldrb	r9,[r10,r9]		@ Td4[s3>>0]
 	ldrb	r3,[r10,r3,lsr#24]	@ Td4[s3>>24]
 	eor	r0,r0,r7,lsl#16
+	ldr	r7,[r11,#0]
 	eor	r1,r1,r8,lsl#8
+	ldr	r4,[r11,#4]
 	eor	r2,r9,r2,lsl#8
+	ldr	r5,[r11,#8]
 	eor	r3,r6,r3,lsl#24
+	ldr	r6,[r11,#12]
 
-	ldr	lr,[sp],#4		@ pop lr
-	ldr	r4,[r11,#0]
-	ldr	r5,[r11,#4]
-	ldr	r6,[r11,#8]
-	ldr	r7,[r11,#12]
-	eor	r0,r0,r4
-	eor	r1,r1,r5
-	eor	r2,r2,r6
-	eor	r3,r3,r7
+	eor	r0,r0,r7
+	eor	r1,r1,r4
+	eor	r2,r2,r5
+	eor	r3,r3,r6
 
 	sub	r10,r10,#1024
-	mov	pc,lr			@ return
+	ldr	pc,[sp],#4		@ pop and return
 .size	_armv4_AES_decrypt,.-_armv4_AES_decrypt
 .asciz	"AES for ARMv4, CRYPTOGAMS by <appro@openssl.org>"
 .align	2

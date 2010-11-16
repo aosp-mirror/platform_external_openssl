@@ -17,159 +17,163 @@ sha1_block_data_order:
 	mov	r7,r7,ror#30		@ [6]
 .L_00_15:
 	ldrb	r9,[r1],#4
-	ldrb	r10,[r1,#-3]
+	ldrb	r10,[r1,#-1]
 	ldrb	r11,[r1,#-2]
-	ldrb	r12,[r1,#-1]
 	add	r7,r8,r7,ror#2			@ E+=K_00_19
-	orr	r9,r10,r9,lsl#8
+	ldrb	r12,[r1,#-3]
 	add	r7,r7,r3,ror#27			@ E+=ROR(A,27)
-	orr	r9,r11,r9,lsl#8
+	orr	r9,r10,r9,lsl#24
 	eor	r10,r5,r6			@ F_xx_xx
-	orr	r9,r12,r9,lsl#8
-	add	r7,r7,r9			@ E+=X[i]
-	str	r9,[r14,#-4]!
+	orr	r9,r9,r11,lsl#8
+	orr	r9,r9,r12,lsl#16
 	and	r10,r4,r10,ror#2
+	add	r7,r7,r9			@ E+=X[i]
 	eor	r10,r10,r6,ror#2		@ F_00_19(B,C,D)
+	str	r9,[r14,#-4]!
 	add	r7,r7,r10			@ E+=F_00_19(B,C,D)
 	ldrb	r9,[r1],#4
-	ldrb	r10,[r1,#-3]
+	ldrb	r10,[r1,#-1]
 	ldrb	r11,[r1,#-2]
-	ldrb	r12,[r1,#-1]
 	add	r6,r8,r6,ror#2			@ E+=K_00_19
-	orr	r9,r10,r9,lsl#8
+	ldrb	r12,[r1,#-3]
 	add	r6,r6,r7,ror#27			@ E+=ROR(A,27)
-	orr	r9,r11,r9,lsl#8
+	orr	r9,r10,r9,lsl#24
 	eor	r10,r4,r5			@ F_xx_xx
-	orr	r9,r12,r9,lsl#8
-	add	r6,r6,r9			@ E+=X[i]
-	str	r9,[r14,#-4]!
+	orr	r9,r9,r11,lsl#8
+	orr	r9,r9,r12,lsl#16
 	and	r10,r3,r10,ror#2
+	add	r6,r6,r9			@ E+=X[i]
 	eor	r10,r10,r5,ror#2		@ F_00_19(B,C,D)
+	str	r9,[r14,#-4]!
 	add	r6,r6,r10			@ E+=F_00_19(B,C,D)
 	ldrb	r9,[r1],#4
-	ldrb	r10,[r1,#-3]
+	ldrb	r10,[r1,#-1]
 	ldrb	r11,[r1,#-2]
-	ldrb	r12,[r1,#-1]
 	add	r5,r8,r5,ror#2			@ E+=K_00_19
-	orr	r9,r10,r9,lsl#8
+	ldrb	r12,[r1,#-3]
 	add	r5,r5,r6,ror#27			@ E+=ROR(A,27)
-	orr	r9,r11,r9,lsl#8
+	orr	r9,r10,r9,lsl#24
 	eor	r10,r3,r4			@ F_xx_xx
-	orr	r9,r12,r9,lsl#8
-	add	r5,r5,r9			@ E+=X[i]
-	str	r9,[r14,#-4]!
+	orr	r9,r9,r11,lsl#8
+	orr	r9,r9,r12,lsl#16
 	and	r10,r7,r10,ror#2
+	add	r5,r5,r9			@ E+=X[i]
 	eor	r10,r10,r4,ror#2		@ F_00_19(B,C,D)
+	str	r9,[r14,#-4]!
 	add	r5,r5,r10			@ E+=F_00_19(B,C,D)
 	ldrb	r9,[r1],#4
-	ldrb	r10,[r1,#-3]
+	ldrb	r10,[r1,#-1]
 	ldrb	r11,[r1,#-2]
-	ldrb	r12,[r1,#-1]
 	add	r4,r8,r4,ror#2			@ E+=K_00_19
-	orr	r9,r10,r9,lsl#8
+	ldrb	r12,[r1,#-3]
 	add	r4,r4,r5,ror#27			@ E+=ROR(A,27)
-	orr	r9,r11,r9,lsl#8
+	orr	r9,r10,r9,lsl#24
 	eor	r10,r7,r3			@ F_xx_xx
-	orr	r9,r12,r9,lsl#8
-	add	r4,r4,r9			@ E+=X[i]
-	str	r9,[r14,#-4]!
+	orr	r9,r9,r11,lsl#8
+	orr	r9,r9,r12,lsl#16
 	and	r10,r6,r10,ror#2
+	add	r4,r4,r9			@ E+=X[i]
 	eor	r10,r10,r3,ror#2		@ F_00_19(B,C,D)
+	str	r9,[r14,#-4]!
 	add	r4,r4,r10			@ E+=F_00_19(B,C,D)
 	ldrb	r9,[r1],#4
-	ldrb	r10,[r1,#-3]
+	ldrb	r10,[r1,#-1]
 	ldrb	r11,[r1,#-2]
-	ldrb	r12,[r1,#-1]
 	add	r3,r8,r3,ror#2			@ E+=K_00_19
-	orr	r9,r10,r9,lsl#8
+	ldrb	r12,[r1,#-3]
 	add	r3,r3,r4,ror#27			@ E+=ROR(A,27)
-	orr	r9,r11,r9,lsl#8
+	orr	r9,r10,r9,lsl#24
 	eor	r10,r6,r7			@ F_xx_xx
-	orr	r9,r12,r9,lsl#8
-	add	r3,r3,r9			@ E+=X[i]
-	str	r9,[r14,#-4]!
+	orr	r9,r9,r11,lsl#8
+	orr	r9,r9,r12,lsl#16
 	and	r10,r5,r10,ror#2
+	add	r3,r3,r9			@ E+=X[i]
 	eor	r10,r10,r7,ror#2		@ F_00_19(B,C,D)
+	str	r9,[r14,#-4]!
 	add	r3,r3,r10			@ E+=F_00_19(B,C,D)
 	teq	r14,sp
 	bne	.L_00_15		@ [((11+4)*5+2)*3]
 	ldrb	r9,[r1],#4
-	ldrb	r10,[r1,#-3]
+	ldrb	r10,[r1,#-1]
 	ldrb	r11,[r1,#-2]
-	ldrb	r12,[r1,#-1]
 	add	r7,r8,r7,ror#2			@ E+=K_00_19
-	orr	r9,r10,r9,lsl#8
+	ldrb	r12,[r1,#-3]
 	add	r7,r7,r3,ror#27			@ E+=ROR(A,27)
-	orr	r9,r11,r9,lsl#8
+	orr	r9,r10,r9,lsl#24
 	eor	r10,r5,r6			@ F_xx_xx
-	orr	r9,r12,r9,lsl#8
-	add	r7,r7,r9			@ E+=X[i]
-	str	r9,[r14,#-4]!
+	orr	r9,r9,r11,lsl#8
+	orr	r9,r9,r12,lsl#16
 	and	r10,r4,r10,ror#2
+	add	r7,r7,r9			@ E+=X[i]
 	eor	r10,r10,r6,ror#2		@ F_00_19(B,C,D)
+	str	r9,[r14,#-4]!
 	add	r7,r7,r10			@ E+=F_00_19(B,C,D)
 	ldr	r9,[r14,#15*4]
 	ldr	r10,[r14,#13*4]
 	ldr	r11,[r14,#7*4]
-	ldr	r12,[r14,#2*4]
 	add	r6,r8,r6,ror#2			@ E+=K_xx_xx
+	ldr	r12,[r14,#2*4]
 	eor	r9,r9,r10
-	eor	r9,r9,r11
-	eor	r9,r9,r12
-	add	r6,r6,r7,ror#27			@ E+=ROR(A,27)
-	eor	r10,r4,r5			@ F_xx_xx, but not in 40_59
+	eor	r11,r11,r12
+	eor	r10,r4,r5			@ F_xx_xx
 	mov	r9,r9,ror#31
+	add	r6,r6,r7,ror#27			@ E+=ROR(A,27)
+	eor	r9,r9,r11,ror#31
+	and r10,r3,r10,ror#2					@ F_xx_xx
+						@ F_xx_xx
 	add	r6,r6,r9			@ E+=X[i]
 	str	r9,[r14,#-4]!
-	and	r10,r3,r10,ror#2
 	eor	r10,r10,r5,ror#2		@ F_00_19(B,C,D)
 	add	r6,r6,r10			@ E+=F_00_19(B,C,D)
 	ldr	r9,[r14,#15*4]
 	ldr	r10,[r14,#13*4]
 	ldr	r11,[r14,#7*4]
-	ldr	r12,[r14,#2*4]
 	add	r5,r8,r5,ror#2			@ E+=K_xx_xx
+	ldr	r12,[r14,#2*4]
 	eor	r9,r9,r10
-	eor	r9,r9,r11
-	eor	r9,r9,r12
-	add	r5,r5,r6,ror#27			@ E+=ROR(A,27)
-	eor	r10,r3,r4			@ F_xx_xx, but not in 40_59
+	eor	r11,r11,r12
+	eor	r10,r3,r4			@ F_xx_xx
 	mov	r9,r9,ror#31
+	add	r5,r5,r6,ror#27			@ E+=ROR(A,27)
+	eor	r9,r9,r11,ror#31
+	and r10,r7,r10,ror#2					@ F_xx_xx
+						@ F_xx_xx
 	add	r5,r5,r9			@ E+=X[i]
 	str	r9,[r14,#-4]!
-	and	r10,r7,r10,ror#2
 	eor	r10,r10,r4,ror#2		@ F_00_19(B,C,D)
 	add	r5,r5,r10			@ E+=F_00_19(B,C,D)
 	ldr	r9,[r14,#15*4]
 	ldr	r10,[r14,#13*4]
 	ldr	r11,[r14,#7*4]
-	ldr	r12,[r14,#2*4]
 	add	r4,r8,r4,ror#2			@ E+=K_xx_xx
+	ldr	r12,[r14,#2*4]
 	eor	r9,r9,r10
-	eor	r9,r9,r11
-	eor	r9,r9,r12
-	add	r4,r4,r5,ror#27			@ E+=ROR(A,27)
-	eor	r10,r7,r3			@ F_xx_xx, but not in 40_59
+	eor	r11,r11,r12
+	eor	r10,r7,r3			@ F_xx_xx
 	mov	r9,r9,ror#31
+	add	r4,r4,r5,ror#27			@ E+=ROR(A,27)
+	eor	r9,r9,r11,ror#31
+	and r10,r6,r10,ror#2					@ F_xx_xx
+						@ F_xx_xx
 	add	r4,r4,r9			@ E+=X[i]
 	str	r9,[r14,#-4]!
-	and	r10,r6,r10,ror#2
 	eor	r10,r10,r3,ror#2		@ F_00_19(B,C,D)
 	add	r4,r4,r10			@ E+=F_00_19(B,C,D)
 	ldr	r9,[r14,#15*4]
 	ldr	r10,[r14,#13*4]
 	ldr	r11,[r14,#7*4]
-	ldr	r12,[r14,#2*4]
 	add	r3,r8,r3,ror#2			@ E+=K_xx_xx
+	ldr	r12,[r14,#2*4]
 	eor	r9,r9,r10
-	eor	r9,r9,r11
-	eor	r9,r9,r12
-	add	r3,r3,r4,ror#27			@ E+=ROR(A,27)
-	eor	r10,r6,r7			@ F_xx_xx, but not in 40_59
+	eor	r11,r11,r12
+	eor	r10,r6,r7			@ F_xx_xx
 	mov	r9,r9,ror#31
+	add	r3,r3,r4,ror#27			@ E+=ROR(A,27)
+	eor	r9,r9,r11,ror#31
+	and r10,r5,r10,ror#2					@ F_xx_xx
+						@ F_xx_xx
 	add	r3,r3,r9			@ E+=X[i]
 	str	r9,[r14,#-4]!
-	and	r10,r5,r10,ror#2
 	eor	r10,r10,r7,ror#2		@ F_00_19(B,C,D)
 	add	r3,r3,r10			@ E+=F_00_19(B,C,D)
 
@@ -180,77 +184,82 @@ sha1_block_data_order:
 	ldr	r9,[r14,#15*4]
 	ldr	r10,[r14,#13*4]
 	ldr	r11,[r14,#7*4]
-	ldr	r12,[r14,#2*4]
 	add	r7,r8,r7,ror#2			@ E+=K_xx_xx
+	ldr	r12,[r14,#2*4]
 	eor	r9,r9,r10
-	eor	r9,r9,r11
-	eor	r9,r9,r12
-	add	r7,r7,r3,ror#27			@ E+=ROR(A,27)
-	eor	r10,r5,r6			@ F_xx_xx, but not in 40_59
+	eor	r11,r11,r12
+	eor	r10,r5,r6			@ F_xx_xx
 	mov	r9,r9,ror#31
+	add	r7,r7,r3,ror#27			@ E+=ROR(A,27)
+	eor	r9,r9,r11,ror#31
+	eor r10,r4,r10,ror#2					@ F_xx_xx
+						@ F_xx_xx
 	add	r7,r7,r9			@ E+=X[i]
 	str	r9,[r14,#-4]!
-	eor	r10,r4,r10,ror#2		@ F_20_39(B,C,D)
 	add	r7,r7,r10			@ E+=F_20_39(B,C,D)
 	ldr	r9,[r14,#15*4]
 	ldr	r10,[r14,#13*4]
 	ldr	r11,[r14,#7*4]
-	ldr	r12,[r14,#2*4]
 	add	r6,r8,r6,ror#2			@ E+=K_xx_xx
+	ldr	r12,[r14,#2*4]
 	eor	r9,r9,r10
-	eor	r9,r9,r11
-	eor	r9,r9,r12
-	add	r6,r6,r7,ror#27			@ E+=ROR(A,27)
-	eor	r10,r4,r5			@ F_xx_xx, but not in 40_59
+	eor	r11,r11,r12
+	eor	r10,r4,r5			@ F_xx_xx
 	mov	r9,r9,ror#31
+	add	r6,r6,r7,ror#27			@ E+=ROR(A,27)
+	eor	r9,r9,r11,ror#31
+	eor r10,r3,r10,ror#2					@ F_xx_xx
+						@ F_xx_xx
 	add	r6,r6,r9			@ E+=X[i]
 	str	r9,[r14,#-4]!
-	eor	r10,r3,r10,ror#2		@ F_20_39(B,C,D)
 	add	r6,r6,r10			@ E+=F_20_39(B,C,D)
 	ldr	r9,[r14,#15*4]
 	ldr	r10,[r14,#13*4]
 	ldr	r11,[r14,#7*4]
-	ldr	r12,[r14,#2*4]
 	add	r5,r8,r5,ror#2			@ E+=K_xx_xx
+	ldr	r12,[r14,#2*4]
 	eor	r9,r9,r10
-	eor	r9,r9,r11
-	eor	r9,r9,r12
-	add	r5,r5,r6,ror#27			@ E+=ROR(A,27)
-	eor	r10,r3,r4			@ F_xx_xx, but not in 40_59
+	eor	r11,r11,r12
+	eor	r10,r3,r4			@ F_xx_xx
 	mov	r9,r9,ror#31
+	add	r5,r5,r6,ror#27			@ E+=ROR(A,27)
+	eor	r9,r9,r11,ror#31
+	eor r10,r7,r10,ror#2					@ F_xx_xx
+						@ F_xx_xx
 	add	r5,r5,r9			@ E+=X[i]
 	str	r9,[r14,#-4]!
-	eor	r10,r7,r10,ror#2		@ F_20_39(B,C,D)
 	add	r5,r5,r10			@ E+=F_20_39(B,C,D)
 	ldr	r9,[r14,#15*4]
 	ldr	r10,[r14,#13*4]
 	ldr	r11,[r14,#7*4]
-	ldr	r12,[r14,#2*4]
 	add	r4,r8,r4,ror#2			@ E+=K_xx_xx
+	ldr	r12,[r14,#2*4]
 	eor	r9,r9,r10
-	eor	r9,r9,r11
-	eor	r9,r9,r12
-	add	r4,r4,r5,ror#27			@ E+=ROR(A,27)
-	eor	r10,r7,r3			@ F_xx_xx, but not in 40_59
+	eor	r11,r11,r12
+	eor	r10,r7,r3			@ F_xx_xx
 	mov	r9,r9,ror#31
+	add	r4,r4,r5,ror#27			@ E+=ROR(A,27)
+	eor	r9,r9,r11,ror#31
+	eor r10,r6,r10,ror#2					@ F_xx_xx
+						@ F_xx_xx
 	add	r4,r4,r9			@ E+=X[i]
 	str	r9,[r14,#-4]!
-	eor	r10,r6,r10,ror#2		@ F_20_39(B,C,D)
 	add	r4,r4,r10			@ E+=F_20_39(B,C,D)
 	ldr	r9,[r14,#15*4]
 	ldr	r10,[r14,#13*4]
 	ldr	r11,[r14,#7*4]
-	ldr	r12,[r14,#2*4]
 	add	r3,r8,r3,ror#2			@ E+=K_xx_xx
+	ldr	r12,[r14,#2*4]
 	eor	r9,r9,r10
-	eor	r9,r9,r11
-	eor	r9,r9,r12
-	add	r3,r3,r4,ror#27			@ E+=ROR(A,27)
-	eor	r10,r6,r7			@ F_xx_xx, but not in 40_59
+	eor	r11,r11,r12
+	eor	r10,r6,r7			@ F_xx_xx
 	mov	r9,r9,ror#31
+	add	r3,r3,r4,ror#27			@ E+=ROR(A,27)
+	eor	r9,r9,r11,ror#31
+	eor r10,r5,r10,ror#2					@ F_xx_xx
+						@ F_xx_xx
 	add	r3,r3,r9			@ E+=X[i]
 	str	r9,[r14,#-4]!
-	eor	r10,r5,r10,ror#2		@ F_20_39(B,C,D)
 	add	r3,r3,r10			@ E+=F_20_39(B,C,D)
 	teq	r14,sp			@ preserve carry
 	bne	.L_20_39_or_60_79	@ [+((12+3)*5+2)*4]
@@ -262,88 +271,88 @@ sha1_block_data_order:
 	ldr	r9,[r14,#15*4]
 	ldr	r10,[r14,#13*4]
 	ldr	r11,[r14,#7*4]
-	ldr	r12,[r14,#2*4]
 	add	r7,r8,r7,ror#2			@ E+=K_xx_xx
+	ldr	r12,[r14,#2*4]
 	eor	r9,r9,r10
-	eor	r9,r9,r11
-	eor	r9,r9,r12
-	add	r7,r7,r3,ror#27			@ E+=ROR(A,27)
+	eor	r11,r11,r12
+	eor	r10,r5,r6			@ F_xx_xx
 	mov	r9,r9,ror#31
+	add	r7,r7,r3,ror#27			@ E+=ROR(A,27)
+	eor	r9,r9,r11,ror#31
+	and r10,r4,r10,ror#2					@ F_xx_xx
+	and r11,r5,r6					@ F_xx_xx
 	add	r7,r7,r9			@ E+=X[i]
 	str	r9,[r14,#-4]!
-	and	r10,r4,r5,ror#2
-	orr	r11,r4,r5,ror#2
-	and	r11,r11,r6,ror#2
-	orr	r10,r10,r11			@ F_40_59(B,C,D)
 	add	r7,r7,r10			@ E+=F_40_59(B,C,D)
+	add	r7,r7,r11,ror#2
 	ldr	r9,[r14,#15*4]
 	ldr	r10,[r14,#13*4]
 	ldr	r11,[r14,#7*4]
-	ldr	r12,[r14,#2*4]
 	add	r6,r8,r6,ror#2			@ E+=K_xx_xx
+	ldr	r12,[r14,#2*4]
 	eor	r9,r9,r10
-	eor	r9,r9,r11
-	eor	r9,r9,r12
-	add	r6,r6,r7,ror#27			@ E+=ROR(A,27)
+	eor	r11,r11,r12
+	eor	r10,r4,r5			@ F_xx_xx
 	mov	r9,r9,ror#31
+	add	r6,r6,r7,ror#27			@ E+=ROR(A,27)
+	eor	r9,r9,r11,ror#31
+	and r10,r3,r10,ror#2					@ F_xx_xx
+	and r11,r4,r5					@ F_xx_xx
 	add	r6,r6,r9			@ E+=X[i]
 	str	r9,[r14,#-4]!
-	and	r10,r3,r4,ror#2
-	orr	r11,r3,r4,ror#2
-	and	r11,r11,r5,ror#2
-	orr	r10,r10,r11			@ F_40_59(B,C,D)
 	add	r6,r6,r10			@ E+=F_40_59(B,C,D)
+	add	r6,r6,r11,ror#2
 	ldr	r9,[r14,#15*4]
 	ldr	r10,[r14,#13*4]
 	ldr	r11,[r14,#7*4]
-	ldr	r12,[r14,#2*4]
 	add	r5,r8,r5,ror#2			@ E+=K_xx_xx
+	ldr	r12,[r14,#2*4]
 	eor	r9,r9,r10
-	eor	r9,r9,r11
-	eor	r9,r9,r12
-	add	r5,r5,r6,ror#27			@ E+=ROR(A,27)
+	eor	r11,r11,r12
+	eor	r10,r3,r4			@ F_xx_xx
 	mov	r9,r9,ror#31
+	add	r5,r5,r6,ror#27			@ E+=ROR(A,27)
+	eor	r9,r9,r11,ror#31
+	and r10,r7,r10,ror#2					@ F_xx_xx
+	and r11,r3,r4					@ F_xx_xx
 	add	r5,r5,r9			@ E+=X[i]
 	str	r9,[r14,#-4]!
-	and	r10,r7,r3,ror#2
-	orr	r11,r7,r3,ror#2
-	and	r11,r11,r4,ror#2
-	orr	r10,r10,r11			@ F_40_59(B,C,D)
 	add	r5,r5,r10			@ E+=F_40_59(B,C,D)
+	add	r5,r5,r11,ror#2
 	ldr	r9,[r14,#15*4]
 	ldr	r10,[r14,#13*4]
 	ldr	r11,[r14,#7*4]
-	ldr	r12,[r14,#2*4]
 	add	r4,r8,r4,ror#2			@ E+=K_xx_xx
+	ldr	r12,[r14,#2*4]
 	eor	r9,r9,r10
-	eor	r9,r9,r11
-	eor	r9,r9,r12
-	add	r4,r4,r5,ror#27			@ E+=ROR(A,27)
+	eor	r11,r11,r12
+	eor	r10,r7,r3			@ F_xx_xx
 	mov	r9,r9,ror#31
+	add	r4,r4,r5,ror#27			@ E+=ROR(A,27)
+	eor	r9,r9,r11,ror#31
+	and r10,r6,r10,ror#2					@ F_xx_xx
+	and r11,r7,r3					@ F_xx_xx
 	add	r4,r4,r9			@ E+=X[i]
 	str	r9,[r14,#-4]!
-	and	r10,r6,r7,ror#2
-	orr	r11,r6,r7,ror#2
-	and	r11,r11,r3,ror#2
-	orr	r10,r10,r11			@ F_40_59(B,C,D)
 	add	r4,r4,r10			@ E+=F_40_59(B,C,D)
+	add	r4,r4,r11,ror#2
 	ldr	r9,[r14,#15*4]
 	ldr	r10,[r14,#13*4]
 	ldr	r11,[r14,#7*4]
-	ldr	r12,[r14,#2*4]
 	add	r3,r8,r3,ror#2			@ E+=K_xx_xx
+	ldr	r12,[r14,#2*4]
 	eor	r9,r9,r10
-	eor	r9,r9,r11
-	eor	r9,r9,r12
-	add	r3,r3,r4,ror#27			@ E+=ROR(A,27)
+	eor	r11,r11,r12
+	eor	r10,r6,r7			@ F_xx_xx
 	mov	r9,r9,ror#31
+	add	r3,r3,r4,ror#27			@ E+=ROR(A,27)
+	eor	r9,r9,r11,ror#31
+	and r10,r5,r10,ror#2					@ F_xx_xx
+	and r11,r6,r7					@ F_xx_xx
 	add	r3,r3,r9			@ E+=X[i]
 	str	r9,[r14,#-4]!
-	and	r10,r5,r6,ror#2
-	orr	r11,r5,r6,ror#2
-	and	r11,r11,r7,ror#2
-	orr	r10,r10,r11			@ F_40_59(B,C,D)
 	add	r3,r3,r10			@ E+=F_40_59(B,C,D)
+	add	r3,r3,r11,ror#2
 	teq	r14,sp
 	bne	.L_40_59		@ [+((12+5)*5+2)*4]
 

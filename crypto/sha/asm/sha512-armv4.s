@@ -119,33 +119,31 @@ sha512_block_data_order:
 	eor	r9,r9,r7,lsl#23
 	eor	r10,r10,r8,lsl#23	@ Sigma1(e)
 	adds	r3,r3,r9
-	adc	r4,r4,r10		@ T += Sigma1(e)
-	adds	r3,r3,r11
-	adc	r4,r4,r12		@ T += h
-
 	ldr	r9,[sp,#40+0]	@ f.lo
+	adc	r4,r4,r10		@ T += Sigma1(e)
 	ldr	r10,[sp,#40+4]	@ f.hi
+	adds	r3,r3,r11
 	ldr	r11,[sp,#48+0]	@ g.lo
+	adc	r4,r4,r12		@ T += h
 	ldr	r12,[sp,#48+4]	@ g.hi
+
+	eor	r9,r9,r11
 	str	r7,[sp,#32+0]
-	str	r8,[sp,#32+4]
-	str	r5,[sp,#0+0]
-	str	r6,[sp,#0+4]
-
-	eor	r9,r9,r11
 	eor	r10,r10,r12
+	str	r8,[sp,#32+4]
 	and	r9,r9,r7
+	str	r5,[sp,#0+0]
 	and	r10,r10,r8
+	str	r6,[sp,#0+4]
 	eor	r9,r9,r11
-	eor	r10,r10,r12		@ Ch(e,f,g)
-
 	ldr	r11,[r14,#4]		@ K[i].lo
+	eor	r10,r10,r12		@ Ch(e,f,g)
 	ldr	r12,[r14,#0]		@ K[i].hi
-	ldr	r7,[sp,#24+0]	@ d.lo
-	ldr	r8,[sp,#24+4]	@ d.hi
 
 	adds	r3,r3,r9
+	ldr	r7,[sp,#24+0]	@ d.lo
 	adc	r4,r4,r10		@ T += Ch(e,f,g)
+	ldr	r8,[sp,#24+4]	@ d.hi
 	adds	r3,r3,r11
 	adc	r4,r4,r12		@ T += K[i]
 	adds	r7,r7,r3
@@ -261,33 +259,31 @@ sha512_block_data_order:
 	eor	r9,r9,r7,lsl#23
 	eor	r10,r10,r8,lsl#23	@ Sigma1(e)
 	adds	r3,r3,r9
-	adc	r4,r4,r10		@ T += Sigma1(e)
-	adds	r3,r3,r11
-	adc	r4,r4,r12		@ T += h
-
 	ldr	r9,[sp,#40+0]	@ f.lo
+	adc	r4,r4,r10		@ T += Sigma1(e)
 	ldr	r10,[sp,#40+4]	@ f.hi
+	adds	r3,r3,r11
 	ldr	r11,[sp,#48+0]	@ g.lo
+	adc	r4,r4,r12		@ T += h
 	ldr	r12,[sp,#48+4]	@ g.hi
+
+	eor	r9,r9,r11
 	str	r7,[sp,#32+0]
-	str	r8,[sp,#32+4]
-	str	r5,[sp,#0+0]
-	str	r6,[sp,#0+4]
-
-	eor	r9,r9,r11
 	eor	r10,r10,r12
+	str	r8,[sp,#32+4]
 	and	r9,r9,r7
+	str	r5,[sp,#0+0]
 	and	r10,r10,r8
+	str	r6,[sp,#0+4]
 	eor	r9,r9,r11
-	eor	r10,r10,r12		@ Ch(e,f,g)
-
 	ldr	r11,[r14,#4]		@ K[i].lo
+	eor	r10,r10,r12		@ Ch(e,f,g)
 	ldr	r12,[r14,#0]		@ K[i].hi
-	ldr	r7,[sp,#24+0]	@ d.lo
-	ldr	r8,[sp,#24+4]	@ d.hi
 
 	adds	r3,r3,r9
+	ldr	r7,[sp,#24+0]	@ d.lo
 	adc	r4,r4,r10		@ T += Ch(e,f,g)
+	ldr	r8,[sp,#24+4]	@ d.hi
 	adds	r3,r3,r11
 	adc	r4,r4,r12		@ T += K[i]
 	adds	r7,r7,r3
