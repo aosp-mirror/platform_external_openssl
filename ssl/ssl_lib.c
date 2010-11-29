@@ -2602,6 +2602,8 @@ const char *SSL_SESSION_get_version(const SSL_SESSION *s)
 
 const char* SSL_authentication_method(const SSL* ssl)
 	{
+	if (ssl->cert != NULL && ssl->cert->rsa_tmp != NULL)
+		return SSL_TXT_RSA "_" SSL_TXT_EXPORT;
 	switch (ssl->version)
 		{
 	case SSL2_VERSION:
