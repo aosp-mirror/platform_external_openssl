@@ -26,4 +26,6 @@ jsse.patch
 
 Support for JSSE implementation based on OpenSSL.
 
+npn.patch
 
+Transport Layer Security (TLS) Next Protocol Negotiation Extension
