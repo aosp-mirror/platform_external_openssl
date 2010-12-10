@@ -27,3 +27,11 @@ jsse.patch
 Support for JSSE implementation based on OpenSSL.
 
 
+secadv_20101116-2.patch
+
+OpenSSL Security Advisory [16 November 2010]
+TLS extension parsing race condition. (UPDATED)
+CVE-2010-3864
+http://www.openssl.org/news/secadv_20101116-2.txt
+
+
