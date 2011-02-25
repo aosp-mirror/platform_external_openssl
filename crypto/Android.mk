@@ -482,9 +482,14 @@ local_c_includes := \
 local_c_flags := -DNO_WINDOWS_BRAINDEATH
 
 #######################################
-
-# target
+# target static library
 include $(CLEAR_VARS)
+
+ifneq ($(TARGET_ARCH),x86)
+LOCAL_NDK_VERSION := 4
+LOCAL_SDK_VERSION := 8
+endif
+
 include $(LOCAL_PATH)/../android-config.mk
 LOCAL_SRC_FILES += $(local_src_files)
 LOCAL_CFLAGS += $(local_c_flags)
@@ -499,7 +504,38 @@ endif
 ifeq ($(TARGET_SIMULATOR),true)
 	# Make valgrind happy.
 	LOCAL_CFLAGS += -DPURIFY
-    LOCAL_LDLIBS += -ldl
+	LOCAL_LDLIBS += -ldl
+else
+	LOCAL_SHARED_LIBRARIES += libdl
+endif
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE:= libcrypto_static
+include $(BUILD_STATIC_LIBRARY)
+
+#######################################
+# target shared library
+include $(CLEAR_VARS)
+
+ifneq ($(TARGET_ARCH),x86)
+LOCAL_NDK_VERSION := 4
+LOCAL_SDK_VERSION := 8
+endif
+
+include $(LOCAL_PATH)/../android-config.mk
+LOCAL_SRC_FILES += $(local_src_files)
+LOCAL_CFLAGS += $(local_c_flags)
+LOCAL_C_INCLUDES += $(local_c_includes)
+LOCAL_SHARED_LIBRARIES += libz
+ifeq ($(TARGET_ARCH),arm)
+	LOCAL_SRC_FILES += $(arm_src_files)
+	LOCAL_CFLAGS += $(arm_cflags)
+else
+	LOCAL_SRC_FILES += $(non_arm_src_files)
+endif
+ifeq ($(TARGET_SIMULATOR),true)
+	# Make valgrind happy.
+	LOCAL_CFLAGS += -DPURIFY
+	LOCAL_LDLIBS += -ldl
 else
 	LOCAL_SHARED_LIBRARIES += libdl
 endif
