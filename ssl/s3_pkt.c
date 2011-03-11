@@ -359,7 +359,7 @@ fprintf(stderr, "Record type=%d, Length=%d\n", rr->type, rr->length);
 		/* If we receive a valid record larger than the current buffer size,
 		 * allocate some memory for it.
 		 */
-		if (rr->length > s->s3->rbuf.len - SSL3_RT_HEADER_LENGTH)
+		if (rr->length > s->s3->rbuf.len - SSL3_RT_HEADER_LENGTH - align)
 			{
 			if ((p=OPENSSL_realloc(s->s3->rbuf.buf, rr->length + SSL3_RT_HEADER_LENGTH + align))==NULL)
 				{
