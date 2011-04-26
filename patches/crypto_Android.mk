@@ -7,7 +7,8 @@ arm_src_files := \
     sha/asm/sha1-armv4-large.s \
     sha/asm/sha256-armv4.s \
     sha/asm/sha512-armv4.s
-non_arm_src_files := aes/aes_core.c
+non_arm_src_files := aes/aes_core.c \
+      bn/bn_asm.c
 
 local_src_files := \
 	cryptlib.c \
