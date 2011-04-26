@@ -1,13 +1,39 @@
 LOCAL_PATH:= $(call my-dir)
 
-arm_cflags := -DOPENSSL_BN_ASM_MONT -DAES_ASM -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM
-arm_src_files := \
+ifeq ($(TARGET_ARCH),arm)
+  target_cflags := -DOPENSSL_BN_ASM_MONT -DAES_ASM -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM
+  target_src_files := \
     aes/asm/aes-armv4.s \
+    bn/bn_asm.c \
     bn/asm/armv4-mont.s \
     sha/asm/sha1-armv4-large.s \
     sha/asm/sha256-armv4.s \
     sha/asm/sha512-armv4.s
-non_arm_src_files := aes/aes_core.c
+else
+  ifeq ($(TARGET_ARCH),mips)
+    ifneq (($TARGET_HAS_BIGENDIAN),true)
+     target_cflags := -DSHA1_ASM -DSHA256_ASM
+     target_src_files := \
+       0.9.9-dev/bn/bn-mips.s \
+       aes/aes_core.c \
+       0.9.9-dev/sha/sha1-mips.s \
+       0.9.9-dev/sha/sha256-mips.s
+    else
+      target_cflags :=
+      target_src_files := \
+        aes/aes_core.c \
+        bn/bn_asm.c
+    endif
+  else
+    target_cflags :=
+    target_src_files := \
+      aes/aes_core.c \
+      bn/bn_asm.c
+  endif
+endif
+
+non_arm_src_files := aes/aes_core.c \
+      bn/bn_asm.c
 
 local_src_files := \
 	cryptlib.c \
@@ -131,7 +157,6 @@ local_src_files := \
 	bio/bss_null.c \
 	bio/bss_sock.c \
 	bn/bn_add.c \
-	bn/bn_asm.c \
 	bn/bn_blind.c \
 	bn/bn_const.c \
 	bn/bn_ctx.c \
@@ -519,12 +544,8 @@ endif
 LOCAL_SRC_FILES += $(local_src_files)
 LOCAL_CFLAGS += $(local_c_flags)
 LOCAL_C_INCLUDES += $(local_c_includes)
-ifeq ($(TARGET_ARCH),arm)
-	LOCAL_SRC_FILES += $(arm_src_files)
-	LOCAL_CFLAGS += $(arm_cflags)
-else
-	LOCAL_SRC_FILES += $(non_arm_src_files)
-endif
+LOCAL_SRC_FILES += $(target_src_files)
+LOCAL_CFLAGS += $(target_cflags)
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE:= libcrypto
 include $(BUILD_SHARED_LIBRARY)
