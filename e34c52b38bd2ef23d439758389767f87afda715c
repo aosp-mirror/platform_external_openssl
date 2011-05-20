@@ -1,0 +1,8 @@
+Change-Id: Ie34c52b38bd2ef23d439758389767f87afda715c
+Code-Review+2: Jean-Baptiste Queru <jbq@google.com>
+Verified+1: Jean-Baptiste Queru <jbq@google.com>
+Submitted-by: Jean-Baptiste Queru <jbq@google.com>
+Submitted-at: Fri, 21 Aug 2009 16:31:49 -0700
+Reviewed-on: https://review.source.android.com/11292
+Project: platform/external/openssl
+Branch: refs/heads/master

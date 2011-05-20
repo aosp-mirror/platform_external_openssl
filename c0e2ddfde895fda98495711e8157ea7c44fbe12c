@@ -1,0 +1,10 @@
+Change-Id: Ic0e2ddfde895fda98495711e8157ea7c44fbe12c
+Code-Review+2: Dan Bornstein <danfuzz@android.com>
+Code-Review+1: Jean-Baptiste Queru <jbq@google.com>
+Verified+1: Jean-Baptiste Queru <jbq@google.com>
+Code-Review+2: rich cannings <richc@google.com>
+Submitted-by: Jean-Baptiste Queru <jbq@google.com>
+Submitted-at: Fri, 21 Aug 2009 15:33:20 -0700
+Reviewed-on: https://review.source.android.com/11204
+Project: platform/external/openssl
+Branch: refs/heads/master
