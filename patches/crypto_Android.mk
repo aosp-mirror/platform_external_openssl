@@ -501,13 +501,7 @@ ifeq ($(TARGET_ARCH),arm)
 else
 	LOCAL_SRC_FILES += $(non_arm_src_files)
 endif
-ifeq ($(TARGET_SIMULATOR),true)
-	# Make valgrind happy.
-	LOCAL_CFLAGS += -DPURIFY
-	LOCAL_LDLIBS += -ldl
-else
-	LOCAL_SHARED_LIBRARIES += libdl
-endif
+LOCAL_SHARED_LIBRARIES += libdl
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE:= libcrypto_static
 include $(BUILD_STATIC_LIBRARY)
@@ -532,13 +526,7 @@ ifeq ($(TARGET_ARCH),arm)
 else
 	LOCAL_SRC_FILES += $(non_arm_src_files)
 endif
-ifeq ($(TARGET_SIMULATOR),true)
-	# Make valgrind happy.
-	LOCAL_CFLAGS += -DPURIFY
-	LOCAL_LDLIBS += -ldl
-else
-	LOCAL_SHARED_LIBRARIES += libdl
-endif
+LOCAL_SHARED_LIBRARIES += libdl
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE:= libcrypto
 include $(BUILD_SHARED_LIBRARY)
