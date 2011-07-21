@@ -484,24 +484,22 @@ local_c_flags := -DNO_WINDOWS_BRAINDEATH
 #######################################
 # target static library
 include $(CLEAR_VARS)
+include $(LOCAL_PATH)/../android-config.mk
 
 ifneq ($(TARGET_ARCH),x86)
-LOCAL_NDK_VERSION := 4
-LOCAL_SDK_VERSION := 8
+LOCAL_NDK_VERSION := 5
+LOCAL_SDK_VERSION := 9
 endif
 
-include $(LOCAL_PATH)/../android-config.mk
 LOCAL_SRC_FILES += $(local_src_files)
 LOCAL_CFLAGS += $(local_c_flags)
 LOCAL_C_INCLUDES += $(local_c_includes)
-LOCAL_SHARED_LIBRARIES += libz
 ifeq ($(TARGET_ARCH),arm)
 	LOCAL_SRC_FILES += $(arm_src_files)
 	LOCAL_CFLAGS += $(arm_cflags)
 else
 	LOCAL_SRC_FILES += $(non_arm_src_files)
 endif
-LOCAL_SHARED_LIBRARIES += libdl
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE:= libcrypto_static
 include $(BUILD_STATIC_LIBRARY)
@@ -509,24 +507,26 @@ include $(BUILD_STATIC_LIBRARY)
 #######################################
 # target shared library
 include $(CLEAR_VARS)
+include $(LOCAL_PATH)/../android-config.mk
 
 ifneq ($(TARGET_ARCH),x86)
-LOCAL_NDK_VERSION := 4
-LOCAL_SDK_VERSION := 8
+LOCAL_NDK_VERSION := 5
+LOCAL_SDK_VERSION := 9
+# Use the NDK prebuilt libz and libdl.
+LOCAL_LDFLAGS += -lz -ldl
+else
+LOCAL_SHARED_LIBRARIES += libz libdl
 endif
 
-include $(LOCAL_PATH)/../android-config.mk
 LOCAL_SRC_FILES += $(local_src_files)
 LOCAL_CFLAGS += $(local_c_flags)
 LOCAL_C_INCLUDES += $(local_c_includes)
-LOCAL_SHARED_LIBRARIES += libz
 ifeq ($(TARGET_ARCH),arm)
 	LOCAL_SRC_FILES += $(arm_src_files)
 	LOCAL_CFLAGS += $(arm_cflags)
 else
 	LOCAL_SRC_FILES += $(non_arm_src_files)
 endif
-LOCAL_SHARED_LIBRARIES += libdl
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE:= libcrypto
 include $(BUILD_SHARED_LIBRARY)
