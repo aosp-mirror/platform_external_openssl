@@ -222,8 +222,6 @@ local_src_files := \
 	dso/dso_lib.c \
 	dso/dso_null.c \
 	dso/dso_openssl.c \
-	dso/dso_vms.c \
-	dso/dso_win32.c \
 	ec/ec2_mult.c \
 	ec/ec2_smpl.c \
 	ec/ec_ameth.c \

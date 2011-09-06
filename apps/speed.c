@@ -2705,6 +2705,7 @@ static int do_multi(int multi)
 				else
 					rsa_results[k][1]=d;
 				}
+#ifndef OPENSSL_NO_DSA
 			else if(!strncmp(buf,"+F3:",4))
 				{
 				int k;
@@ -2726,6 +2727,7 @@ static int do_multi(int multi)
 				else
 					dsa_results[k][1]=d;
 				}
+#endif
 #ifndef OPENSSL_NO_ECDSA
 			else if(!strncmp(buf,"+F4:",4))
 				{
