@@ -93,6 +93,7 @@ sha1_block_data_order:
 	add	r3,r3,r10			@ E+=F_00_19(B,C,D)
 	teq	r14,sp
 	bne	.L_00_15		@ [((11+4)*5+2)*3]
+	sub	sp,sp,#5*4
 	ldrb	r9,[r1],#4
 	ldrb	r10,[r1,#-1]
 	ldrb	r11,[r1,#-2]
@@ -178,7 +179,7 @@ sha1_block_data_order:
 	add	r3,r3,r10			@ E+=F_00_19(B,C,D)
 
 	ldr	r8,.LK_20_39		@ [+15+16*4]
-	sub	sp,sp,#25*4
+	sub	sp,sp,#20*4
 	cmn	sp,#0			@ [+3], clear carry to denote 20_39
 .L_20_39_or_60_79:
 	ldr	r9,[r14,#15*4]
