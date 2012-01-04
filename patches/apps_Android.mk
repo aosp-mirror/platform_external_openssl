@@ -62,10 +62,6 @@ local_c_includes := \
 
 local_cflags := -DMONOLITH
 
-# These flags omit whole features from the commandline "openssl".
-# However, portions of these features are actually turned on.
-local_cflags += -DOPENSSL_NO_DTLS1
-
 include $(CLEAR_VARS)
 LOCAL_MODULE:= openssl
 LOCAL_MODULE_TAGS := optional

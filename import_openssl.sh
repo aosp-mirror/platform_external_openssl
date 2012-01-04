@@ -241,7 +241,7 @@ function applypatches () {
   done
 
   # Cleanup patch output
-  find . -type f -name "*.orig" -print0 | xargs -0 rm -f
+  find . \( -type f -o -type l \) -name "*.orig" -print0 | xargs -0 rm -f
 
   cd ..
 }
