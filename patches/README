@@ -33,7 +33,3 @@ Transport Layer Security (TLS) Next Protocol Negotiation Extension
 sha1_armv4_large.patch
 
 This patch eliminates memory stores to addresses below SP.
-
-openssl_no_dtls1.patch
-
-Add missing #ifndef OPENSSL_NO_DTLS1
