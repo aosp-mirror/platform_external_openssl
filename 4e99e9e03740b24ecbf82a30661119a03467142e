@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAACe3///+A\u003d",
+        "filename": "android-config.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1003224
+      },
+      "writtenOn": "2012-01-31T22:04:35Z",
+      "side": 1,
+      "message": "does digit\u0027s ARCH_HAVE_BIGENDIAN comment apply here?",
+      "revId": "4e99e9e03740b24ecbf82a30661119a03467142e",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
