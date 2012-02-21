@@ -37,3 +37,7 @@ This patch sets the padding for SSLv3 block ciphers to zero.
 sha1_armv4_large.patch
 
 This patch eliminates memory stores to addresses below SP.
+
+mips_asm.patch
+
+MIPS assembly routines (AES, BN, SHA1, SHA256)
