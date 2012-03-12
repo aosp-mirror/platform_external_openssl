@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAADyH///+w\u003d",
+        "filename": "crypto/Android.mk",
+        "patchSetId": 2
+      },
+      "lineNbr": 487,
+      "author": {
+        "id": 1003723
+      },
+      "writtenOn": "2012-03-12T02:55:09Z",
+      "side": 1,
+      "message": "Ying, is this change okay with you?",
+      "revId": "8e951ffac5e65cb0696b5c13196a9dbad78a8ca3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAADyH///+s\u003d",
+        "filename": "openssl.config",
+        "patchSetId": 2
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1003723
+      },
+      "writtenOn": "2012-03-12T02:55:09Z",
+      "side": 1,
+      "message": "./import_openssl.sh import ~/openssl-1.0.0g.tar.gz fails because the file is mips_asm.patch, not mips-asm.patch",
+      "revId": "8e951ffac5e65cb0696b5c13196a9dbad78a8ca3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
