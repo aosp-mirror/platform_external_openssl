@@ -49,7 +49,7 @@ local_src_files:= \
 include $(CLEAR_VARS)
 include $(LOCAL_PATH)/../android-config.mk
 
-ifneq ($(TARGET_ARCH),x86)
+ifeq ($(TARGET_ARCH),arm)
 LOCAL_NDK_VERSION := 5
 LOCAL_SDK_VERSION := 9
 endif
@@ -64,7 +64,7 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 include $(LOCAL_PATH)/../android-config.mk
 
-ifneq ($(TARGET_ARCH),x86)
+ifeq ($(TARGET_ARCH),arm)
 LOCAL_NDK_VERSION := 5
 LOCAL_SDK_VERSION := 9
 endif
