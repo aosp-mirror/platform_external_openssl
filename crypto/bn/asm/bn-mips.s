@@ -394,14 +394,14 @@ bn_add_words_internal:
 	sltu	$2,$14,$10
 	sw	$14,-2*4($4)
 	addu	$2,$24
-
+	
 	addu	$11,$15
 	sltu	$25,$11,$15
 	addu	$15,$11,$2
 	sltu	$2,$15,$11
 	sw	$15,-4($4)
 	addu	$2,$25
-
+	
 	.set	noreorder
 	bgtzl	$1,.L_bn_add_words_loop
 	lw	$12,0($5)
@@ -567,7 +567,7 @@ bn_div_3_words:
 				# so that we can save two arguments
 				# and return address in registers
 				# instead of stack:-)
-
+				
 	lw	$4,($7)
 	move	$10,$5
 	bne	$4,$6,bn_div_3_words_internal

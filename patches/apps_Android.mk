@@ -48,6 +48,7 @@ local_src_files:= \
 	smime.c \
 	speed.c \
 	spkac.c \
+	srp.c \
 	verify.c \
 	version.c \
 	x509.c

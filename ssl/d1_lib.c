@@ -82,6 +82,7 @@ SSL3_ENC_METHOD DTLSv1_enc_data={
 	TLS_MD_CLIENT_FINISH_CONST,TLS_MD_CLIENT_FINISH_CONST_SIZE,
 	TLS_MD_SERVER_FINISH_CONST,TLS_MD_SERVER_FINISH_CONST_SIZE,
 	tls1_alert_code,
+	tls1_export_keying_material,
 	};
 
 long dtls1_default_timeout(void)
@@ -291,6 +292,15 @@ const SSL_CIPHER *dtls1_get_cipher(unsigned int u)
 
 void dtls1_start_timer(SSL *s)
 	{
+#ifndef OPENSSL_NO_SCTP
+	/* Disable timer for SCTP */
+	if (BIO_dgram_is_sctp(SSL_get_wbio(s)))
+		{
+		memset(&(s->d1->next_timeout), 0, sizeof(struct timeval));
+		return;
+		}
+#endif
+
 	/* If timer is not set, initialize duration with 1 second */
 	if (s->d1->next_timeout.tv_sec == 0 && s->d1->next_timeout.tv_usec == 0)
 		{
@@ -402,7 +412,7 @@ int dtls1_check_timeout_num(SSL *s)
 	if (s->d1->timeout.num_alerts > DTLS1_TMO_ALERT_COUNT)
 		{
 		/* fail the connection, enough alerts have been sent */
-		SSLerr(SSL_F_DTLS1_CHECK_TIMEOUT_NUM,SSL_R_READ_TIMEOUT_EXPIRED);
+		SSLerr(SSL_F_DTLS1_HANDLE_TIMEOUT,SSL_R_READ_TIMEOUT_EXPIRED);
 		return -1;
 		}
 
@@ -427,6 +437,14 @@ int dtls1_handle_timeout(SSL *s)
 		{
 		s->d1->timeout.read_timeouts = 1;
 		}
+
+#ifndef OPENSSL_NO_HEARTBEATS
+	if (s->tlsext_hb_pending)
+		{
+		s->tlsext_hb_pending = 0;
+		return dtls1_heartbeat(s);
+		}
+#endif
 
 	dtls1_start_timer(s);
 	return dtls1_retransmit_buffered_messages(s);

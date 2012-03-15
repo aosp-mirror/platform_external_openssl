@@ -169,7 +169,11 @@ local_src_files := \
 	bn/bn_sqrt.c \
 	bn/bn_word.c \
 	buffer/buf_err.c \
+	buffer/buf_str.c \
 	buffer/buffer.c \
+	cmac/cm_ameth.c \
+	cmac/cm_pmeth.c \
+	cmac/cmac.c \
 	comp/c_rle.c \
 	comp/c_zlib.c \
 	comp/comp_err.c \
@@ -235,6 +239,7 @@ local_src_files := \
 	dso/dso_null.c \
 	dso/dso_openssl.c \
 	ec/ec2_mult.c \
+	ec/ec2_oct.c \
 	ec/ec2_smpl.c \
 	ec/ec_ameth.c \
 	ec/ec_asn1.c \
@@ -245,11 +250,13 @@ local_src_files := \
 	ec/ec_key.c \
 	ec/ec_lib.c \
 	ec/ec_mult.c \
+	ec/ec_oct.c \
 	ec/ec_pmeth.c \
 	ec/ec_print.c \
 	ec/eck_prn.c \
 	ec/ecp_mont.c \
 	ec/ecp_nist.c \
+	ec/ecp_oct.c \
 	ec/ecp_smpl.c \
 	ecdh/ech_err.c \
 	ecdh/ech_key.c \
@@ -295,6 +302,7 @@ local_src_files := \
 	evp/c_alld.c \
 	evp/digest.c \
 	evp/e_aes.c \
+	evp/e_aes_cbc_hmac_sha1.c \
 	evp/e_bf.c \
 	evp/e_des.c \
 	evp/e_des3.c \
@@ -302,6 +310,7 @@ local_src_files := \
 	evp/e_old.c \
 	evp/e_rc2.c \
 	evp/e_rc4.c \
+	evp/e_rc4_hmac_md5.c \
 	evp/e_rc5.c \
 	evp/e_xcbc_d.c \
 	evp/encode.c \
@@ -347,9 +356,13 @@ local_src_files := \
 	md5/md5_dgst.c \
 	md5/md5_one.c \
 	modes/cbc128.c \
+	modes/ccm128.c \
 	modes/cfb128.c \
 	modes/ctr128.c \
+	modes/gcm128.c \
 	modes/ofb128.c \
+	modes/xts128.c \
+	o_init.c \
 	objects/o_names.c \
 	objects/obj_dat.c \
 	objects/obj_err.c \
@@ -398,6 +411,7 @@ local_src_files := \
 	pkcs7/pk7_mime.c \
 	pkcs7/pk7_smime.c \
 	pkcs7/pkcs7err.c \
+	pqueue/pqueue.c \
 	rand/md_rand.c \
 	rand/rand_egd.c \
 	rand/rand_err.c \
@@ -411,11 +425,13 @@ local_src_files := \
 	rc2/rc2ofb64.c \
 	rc4/rc4_enc.c \
 	rc4/rc4_skey.c \
+	rc4/rc4_utl.c \
 	ripemd/rmd_dgst.c \
 	ripemd/rmd_one.c \
 	rsa/rsa_ameth.c \
 	rsa/rsa_asn1.c \
 	rsa/rsa_chk.c \
+	rsa/rsa_crpt.c \
 	rsa/rsa_eay.c \
 	rsa/rsa_err.c \
 	rsa/rsa_gen.c \
@@ -436,6 +452,8 @@ local_src_files := \
 	sha/sha256.c \
 	sha/sha512.c \
 	sha/sha_dgst.c \
+	srp/srp_lib.c \
+	srp/srp_vfy.c \
 	stack/stack.c \
 	ts/ts_err.c \
 	txt_db/txt_db.c \
@@ -507,11 +525,14 @@ local_c_includes := \
 	external/openssl \
 	external/openssl/crypto/asn1 \
 	external/openssl/crypto/evp \
+	external/openssl/crypto/modes \
 	external/openssl/include \
 	external/openssl/include/openssl \
 	external/zlib
 
 local_c_flags := -DNO_WINDOWS_BRAINDEATH
+
+local_as_flags := -x assembler-with-cpp
 
 #######################################
 # target static library
@@ -525,6 +546,7 @@ endif
 
 LOCAL_SRC_FILES += $(local_src_files)
 LOCAL_CFLAGS += $(local_c_flags)
+LOCAL_ASFLAGS += $(local_as_flags)
 LOCAL_C_INCLUDES += $(local_c_includes)
 ifeq ($(TARGET_ARCH),arm)
 	LOCAL_SRC_FILES += $(arm_src_files)
@@ -561,6 +583,7 @@ endif
 
 LOCAL_SRC_FILES += $(local_src_files)
 LOCAL_CFLAGS += $(local_c_flags)
+LOCAL_ASFLAGS += $(local_as_flags)
 LOCAL_C_INCLUDES += $(local_c_includes)
 ifeq ($(TARGET_ARCH),arm)
 	LOCAL_SRC_FILES += $(arm_src_files)
@@ -587,6 +610,7 @@ include $(CLEAR_VARS)
 include $(LOCAL_PATH)/../android-config.mk
 LOCAL_SRC_FILES += $(local_src_files)
 LOCAL_CFLAGS += $(local_c_flags) -DPURIFY
+LOCAL_ASFLAGS += $(local_as_flags)
 LOCAL_C_INCLUDES += $(local_c_includes)
 LOCAL_SRC_FILES += $(other_arch_src_files)
 LOCAL_STATIC_LIBRARIES += libz
@@ -602,6 +626,7 @@ include $(CLEAR_VARS)
 include $(LOCAL_PATH)/../android-config.mk
 LOCAL_SRC_FILES += $(local_src_files)
 LOCAL_CFLAGS += $(local_c_flags) -DPURIFY
+LOCAL_ASFLAGS += $(local_as_flags)
 LOCAL_C_INCLUDES += $(local_c_includes)
 LOCAL_SRC_FILES += $(other_arch_src_files)
 LOCAL_STATIC_LIBRARIES += libz
