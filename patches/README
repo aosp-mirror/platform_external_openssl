@@ -33,3 +33,8 @@ Transport Layer Security (TLS) Next Protocol Negotiation Extension
 sha1_armv4_large.patch
 
 This patch eliminates memory stores to addresses below SP.
+
+openssl_cn_22286.patch
+
+use client version when deciding whether to send supported signature algorithms extension
+http://cvs.openssl.org/chngview?cn=22286
