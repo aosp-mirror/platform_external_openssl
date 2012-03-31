@@ -1,12 +1,14 @@
 LOCAL_PATH:= $(call my-dir)
 
-arm_cflags := -DOPENSSL_BN_ASM_MONT -DAES_ASM -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM
+arm_cflags := -DOPENSSL_BN_ASM_GF2m -DOPENSSL_BN_ASM_MONT -DGHASH_ASM -DAES_ASM -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM
 mips_cflags := -DOPENSSL_BN_ASM_MONT -DAES_ASM -DSHA1_ASM -DSHA256_ASM
 
 arm_src_files := \
     aes/asm/aes-armv4.s \
+    bn/asm/armv4-gf2m.s \
     bn/asm/armv4-mont.s \
     bn/bn_asm.c \
+    modes/asm/ghash-armv4.s \
     sha/asm/sha1-armv4-large.s \
     sha/asm/sha256-armv4.s \
     sha/asm/sha512-armv4.s

@@ -136,7 +136,9 @@ function import() {
 
   # Generate arm asm
   perl crypto/aes/asm/aes-armv4.pl         > crypto/aes/asm/aes-armv4.s
+  perl crypto/bn/asm/armv4-gf2m.pl         > crypto/bn/asm/armv4-gf2m.s
   perl crypto/bn/asm/armv4-mont.pl         > crypto/bn/asm/armv4-mont.s
+  perl crypto/modes/asm/ghash-armv4.pl     > crypto/modes/asm/ghash-armv4.s
   perl crypto/sha/asm/sha1-armv4-large.pl  > crypto/sha/asm/sha1-armv4-large.s
   perl crypto/sha/asm/sha256-armv4.pl      > crypto/sha/asm/sha256-armv4.s
   perl crypto/sha/asm/sha512-armv4.pl      > crypto/sha/asm/sha512-armv4.s
