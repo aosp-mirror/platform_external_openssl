@@ -38,3 +38,7 @@ openssl_cn_22286.patch
 
 use client version when deciding whether to send supported signature algorithms extension
 http://cvs.openssl.org/chngview?cn=22286
+
+asn1_overflow.patch
+
+Fix integer overflow in ASN.1 parsing functions.
