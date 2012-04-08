@@ -129,11 +129,6 @@ function import() {
     fi
   done
 
-  # Copy Makefiles
-  cp ../patches/apps_Android.mk apps/Android.mk
-  cp ../patches/crypto_Android.mk crypto/Android.mk
-  cp ../patches/ssl_Android.mk ssl/Android.mk
-
   # Generate arm asm
   perl crypto/aes/asm/aes-armv4.pl         > crypto/aes/asm/aes-armv4.s
   perl crypto/bn/asm/armv4-gf2m.pl         > crypto/bn/asm/armv4-gf2m.s
