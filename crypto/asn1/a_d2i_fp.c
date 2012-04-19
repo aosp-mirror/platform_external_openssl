@@ -164,7 +164,7 @@ static int asn1_d2i_read_bio(BIO *in, BUF_MEM **pb)
 			{
 			want-=(len-off);
 
-			if (len+want < len || !BUF_MEM_grow_clean(b,len+want))
+			if (len + want < len || !BUF_MEM_grow_clean(b,len+want))
 				{
 				ASN1err(ASN1_F_ASN1_D2I_READ_BIO,ERR_R_MALLOC_FAILURE);
 				goto err;
@@ -232,11 +232,11 @@ static int asn1_d2i_read_bio(BIO *in, BUF_MEM **pb)
 				{
 				want-=(len-off);
 				if (want > INT_MAX /* BIO_read takes an int length */ ||
-				    len+want < len)
-					{
-					ASN1err(ASN1_F_ASN1_D2I_READ_BIO,ASN1_R_TOO_LONG);
-					goto err;
-					}
+					len+want < len)
+						{
+						ASN1err(ASN1_F_ASN1_D2I_READ_BIO,ASN1_R_TOO_LONG);
+						goto err;
+						}
 				if (!BUF_MEM_grow_clean(b,len+want))
 					{
 					ASN1err(ASN1_F_ASN1_D2I_READ_BIO,ERR_R_MALLOC_FAILURE);
@@ -277,6 +277,7 @@ static int asn1_d2i_read_bio(BIO *in, BUF_MEM **pb)
 		ASN1err(ASN1_F_ASN1_D2I_READ_BIO,ASN1_R_TOO_LONG);
 		goto err;
 		}
+
 	*pb = b;
 	return off;
 err:

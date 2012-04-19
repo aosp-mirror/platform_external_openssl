@@ -34,11 +34,8 @@ sha1_armv4_large.patch
 
 This patch eliminates memory stores to addresses below SP.
 
-openssl_cn_22286.patch
+cn_22455.patch
 
-use client version when deciding whether to send supported signature algorithms extension
-http://cvs.openssl.org/chngview?cn=22286
-
-asn1_overflow.patch
-
-Fix integer overflow in ASN.1 parsing functions.
+fix for non-x86 build issue in crypto/e_rc4_hmac_md5.c
+e_rc4_hmac_md5.c: last commit was inappropriate for non-x86[_64] platforms [from HEAD]. PR: 2792
+http://cvs.openssl.org/chngview?cn=22455

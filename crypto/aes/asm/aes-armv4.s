@@ -355,6 +355,7 @@ _armv4_AES_encrypt:
 .type   private_AES_set_encrypt_key,%function
 .align	5
 private_AES_set_encrypt_key:
+_armv4_AES_set_encrypt_key:
 	sub	r3,pc,#8		@ AES_set_encrypt_key
 	teq	r0,#0
 	moveq	r0,#-1
@@ -372,7 +373,7 @@ private_AES_set_encrypt_key:
 	bne	.Labrt
 
 .Lok:	stmdb   sp!,{r4-r12,lr}
-	sub	r10,r3,#private_AES_set_encrypt_key-AES_Te-1024	@ Te4
+	sub	r10,r3,#_armv4_AES_set_encrypt_key-AES_Te-1024	@ Te4
 
 	mov	r12,r0		@ inp
 	mov	lr,r1			@ bits
@@ -632,7 +633,7 @@ private_AES_set_encrypt_key:
 .align	5
 private_AES_set_decrypt_key:
 	str	lr,[sp,#-4]!            @ push lr
-	bl	private_AES_set_encrypt_key
+	bl	_armv4_AES_set_encrypt_key
 	teq	r0,#0
 	ldrne	lr,[sp],#4              @ pop lr
 	bne	.Labrt
