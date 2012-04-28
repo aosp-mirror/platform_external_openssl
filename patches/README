@@ -33,9 +33,3 @@ Transport Layer Security (TLS) Next Protocol Negotiation Extension
 sha1_armv4_large.patch
 
 This patch eliminates memory stores to addresses below SP.
-
-cn_22455.patch
-
-fix for non-x86 build issue in crypto/e_rc4_hmac_md5.c
-e_rc4_hmac_md5.c: last commit was inappropriate for non-x86[_64] platforms [from HEAD]. PR: 2792
-http://cvs.openssl.org/chngview?cn=22455
