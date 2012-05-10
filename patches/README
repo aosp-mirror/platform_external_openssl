@@ -26,10 +26,6 @@ jsse.patch
 
 Support for JSSE implementation based on OpenSSL.
 
-npn.patch
-
-Transport Layer Security (TLS) Next Protocol Negotiation Extension
-
 sha1_armv4_large.patch
 
 This patch eliminates memory stores to addresses below SP.
