@@ -535,10 +535,14 @@ local_c_flags := -DNO_WINDOWS_BRAINDEATH
 
 local_as_flags := -x assembler-with-cpp
 
+local_c_includes += $(log_c_includes)
+
 #######################################
 # target static library
 include $(CLEAR_VARS)
 include $(LOCAL_PATH)/android-config.mk
+
+LOCAL_SHARED_LIBRARIES := $(log_shared_libraries)
 
 ifeq ($(TARGET_ARCH),arm)
 LOCAL_NDK_VERSION := 5
@@ -572,6 +576,8 @@ include $(BUILD_STATIC_LIBRARY)
 # target shared library
 include $(CLEAR_VARS)
 include $(LOCAL_PATH)/android-config.mk
+
+LOCAL_SHARED_LIBRARIES := $(log_shared_libraries)
 
 ifeq ($(TARGET_ARCH),arm)
 LOCAL_NDK_VERSION := 5
@@ -609,6 +615,7 @@ include $(BUILD_SHARED_LIBRARY)
 # host shared library
 include $(CLEAR_VARS)
 include $(LOCAL_PATH)/android-config.mk
+LOCAL_SHARED_LIBRARIES := $(log_shared_libraries)
 LOCAL_SRC_FILES += $(local_src_files)
 LOCAL_CFLAGS += $(local_c_flags) -DPURIFY
 LOCAL_ASFLAGS += $(local_as_flags)
@@ -625,6 +632,7 @@ include $(BUILD_HOST_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 include $(LOCAL_PATH)/android-config.mk
+LOCAL_SHARED_LIBRARIES := $(log_shared_libraries)
 LOCAL_SRC_FILES += $(local_src_files)
 LOCAL_CFLAGS += $(local_c_flags) -DPURIFY
 LOCAL_ASFLAGS += $(local_as_flags)
