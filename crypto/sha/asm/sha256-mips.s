@@ -15,6 +15,7 @@ sha256_block_data_order:
 	.frame	$29,128,$31
 	.mask	3237937152,-4
 	.set	noreorder
+	.cpload	$25
 	sub $29,128
 	sw	$31,128-1*4($29)
 	sw	$30,128-2*4($29)
@@ -27,8 +28,6 @@ sha256_block_data_order:
 	sw	$17,128-9*4($29)
 	sw	$16,128-10*4($29)
 	sll $23,$6,6
-	.cplocal	$6
-	.cpsetup	$25,$0,sha256_block_data_order
 	.set	reorder
 	la	$6,K256		# PIC-ified 'load address'
 
