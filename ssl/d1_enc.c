@@ -115,16 +115,12 @@
 
 #include <stdio.h>
 #include "ssl_locl.h"
-#ifndef OPENSSL_NO_COMP
 #include <openssl/comp.h>
-#endif
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
 #include <openssl/md5.h>
 #include <openssl/rand.h>
-#ifdef KSSL_DEBUG
-#include <openssl/des.h>
-#endif
+
 
 int dtls1_enc(SSL *s, int send)
 	{
@@ -136,12 +132,8 @@ int dtls1_enc(SSL *s, int send)
 
 	if (send)
 		{
-		if (EVP_MD_CTX_md(s->write_hash))
-			{
-			n=EVP_MD_CTX_size(s->write_hash);
-			if (n < 0)
-				return -1;
-			}
+		if (s->write_hash != NULL)
+			n=EVP_MD_size(s->write_hash);
 		ds=s->enc_write_ctx;
 		rec= &(s->s3->wrec);
 		if (s->enc_write_ctx == NULL)
@@ -155,19 +147,15 @@ int dtls1_enc(SSL *s, int send)
 					__FILE__, __LINE__);
 			else if ( EVP_CIPHER_block_size(ds->cipher) > 1)
 				{
-				if (RAND_bytes(rec->input, EVP_CIPHER_block_size(ds->cipher)) <= 0)
+				if (!RAND_bytes(rec->input, EVP_CIPHER_block_size(ds->cipher)))
 					return -1;
 				}
 			}
 		}
 	else
 		{
-		if (EVP_MD_CTX_md(s->read_hash))
-			{
-			n=EVP_MD_CTX_size(s->read_hash);
-			if (n < 0)
-				return -1;
-			}
+		if (s->read_hash != NULL)
+			n=EVP_MD_size(s->read_hash);
 		ds=s->enc_read_ctx;
 		rec= &(s->s3->rrec);
 		if (s->enc_read_ctx == NULL)
@@ -231,7 +219,11 @@ int dtls1_enc(SSL *s, int send)
 		if (!send)
 			{
 			if (l == 0 || l%bs != 0)
-				return -1;
+				{
+				SSLerr(SSL_F_DTLS1_ENC,SSL_R_BLOCK_CIPHER_PAD_IS_WRONG);
+				ssl3_send_alert(s,SSL3_AL_FATAL,SSL_AD_DECRYPTION_FAILED);
+				return 0;
+				}
 			}
 		
 		EVP_Cipher(ds,rec->data,rec->input,l);
@@ -260,7 +252,7 @@ int dtls1_enc(SSL *s, int send)
 				}
 			/* TLS 1.0 does not bound the number of padding bytes by the block size.
 			 * All of them must have value 'padding_length'. */
-			if (i + bs > (int)rec->length)
+			if (i > (int)rec->length)
 				{
 				/* Incorrect padding. SSLerr() and ssl3_alert are done
 				 * by caller: we don't want to reveal whether this is

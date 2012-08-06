@@ -1,7 +1,6 @@
 #!/usr/local/bin/perl
 
-$0 =~ m/(.*[\/\\])[^\/\\]+$/; $dir=$1;
-push(@INC,"${dir}","${dir}../../perlasm");
+push(@INC,"perlasm","../../perlasm");
 require "x86asm.pl";
 require "cbc.pl";
 

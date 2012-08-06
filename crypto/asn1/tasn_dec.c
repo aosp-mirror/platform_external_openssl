@@ -1,5 +1,5 @@
 /* tasn_dec.c */
-/* Written by Dr Stephen N Henson (steve@openssl.org) for the OpenSSL
+/* Written by Dr Stephen N Henson (shenson@bigfoot.com) for the OpenSSL
  * project 2000.
  */
 /* ====================================================================
@@ -69,7 +69,7 @@ static int asn1_check_eoc(const unsigned char **in, long len);
 static int asn1_find_end(const unsigned char **in, long len, char inf);
 
 static int asn1_collect(BUF_MEM *buf, const unsigned char **in, long len,
-			char inf, int tag, int aclass, int depth);
+				char inf, int tag, int aclass);
 
 static int collect_data(BUF_MEM *buf, const unsigned char **p, long plen);
 
@@ -114,8 +114,6 @@ unsigned long ASN1_tag2bit(int tag)
 /* Macro to initialize and invalidate the cache */
 
 #define asn1_tlc_clear(c)	if (c) (c)->valid = 0
-/* Version to avoid compiler warning about 'c' always non-NULL */
-#define asn1_tlc_clear_nc(c)	(c)->valid = 0
 
 /* Decode an ASN1 item, this currently behaves just 
  * like a standard 'd2i' function. 'in' points to 
@@ -132,7 +130,7 @@ ASN1_VALUE *ASN1_item_d2i(ASN1_VALUE **pval,
 	ASN1_VALUE *ptmpval = NULL;
 	if (!pval)
 		pval = &ptmpval;
-	asn1_tlc_clear_nc(&c);
+	c.valid = 0;
 	if (ASN1_item_ex_d2i(pval, in, len, it, -1, 0, 0, &c) > 0) 
 		return *pval;
 	return NULL;
@@ -142,7 +140,7 @@ int ASN1_template_d2i(ASN1_VALUE **pval,
 		const unsigned char **in, long len, const ASN1_TEMPLATE *tt)
 	{
 	ASN1_TLC c;
-	asn1_tlc_clear_nc(&c);
+	c.valid = 0;
 	return asn1_template_ex_d2i(pval, in, len, tt, 0, &c);
 	}
 
@@ -168,7 +166,7 @@ int ASN1_item_ex_d2i(ASN1_VALUE **pval, const unsigned char **in, long len,
 	int i;
 	int otag;
 	int ret = 0;
-	ASN1_VALUE **pchptr, *ptmpval;
+	ASN1_VALUE *pchval, **pchptr, *ptmpval;
 	if (!pval)
 		return 0;
 	if (aux && aux->asn1_cb)
@@ -308,7 +306,7 @@ int ASN1_item_ex_d2i(ASN1_VALUE **pval, const unsigned char **in, long len,
 
 
 		case ASN1_ITYPE_CHOICE:
-		if (asn1_cb && !asn1_cb(ASN1_OP_D2I_PRE, pval, it, NULL))
+		if (asn1_cb && !asn1_cb(ASN1_OP_D2I_PRE, pval, it))
 				goto auxerr;
 
 		/* Allocate structure */
@@ -319,6 +317,7 @@ int ASN1_item_ex_d2i(ASN1_VALUE **pval, const unsigned char **in, long len,
 			goto err;
 			}
 		/* CHOICE type, try each possibility in turn */
+		pchval = NULL;
 		p = *in;
 		for (i = 0, tt=it->templates; i < it->tcount; i++, tt++)
 			{
@@ -357,7 +356,7 @@ int ASN1_item_ex_d2i(ASN1_VALUE **pval, const unsigned char **in, long len,
 
 		asn1_set_choice_selector(pval, i, it);
 		*in = p;
-		if (asn1_cb && !asn1_cb(ASN1_OP_D2I_POST, pval, it, NULL))
+		if (asn1_cb && !asn1_cb(ASN1_OP_D2I_POST, pval, it))
 				goto auxerr;
 		return 1;
 
@@ -404,7 +403,7 @@ int ASN1_item_ex_d2i(ASN1_VALUE **pval, const unsigned char **in, long len,
 			goto err;
 			}
 
-		if (asn1_cb && !asn1_cb(ASN1_OP_D2I_PRE, pval, it, NULL))
+		if (asn1_cb && !asn1_cb(ASN1_OP_D2I_PRE, pval, it))
 				goto auxerr;
 
 		/* Get each field entry */
@@ -506,7 +505,7 @@ int ASN1_item_ex_d2i(ASN1_VALUE **pval, const unsigned char **in, long len,
 		if (!asn1_enc_save(pval, *in, p - *in, it))
 			goto auxerr;
 		*in = p;
-		if (asn1_cb && !asn1_cb(ASN1_OP_D2I_POST, pval, it, NULL))
+		if (asn1_cb && !asn1_cb(ASN1_OP_D2I_POST, pval, it))
 				goto auxerr;
 		return 1;
 
@@ -612,6 +611,7 @@ static int asn1_template_ex_d2i(ASN1_VALUE **val,
 
 	err:
 	ASN1_template_free(val, tt);
+	*val = NULL;
 	return 0;
 	}
 
@@ -666,12 +666,11 @@ static int asn1_template_noexp_d2i(ASN1_VALUE **val,
 		else
 			{
 			/* We've got a valid STACK: free up any items present */
-			STACK_OF(ASN1_VALUE) *sktmp
-			    = (STACK_OF(ASN1_VALUE) *)*val;
+			STACK *sktmp = (STACK *)*val;
 			ASN1_VALUE *vtmp;
-			while(sk_ASN1_VALUE_num(sktmp) > 0)
+			while(sk_num(sktmp) > 0)
 				{
-				vtmp = sk_ASN1_VALUE_pop(sktmp);
+				vtmp = (ASN1_VALUE *)sk_pop(sktmp);
 				ASN1_item_ex_free(&vtmp,
 						ASN1_ITEM_ptr(tt->item));
 				}
@@ -712,8 +711,7 @@ static int asn1_template_noexp_d2i(ASN1_VALUE **val,
 				goto err;
 				}
 			len -= p - q;
-			if (!sk_ASN1_VALUE_push((STACK_OF(ASN1_VALUE) *)*val,
-						skfield))
+			if (!sk_push((STACK *)*val, (char *)skfield))
 				{
 				ASN1err(ASN1_F_ASN1_TEMPLATE_NOEXP_D2I,
 						ERR_R_MALLOC_FAILURE);
@@ -760,6 +758,7 @@ static int asn1_template_noexp_d2i(ASN1_VALUE **val,
 
 	err:
 	ASN1_template_free(val, tt);
+	*val = NULL;
 	return 0;
 	}
 
@@ -879,7 +878,7 @@ static int asn1_d2i_ex_primitive(ASN1_VALUE **pval,
 		 * internally irrespective of the type. So instead just check
 		 * for UNIVERSAL class and ignore the tag.
 		 */
-		if (!asn1_collect(&buf, &p, plen, inf, -1, V_ASN1_UNIVERSAL, 0))
+		if (!asn1_collect(&buf, &p, plen, inf, -1, V_ASN1_UNIVERSAL))
 			{
 			free_cont = 1;
 			goto err;
@@ -1013,18 +1012,6 @@ int asn1_ex_c2i(ASN1_VALUE **pval, const unsigned char *cont, int len,
 		case V_ASN1_SET:
 		case V_ASN1_SEQUENCE:
 		default:
-		if (utype == V_ASN1_BMPSTRING && (len & 1))
-			{
-			ASN1err(ASN1_F_ASN1_EX_C2I,
-					ASN1_R_BMPSTRING_IS_WRONG_LENGTH);
-			goto err;
-			}
-		if (utype == V_ASN1_UNIVERSALSTRING && (len & 3))
-			{
-			ASN1err(ASN1_F_ASN1_EX_C2I,
-					ASN1_R_UNIVERSALSTRING_IS_WRONG_LENGTH);
-			goto err;
-			}
 		/* All based on ASN1_STRING and handled the same */
 		if (!*pval)
 			{
@@ -1141,18 +1128,8 @@ static int asn1_find_end(const unsigned char **in, long len, char inf)
  * if it is indefinite length.
  */
 
-#ifndef ASN1_MAX_STRING_NEST
-/* This determines how many levels of recursion are permitted in ASN1
- * string types. If it is not limited stack overflows can occur. If set
- * to zero no recursion is allowed at all. Although zero should be adequate
- * examples exist that require a value of 1. So 5 should be more than enough.
- */
-#define ASN1_MAX_STRING_NEST 5
-#endif
-
-
 static int asn1_collect(BUF_MEM *buf, const unsigned char **in, long len,
-			char inf, int tag, int aclass, int depth)
+				char inf, int tag, int aclass)
 	{
 	const unsigned char *p, *q;
 	long plen;
@@ -1194,15 +1171,13 @@ static int asn1_collect(BUF_MEM *buf, const unsigned char **in, long len,
 		/* If indefinite length constructed update max length */
 		if (cst)
 			{
-			if (depth >= ASN1_MAX_STRING_NEST)
-				{
-				ASN1err(ASN1_F_ASN1_COLLECT,
-					ASN1_R_NESTED_ASN1_STRING);
+#ifdef OPENSSL_ALLOW_NESTED_ASN1_STRINGS
+			if (!asn1_collect(buf, &p, plen, ininf, tag, aclass))
 				return 0;
-				}
-			if (!asn1_collect(buf, &p, plen, ininf, tag, aclass,
-						depth + 1))
-				return 0;
+#else
+			ASN1err(ASN1_F_ASN1_COLLECT, ASN1_R_NESTED_ASN1_STRING);
+			return 0;
+#endif
 			}
 		else if (plen && !collect_data(buf, &p, plen))
 			return 0;

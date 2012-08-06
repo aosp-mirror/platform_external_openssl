@@ -94,18 +94,16 @@ BIO *BIO_new_mem_buf(void *buf, int len)
 {
 	BIO *ret;
 	BUF_MEM *b;
-	size_t sz;
-
 	if (!buf) {
 		BIOerr(BIO_F_BIO_NEW_MEM_BUF,BIO_R_NULL_PARAMETER);
 		return NULL;
 	}
-	sz = (len<0) ? strlen(buf) : (size_t)len;
+	if(len == -1) len = strlen(buf);
 	if(!(ret = BIO_new(BIO_s_mem())) ) return NULL;
 	b = (BUF_MEM *)ret->ptr;
 	b->data = buf;
-	b->length = sz;
-	b->max = sz;
+	b->length = len;
+	b->max = len;
 	ret->flags |= BIO_FLAGS_MEM_RDONLY;
 	/* Since this is static data retrying wont help */
 	ret->num = 0;
@@ -146,16 +144,22 @@ static int mem_read(BIO *b, char *out, int outl)
 	{
 	int ret= -1;
 	BUF_MEM *bm;
+	int i;
+	char *from,*to;
 
 	bm=(BUF_MEM *)b->ptr;
 	BIO_clear_retry_flags(b);
-	ret=(outl >=0 && (size_t)outl > bm->length)?(int)bm->length:outl;
+	ret=(outl > bm->length)?bm->length:outl;
 	if ((out != NULL) && (ret > 0)) {
 		memcpy(out,bm->data,ret);
 		bm->length-=ret;
+		/* memmove(&(bm->data[0]),&(bm->data[ret]), bm->length); */
 		if(b->flags & BIO_FLAGS_MEM_RDONLY) bm->data += ret;
 		else {
-			memmove(&(bm->data[0]),&(bm->data[ret]),bm->length);
+			from=(char *)&(bm->data[ret]);
+			to=(char *)&(bm->data[0]);
+			for (i=0; i<bm->length; i++)
+				to[i]=from[i];
 		}
 	} else if (bm->length == 0)
 		{
@@ -280,7 +284,6 @@ static int mem_gets(BIO *bp, char *buf, int size)
 
 	BIO_clear_retry_flags(bp);
 	j=bm->length;
-	if ((size-1) < j) j=size-1;
 	if (j <= 0)
 		{
 		*buf='\0';
@@ -289,18 +292,17 @@ static int mem_gets(BIO *bp, char *buf, int size)
 	p=bm->data;
 	for (i=0; i<j; i++)
 		{
-		if (p[i] == '\n')
-			{
-			i++;
-			break;
-			}
+		if (p[i] == '\n') break;
 		}
-
-	/*
-	 * i is now the max num of bytes to copy, either j or up to
-	 * and including the first newline
-	 */ 
-
+	if (i == j)
+		{
+		BIO_set_retry_read(bp);
+		/* return(-1);  change the semantics 0.6.6a */ 
+		}
+	else
+		i++;
+	/* i is the max to copy */
+	if ((size-1) < i) i=size-1;
 	i=mem_read(bp,buf,i);
 	if (i > 0) buf[i]='\0';
 	ret=i;

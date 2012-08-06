@@ -68,14 +68,15 @@ int ssl2_enc_init(SSL *s, int client)
 	const EVP_MD *md;
 	int num;
 
-	if (!ssl_cipher_get_evp(s->session,&c,&md,NULL,NULL,NULL))
+	if (!ssl_cipher_get_evp(s->session,&c,&md,NULL))
 		{
 		ssl2_return_error(s,SSL2_PE_NO_CIPHER);
 		SSLerr(SSL_F_SSL2_ENC_INIT,SSL_R_PROBLEMS_MAPPING_CIPHER_FUNCTIONS);
 		return(0);
 		}
-	ssl_replace_hash(&s->read_hash,md);
-	ssl_replace_hash(&s->write_hash,md);
+
+	s->read_hash=md;
+	s->write_hash=md;
 
 	if ((s->enc_read_ctx == NULL) &&
 		((s->enc_read_ctx=(EVP_CIPHER_CTX *)
@@ -175,7 +176,7 @@ void ssl2_mac(SSL *s, unsigned char *md, int send)
 
 	/* There has to be a MAC algorithm. */
 	EVP_MD_CTX_init(&c);
-	EVP_MD_CTX_copy(&c, s->read_hash);
+	EVP_DigestInit_ex(&c, s->read_hash, NULL);
 	EVP_DigestUpdate(&c,sec,
 		EVP_CIPHER_CTX_key_length(s->enc_read_ctx));
 	EVP_DigestUpdate(&c,act,len); 

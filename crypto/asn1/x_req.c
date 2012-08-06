@@ -79,8 +79,7 @@
  *
  */
 
-static int rinf_cb(int operation, ASN1_VALUE **pval, const ASN1_ITEM *it,
-							void *exarg)
+static int rinf_cb(int operation, ASN1_VALUE **pval, const ASN1_ITEM *it)
 {
 	X509_REQ_INFO *rinf = (X509_REQ_INFO *)*pval;
 

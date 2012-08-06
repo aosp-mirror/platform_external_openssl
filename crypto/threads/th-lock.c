@@ -60,10 +60,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#ifdef LINUX
-#include <typedefs.h>
-#endif
-#ifdef OPENSSL_SYS_WIN32
+#if WIN32
 #include <windows.h>
 #endif
 #ifdef SOLARIS
@@ -119,12 +116,12 @@ void CRYPTO_thread_setup(void)
 		lock_cs[i]=CreateMutex(NULL,FALSE,NULL);
 		}
 
-	CRYPTO_set_locking_callback((void (*)(int,int,char *,int))win32_locking_callback);
+	CRYPTO_set_locking_callback((void (*)(int,int,const char *,int))win32_locking_callback);
 	/* id callback defined */
-	return(1);
+	//return(1);
 	}
 
-static void CRYPTO_thread_cleanup(void)
+void CRYPTO_thread_cleanup(void)
 	{
 	int i;
 
@@ -336,7 +333,7 @@ void CRYPTO_thread_setup(void)
 	CRYPTO_set_locking_callback((void (*)())pthreads_locking_callback);
 	}
 
-void thread_cleanup(void)
+void CRYPTO_thread_cleanup(void)
 	{
 	int i;
 

@@ -70,8 +70,9 @@ static int asn1_print_info(BIO *bp, int tag, int xclass, int constructed,
 	     int indent)
 	{
 	static const char fmt[]="%-18s";
+	static const char fmt2[]="%2d %-15s";
 	char str[128];
-	const char *p;
+	const char *p,*p2=NULL;
 
 	if (constructed & V_ASN1_CONSTRUCTED)
 		p="cons: ";
@@ -92,8 +93,14 @@ static int asn1_print_info(BIO *bp, int tag, int xclass, int constructed,
 	else
 		p = ASN1_tag2str(tag);
 
-	if (BIO_printf(bp,fmt,p) <= 0)
-		goto err;
+	if (p2 != NULL)
+		{
+		if (BIO_printf(bp,fmt2,tag,p2) <= 0) goto err;
+		}
+	else
+		{
+		if (BIO_printf(bp,fmt,p) <= 0) goto err;
+		}
 	return(1);
 err:
 	return(0);
@@ -206,8 +213,6 @@ static int asn1_parse2(BIO *bp, const unsigned char **pp, long length, int offse
 				(tag == V_ASN1_T61STRING) ||
 				(tag == V_ASN1_IA5STRING) ||
 				(tag == V_ASN1_VISIBLESTRING) ||
-				(tag == V_ASN1_NUMERICSTRING) ||
-				(tag == V_ASN1_UTF8STRING) ||
 				(tag == V_ASN1_UTCTIME) ||
 				(tag == V_ASN1_GENERALIZEDTIME))
 				{
@@ -239,7 +244,7 @@ static int asn1_parse2(BIO *bp, const unsigned char **pp, long length, int offse
 				ii=d2i_ASN1_BOOLEAN(NULL,&opp,len+hl);
 				if (ii < 0)
 					{
-					if (BIO_write(bp,"Bad boolean\n",12) <= 0)
+					if (BIO_write(bp,"Bad boolean\n",12))
 						goto end;
 					}
 				BIO_printf(bp,":%d",ii);
@@ -417,7 +422,7 @@ end:
 
 const char *ASN1_tag2str(int tag)
 {
-	static const char * const tag2str[] = {
+	static const char *tag2str[] = {
 	 "EOC", "BOOLEAN", "INTEGER", "BIT STRING", "OCTET STRING", /* 0-4 */
 	 "NULL", "OBJECT", "OBJECT DESCRIPTOR", "EXTERNAL", "REAL", /* 5-9 */
 	 "ENUMERATED", "<ASN1 11>", "UTF8STRING", "<ASN1 13>", 	    /* 10-13 */

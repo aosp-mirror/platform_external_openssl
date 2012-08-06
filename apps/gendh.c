@@ -89,6 +89,9 @@ int MAIN(int, char **);
 int MAIN(int argc, char **argv)
 	{
 	BN_GENCB cb;
+#ifndef OPENSSL_NO_ENGINE
+	ENGINE *e = NULL;
+#endif
 	DH *dh=NULL;
 	int ret=1,num=DEFBITS;
 	int g=2;
@@ -160,7 +163,7 @@ bad:
 		}
 		
 #ifndef OPENSSL_NO_ENGINE
-        setup_engine(bio_err, engine, 0);
+        e = setup_engine(bio_err, engine, 0);
 #endif
 
 	out=BIO_new(BIO_s_file());
@@ -232,10 +235,4 @@ static int MS_CALLBACK dh_cb(int p, int n, BN_GENCB *cb)
 #endif
 	return 1;
 	}
-#else /* !OPENSSL_NO_DH */
-
-# if PEDANTIC
-static void *dummy=&dummy;
-# endif
-
 #endif

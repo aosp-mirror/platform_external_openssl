@@ -90,7 +90,6 @@ UI *UI_new_method(const UI_METHOD *method)
 
 	ret->strings=NULL;
 	ret->user_data=NULL;
-	ret->flags=0;
 	CRYPTO_new_ex_data(CRYPTO_EX_INDEX_UI, ret, &ret->ex_data);
 	return ret;
 	}
@@ -693,17 +692,6 @@ int UI_method_set_closer(UI_METHOD *method, int (*closer)(UI *ui))
 		return -1;
 	}
 
-int UI_method_set_prompt_constructor(UI_METHOD *method, char *(*prompt_constructor)(UI* ui, const char* object_desc, const char* object_name))
-	{
-	if (method)
-		{
-		method->ui_construct_prompt = prompt_constructor;
-		return 0;
-		}
-	else
-		return -1;
-	}
-
 int (*UI_method_get_opener(UI_METHOD *method))(UI*)
 	{
 	if (method)
@@ -740,14 +728,6 @@ int (*UI_method_get_closer(UI_METHOD *method))(UI*)
 	{
 	if (method)
 		return method->ui_close_session;
-	else
-		return NULL;
-	}
-
-char* (*UI_method_get_prompt_constructor(UI_METHOD *method))(UI*, const char*, const char*)
-	{
-	if (method)
-		return method->ui_construct_prompt;
 	else
 		return NULL;
 	}

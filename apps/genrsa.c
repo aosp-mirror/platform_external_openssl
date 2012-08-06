@@ -105,9 +105,9 @@ int MAIN(int argc, char **argv)
 	char *inrand=NULL;
 	BIO *out=NULL;
 	BIGNUM *bn = BN_new();
-	RSA *rsa = NULL;
+	RSA *rsa = RSA_new();
 
-	if(!bn) goto err;
+	if(!bn || !rsa) goto err;
 
 	apps_startup();
 	BN_GENCB_set(&cb, genrsa_cb, bio_err);
@@ -265,13 +265,6 @@ bad:
 
 	BIO_printf(bio_err,"Generating RSA private key, %d bit long modulus\n",
 		num);
-#ifdef OPENSSL_NO_ENGINE
-	rsa = RSA_new();
-#else
-	rsa = RSA_new_method(e);
-#endif
-	if (!rsa)
-		goto err;
 
 	if(!BN_set_word(bn, f4) || !RSA_generate_key_ex(rsa, num, bn, &cb))
 		goto err;

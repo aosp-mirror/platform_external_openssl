@@ -1,5 +1,5 @@
 /* x509_vpm.c */
-/* Written by Dr Stephen N Henson (steve@openssl.org) for the OpenSSL
+/* Written by Dr Stephen N Henson (shenson@bigfoot.com) for the OpenSSL
  * project 2004.
  */
 /* ====================================================================
@@ -74,8 +74,7 @@ static void x509_verify_param_zero(X509_VERIFY_PARAM *param)
 	param->name = NULL;
 	param->purpose = 0;
 	param->trust = 0;
-	/*param->inh_flags = X509_VP_FLAG_DEFAULT;*/
-	param->inh_flags = 0;
+	param->inh_flags = X509_VP_FLAG_DEFAULT;
 	param->flags = 0;
 	param->depth = -1;
 	if (param->policies)
@@ -199,12 +198,8 @@ int X509_VERIFY_PARAM_inherit(X509_VERIFY_PARAM *dest,
 int X509_VERIFY_PARAM_set1(X509_VERIFY_PARAM *to,
 						const X509_VERIFY_PARAM *from)
 	{
-	unsigned long save_flags = to->inh_flags;
-	int ret;
 	to->inh_flags |= X509_VP_FLAG_DEFAULT;
-	ret = X509_VERIFY_PARAM_inherit(to, from);
-	to->inh_flags = save_flags;
-	return ret;
+	return X509_VERIFY_PARAM_inherit(to, from);
 	}
 
 int X509_VERIFY_PARAM_set1_name(X509_VERIFY_PARAM *param, const char *name)
@@ -325,21 +320,11 @@ static const X509_VERIFY_PARAM default_table[] = {
 	0,		/* flags */
 	0,		/* purpose */
 	0,		/* trust */
-	100,		/* depth */
+	9,		/* depth */
 	NULL		/* policies */
 	},
 	{
-	"pkcs7",			/* S/MIME sign parameters */
-	0,				/* Check time */
-	0,				/* internal flags */
-	0,				/* flags */
-	X509_PURPOSE_SMIME_SIGN,	/* purpose */
-	X509_TRUST_EMAIL,		/* trust */
-	-1,				/* depth */
-	NULL				/* policies */
-	},
-	{
-	"smime_sign",			/* S/MIME sign parameters */
+	"pkcs7",			/* SSL/TLS client parameters */
 	0,				/* Check time */
 	0,				/* internal flags */
 	0,				/* flags */
@@ -371,16 +356,11 @@ static const X509_VERIFY_PARAM default_table[] = {
 
 static STACK_OF(X509_VERIFY_PARAM) *param_table = NULL;
 
-static int table_cmp(const X509_VERIFY_PARAM *a, const X509_VERIFY_PARAM *b)
-
+static int table_cmp(const void *pa, const void *pb)
 	{
+	const X509_VERIFY_PARAM *a = pa, *b = pb;
 	return strcmp(a->name, b->name);
 	}
-
-DECLARE_OBJ_BSEARCH_CMP_FN(X509_VERIFY_PARAM, X509_VERIFY_PARAM,
-			   table);
-IMPLEMENT_OBJ_BSEARCH_CMP_FN(X509_VERIFY_PARAM, X509_VERIFY_PARAM,
-			     table);
 
 static int param_cmp(const X509_VERIFY_PARAM * const *a,
 			const X509_VERIFY_PARAM * const *b)
@@ -417,7 +397,6 @@ const X509_VERIFY_PARAM *X509_VERIFY_PARAM_lookup(const char *name)
 	{
 	int idx;
 	X509_VERIFY_PARAM pm;
-
 	pm.name = (char *)name;
 	if (param_table)
 		{
@@ -425,8 +404,11 @@ const X509_VERIFY_PARAM *X509_VERIFY_PARAM_lookup(const char *name)
 		if (idx != -1)
 			return sk_X509_VERIFY_PARAM_value(param_table, idx);
 		}
-	return OBJ_bsearch_table(&pm, default_table,
-			   sizeof(default_table)/sizeof(X509_VERIFY_PARAM));
+	return (const X509_VERIFY_PARAM *) OBJ_bsearch((char *)&pm,
+				(char *)&default_table,
+				sizeof(default_table)/sizeof(X509_VERIFY_PARAM),
+				sizeof(X509_VERIFY_PARAM),
+				table_cmp);
 	}
 
 void X509_VERIFY_PARAM_table_cleanup(void)

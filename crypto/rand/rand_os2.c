@@ -78,10 +78,8 @@ typedef struct _CPUUTIL {
     ULONG ulIntrHigh;           /* High 32 bits of interrupt time */
 } CPUUTIL;
 
-#ifndef __KLIBC__
 APIRET APIENTRY(*DosPerfSysCall) (ULONG ulCommand, ULONG ulParm1, ULONG ulParm2, ULONG ulParm3) = NULL;
 APIRET APIENTRY(*DosQuerySysState) (ULONG func, ULONG arg1, ULONG pid, ULONG _res_, PVOID buf, ULONG bufsz) = NULL;
-#endif
 HMODULE hDoscalls = 0;
 
 int RAND_poll(void)
@@ -93,7 +91,6 @@ int RAND_poll(void)
     if (hDoscalls == 0) {
         ULONG rc = DosLoadModule(failed_module, sizeof(failed_module), "DOSCALLS", &hDoscalls);
 
-#ifndef __KLIBC__
         if (rc == 0) {
             rc = DosQueryProcAddr(hDoscalls, 976, NULL, (PFN *)&DosPerfSysCall);
 
@@ -105,7 +102,6 @@ int RAND_poll(void)
             if (rc)
                 DosQuerySysState = NULL;
         }
-#endif
     }
 
     /* Sample the hi-res timer, runs at around 1.1 MHz */
@@ -126,9 +122,7 @@ int RAND_poll(void)
             RAND_add(&util, sizeof(util), 10);
         }
         else {
-#ifndef __KLIBC__
             DosPerfSysCall = NULL;
-#endif
         }
     }
 

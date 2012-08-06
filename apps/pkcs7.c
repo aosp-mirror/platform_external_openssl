@@ -82,12 +82,15 @@ int MAIN(int, char **);
 
 int MAIN(int argc, char **argv)
 	{
+#ifndef OPENSSL_NO_ENGINE
+	ENGINE *e = NULL;
+#endif
 	PKCS7 *p7=NULL;
 	int i,badops=0;
 	BIO *in=NULL,*out=NULL;
 	int informat,outformat;
 	char *infile,*outfile,*prog;
-	int print_certs=0,text=0,noout=0,p7_print=0;
+	int print_certs=0,text=0,noout=0;
 	int ret=1;
 #ifndef OPENSSL_NO_ENGINE
 	char *engine=NULL;
@@ -136,8 +139,6 @@ int MAIN(int argc, char **argv)
 			noout=1;
 		else if (strcmp(*argv,"-text") == 0)
 			text=1;
-		else if (strcmp(*argv,"-print") == 0)
-			p7_print=1;
 		else if (strcmp(*argv,"-print_certs") == 0)
 			print_certs=1;
 #ifndef OPENSSL_NO_ENGINE
@@ -179,7 +180,7 @@ bad:
 	ERR_load_crypto_strings();
 
 #ifndef OPENSSL_NO_ENGINE
-        setup_engine(bio_err, engine, 0);
+        e = setup_engine(bio_err, engine, 0);
 #endif
 
 	in=BIO_new(BIO_s_file());
@@ -236,9 +237,6 @@ bad:
 			goto end;
 			}
 		}
-
-	if (p7_print)
-		PKCS7_print_ctx(out, p7, 0, NULL);
 
 	if (print_certs)
 		{

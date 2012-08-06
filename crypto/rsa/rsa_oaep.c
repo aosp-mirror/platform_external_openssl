@@ -28,7 +28,7 @@
 #include <openssl/rand.h>
 #include <openssl/sha.h>
 
-static int MGF1(unsigned char *mask, long len,
+int MGF1(unsigned char *mask, long len,
 	const unsigned char *seed, long seedlen);
 
 int RSA_padding_add_PKCS1_OAEP(unsigned char *to, int tlen,
@@ -52,12 +52,18 @@ int RSA_padding_add_PKCS1_OAEP(unsigned char *to, int tlen,
 		return 0;
 		}
 
+	dbmask = OPENSSL_malloc(emlen - SHA_DIGEST_LENGTH);
+	if (dbmask == NULL)
+		{
+		RSAerr(RSA_F_RSA_PADDING_ADD_PKCS1_OAEP, ERR_R_MALLOC_FAILURE);
+		return 0;
+		}
+
 	to[0] = 0;
 	seed = to + 1;
 	db = to + SHA_DIGEST_LENGTH + 1;
 
-	if (!EVP_Digest((void *)param, plen, db, NULL, EVP_sha1(), NULL))
-		return 0;
+	EVP_Digest((void *)param, plen, db, NULL, EVP_sha1(), NULL);
 	memset(db + SHA_DIGEST_LENGTH, 0,
 		emlen - flen - 2 * SHA_DIGEST_LENGTH - 1);
 	db[emlen - flen - SHA_DIGEST_LENGTH - 1] = 0x01;
@@ -70,20 +76,11 @@ int RSA_padding_add_PKCS1_OAEP(unsigned char *to, int tlen,
 	   20);
 #endif
 
-	dbmask = OPENSSL_malloc(emlen - SHA_DIGEST_LENGTH);
-	if (dbmask == NULL)
-		{
-		RSAerr(RSA_F_RSA_PADDING_ADD_PKCS1_OAEP, ERR_R_MALLOC_FAILURE);
-		return 0;
-		}
-
-	if (MGF1(dbmask, emlen - SHA_DIGEST_LENGTH, seed, SHA_DIGEST_LENGTH) < 0)
-		return 0;
+	MGF1(dbmask, emlen - SHA_DIGEST_LENGTH, seed, SHA_DIGEST_LENGTH);
 	for (i = 0; i < emlen - SHA_DIGEST_LENGTH; i++)
 		db[i] ^= dbmask[i];
 
-	if (MGF1(seedmask, SHA_DIGEST_LENGTH, db, emlen - SHA_DIGEST_LENGTH) < 0)
-		return 0;
+	MGF1(seedmask, SHA_DIGEST_LENGTH, db, emlen - SHA_DIGEST_LENGTH);
 	for (i = 0; i < SHA_DIGEST_LENGTH; i++)
 		seed[i] ^= seedmask[i];
 
@@ -136,18 +133,15 @@ int RSA_padding_check_PKCS1_OAEP(unsigned char *to, int tlen,
 
 	maskeddb = padded_from + SHA_DIGEST_LENGTH;
 
-	if (MGF1(seed, SHA_DIGEST_LENGTH, maskeddb, dblen))
-		return -1;
+	MGF1(seed, SHA_DIGEST_LENGTH, maskeddb, dblen);
 	for (i = 0; i < SHA_DIGEST_LENGTH; i++)
 		seed[i] ^= padded_from[i];
   
-	if (MGF1(db, dblen, seed, SHA_DIGEST_LENGTH))
-		return -1;
+	MGF1(db, dblen, seed, SHA_DIGEST_LENGTH);
 	for (i = 0; i < dblen; i++)
 		db[i] ^= maskeddb[i];
 
-	if (!EVP_Digest((void *)param, plen, phash, NULL, EVP_sha1(), NULL))
-		return -1;
+	EVP_Digest((void *)param, plen, phash, NULL, EVP_sha1(), NULL);
 
 	if (memcmp(db, phash, SHA_DIGEST_LENGTH) != 0 || bad)
 		goto decoding_err;
@@ -191,44 +185,35 @@ int PKCS1_MGF1(unsigned char *mask, long len,
 	EVP_MD_CTX c;
 	unsigned char md[EVP_MAX_MD_SIZE];
 	int mdlen;
-	int rv = -1;
 
 	EVP_MD_CTX_init(&c);
 	mdlen = EVP_MD_size(dgst);
-	if (mdlen < 0)
-		goto err;
 	for (i = 0; outlen < len; i++)
 		{
 		cnt[0] = (unsigned char)((i >> 24) & 255);
 		cnt[1] = (unsigned char)((i >> 16) & 255);
 		cnt[2] = (unsigned char)((i >> 8)) & 255;
 		cnt[3] = (unsigned char)(i & 255);
-		if (!EVP_DigestInit_ex(&c,dgst, NULL)
-			|| !EVP_DigestUpdate(&c, seed, seedlen)
-			|| !EVP_DigestUpdate(&c, cnt, 4))
-			goto err;
+		EVP_DigestInit_ex(&c,dgst, NULL);
+		EVP_DigestUpdate(&c, seed, seedlen);
+		EVP_DigestUpdate(&c, cnt, 4);
 		if (outlen + mdlen <= len)
 			{
-			if (!EVP_DigestFinal_ex(&c, mask + outlen, NULL))
-				goto err;
+			EVP_DigestFinal_ex(&c, mask + outlen, NULL);
 			outlen += mdlen;
 			}
 		else
 			{
-			if (!EVP_DigestFinal_ex(&c, md, NULL))
-				goto err;
+			EVP_DigestFinal_ex(&c, md, NULL);
 			memcpy(mask + outlen, md, len - outlen);
 			outlen = len;
 			}
 		}
-	rv = 0;
-	err:
 	EVP_MD_CTX_cleanup(&c);
-	return rv;
+	return 0;
 	}
 
-static int MGF1(unsigned char *mask, long len, const unsigned char *seed,
-		 long seedlen)
+int MGF1(unsigned char *mask, long len, const unsigned char *seed, long seedlen)
 	{
 	return PKCS1_MGF1(mask, len, seed, seedlen, EVP_sha1());
 	}

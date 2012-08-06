@@ -58,6 +58,7 @@
 
 #include "des_locl.h"
 #include "des_ver.h"
+#include "spr.h"
 #include <openssl/opensslv.h>
 #include <openssl/bio.h>
 
@@ -91,7 +92,7 @@ const char *DES_options(void)
 #ifdef DES_UNROLL
 		unroll="16";
 #else
-		unroll="2";
+		unroll="4";
 #endif
 		if (sizeof(DES_LONG) != sizeof(long))
 			size="int";

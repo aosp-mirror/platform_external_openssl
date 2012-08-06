@@ -1,5 +1,5 @@
 /* p12_decr.c */
-/* Written by Dr Stephen N Henson (steve@openssl.org) for the OpenSSL
+/* Written by Dr Stephen N Henson (shenson@bigfoot.com) for the OpenSSL
  * project 1999.
  */
 /* ====================================================================
@@ -89,14 +89,7 @@ unsigned char * PKCS12_pbe_crypt(X509_ALGOR *algor, const char *pass,
 		goto err;
 	}
 
-	if (!EVP_CipherUpdate(&ctx, out, &i, in, inlen))
-		{
-		OPENSSL_free(out);
-		out = NULL;
-		PKCS12err(PKCS12_F_PKCS12_PBE_CRYPT,ERR_R_EVP_LIB);
-		goto err;
-		}
-
+	EVP_CipherUpdate(&ctx, out, &i, in, inlen);
 	outlen = i;
 	if(!EVP_CipherFinal_ex(&ctx, out + i, &i)) {
 		OPENSSL_free(out);

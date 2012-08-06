@@ -1,5 +1,5 @@
 /* a_strnid.c */
-/* Written by Dr Stephen N Henson (steve@openssl.org) for the OpenSSL
+/* Written by Dr Stephen N Henson (shenson@bigfoot.com) for the OpenSSL
  * project 1999.
  */
 /* ====================================================================
@@ -67,6 +67,7 @@ static STACK_OF(ASN1_STRING_TABLE) *stable = NULL;
 static void st_free(ASN1_STRING_TABLE *tbl);
 static int sk_table_cmp(const ASN1_STRING_TABLE * const *a,
 			const ASN1_STRING_TABLE * const *b);
+static int table_cmp(const void *a, const void *b);
 
 
 /* This is the global mask for the mbstring functions: this is use to
@@ -95,7 +96,7 @@ unsigned long ASN1_STRING_get_default_mask(void)
  * default:   the default value, Printable, T61, BMP.
  */
 
-int ASN1_STRING_set_default_mask_asc(const char *p)
+int ASN1_STRING_set_default_mask_asc(char *p)
 {
 	unsigned long mask;
 	char *end;
@@ -157,7 +158,7 @@ ASN1_STRING *ASN1_STRING_set_by_NID(ASN1_STRING **out, const unsigned char *in,
 
 /* This table must be kept in NID order */
 
-static const ASN1_STRING_TABLE tbl_standard[] = {
+static ASN1_STRING_TABLE tbl_standard[] = {
 {NID_commonName,		1, ub_common_name, DIRSTRING_TYPE, 0},
 {NID_countryName,		2, 2, B_ASN1_PRINTABLESTRING, STABLE_NO_MASK},
 {NID_localityName,		1, ub_locality_name, DIRSTRING_TYPE, 0},
@@ -185,14 +186,11 @@ static int sk_table_cmp(const ASN1_STRING_TABLE * const *a,
 	return (*a)->nid - (*b)->nid;
 }
 
-DECLARE_OBJ_BSEARCH_CMP_FN(ASN1_STRING_TABLE, ASN1_STRING_TABLE, table);
-
-static int table_cmp(const ASN1_STRING_TABLE *a, const ASN1_STRING_TABLE *b)
+static int table_cmp(const void *a, const void *b)
 {
-	return a->nid - b->nid;
+	const ASN1_STRING_TABLE *sa = a, *sb = b;
+	return sa->nid - sb->nid;
 }
-
-IMPLEMENT_OBJ_BSEARCH_CMP_FN(ASN1_STRING_TABLE, ASN1_STRING_TABLE, table);
 
 ASN1_STRING_TABLE *ASN1_STRING_TABLE_get(int nid)
 {
@@ -200,8 +198,10 @@ ASN1_STRING_TABLE *ASN1_STRING_TABLE_get(int nid)
 	ASN1_STRING_TABLE *ttmp;
 	ASN1_STRING_TABLE fnd;
 	fnd.nid = nid;
-	ttmp = OBJ_bsearch_table(&fnd, tbl_standard, 
-			   sizeof(tbl_standard)/sizeof(ASN1_STRING_TABLE));
+	ttmp = (ASN1_STRING_TABLE *) OBJ_bsearch((char *)&fnd,
+					(char *)tbl_standard, 
+			sizeof(tbl_standard)/sizeof(ASN1_STRING_TABLE),
+			sizeof(ASN1_STRING_TABLE), table_cmp);
 	if(ttmp) return ttmp;
 	if(!stable) return NULL;
 	idx = sk_ASN1_STRING_TABLE_find(stable, &fnd);

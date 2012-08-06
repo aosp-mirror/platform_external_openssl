@@ -60,9 +60,7 @@
 #include <e_os.h>
 #include "o_str.h"
 
-#if !defined(OPENSSL_IMPLEMENTS_strncasecmp) && \
-    !defined(OPENSSL_SYSNAME_WIN32) && \
-    !defined(NETWARE_CLIB)
+#if !defined(OPENSSL_IMPLEMENTS_strncasecmp) && !defined(OPENSSL_SYSNAME_WIN32) && !defined(OPENSSL_SYSNAME_WINCE)
 # include <strings.h>
 #endif
 

@@ -125,6 +125,7 @@ static int nbiof_free(BIO *a)
 	
 static int nbiof_read(BIO *b, char *out, int outl)
 	{
+	NBIO_TEST *nt;
 	int ret=0;
 #if 1
 	int num;
@@ -133,6 +134,7 @@ static int nbiof_read(BIO *b, char *out, int outl)
 
 	if (out == NULL) return(0);
 	if (b->next_bio == NULL) return(0);
+	nt=(NBIO_TEST *)b->ptr;
 
 	BIO_clear_retry_flags(b);
 #if 1

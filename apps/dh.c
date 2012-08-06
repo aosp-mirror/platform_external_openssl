@@ -88,6 +88,9 @@ int MAIN(int, char **);
 
 int MAIN(int argc, char **argv)
 	{
+#ifndef OPENSSL_NO_ENGINE
+	ENGINE *e = NULL;
+#endif
 	DH *dh=NULL;
 	int i,badops=0,text=0;
 	BIO *in=NULL,*out=NULL;
@@ -186,7 +189,7 @@ bad:
 	ERR_load_crypto_strings();
 
 #ifndef OPENSSL_NO_ENGINE
-        setup_engine(bio_err, engine, 0);
+        e = setup_engine(bio_err, engine, 0);
 #endif
 
 	in=BIO_new(BIO_s_file());
@@ -346,10 +349,4 @@ end:
 	apps_shutdown();
 	OPENSSL_EXIT(ret);
 	}
-#else /* !OPENSSL_NO_DH */
-
-# if PEDANTIC
-static void *dummy=&dummy;
-# endif
-
 #endif

@@ -64,7 +64,6 @@
 #endif
 #include <openssl/buffer.h>
 #include <openssl/bio.h>
-#include <openssl/comp.h>
 #ifndef OPENSSL_NO_RSA
 #include <openssl/rsa.h>
 #endif
@@ -95,17 +94,8 @@
 #include <openssl/ui.h>
 #include <openssl/ocsp.h>
 #include <openssl/err.h>
-#include <openssl/ts.h>
 #ifndef OPENSSL_NO_CMS
 #include <openssl/cms.h>
-#endif
-#ifndef OPENSSL_NO_JPAKE
-#include <openssl/jpake.h>
-#endif
-#include <openssl/comp.h>
-
-#ifdef OPENSSL_FIPS
-#include <openssl/fips.h>
 #endif
 
 void ERR_load_crypto_strings(void)
@@ -130,7 +120,6 @@ void ERR_load_crypto_strings(void)
 	ERR_load_ASN1_strings();
 	ERR_load_CONF_strings();
 	ERR_load_CRYPTO_strings();
-	ERR_load_COMP_strings();
 #ifndef OPENSSL_NO_EC
 	ERR_load_EC_strings();
 #endif
@@ -147,7 +136,6 @@ void ERR_load_crypto_strings(void)
 	ERR_load_PKCS12_strings();
 	ERR_load_RAND_strings();
 	ERR_load_DSO_strings();
-	ERR_load_TS_strings();
 #ifndef OPENSSL_NO_ENGINE
 	ERR_load_ENGINE_strings();
 #endif
@@ -156,12 +144,5 @@ void ERR_load_crypto_strings(void)
 #ifndef OPENSSL_NO_CMS
 	ERR_load_CMS_strings();
 #endif
-#ifndef OPENSSL_NO_JPAKE
-	ERR_load_JPAKE_strings();
-#endif
-	ERR_load_COMP_strings();
-#endif
-#ifdef OPENSSL_FIPS
-	ERR_load_FIPS_strings();
 #endif
 	}

@@ -56,7 +56,7 @@
  * [including the GNU Public Licence.]
  */
 /* ====================================================================
- * Copyright (c) 1998-2007 The OpenSSL Project.  All rights reserved.
+ * Copyright (c) 1998-2002 The OpenSSL Project.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -108,32 +108,6 @@
  * Hudson (tjh@cryptsoft.com).
  *
  */
-/* ====================================================================
- * Copyright 2005 Nokia. All rights reserved.
- *
- * The portions of the attached software ("Contribution") is developed by
- * Nokia Corporation and is licensed pursuant to the OpenSSL open source
- * license.
- *
- * The Contribution, originally written by Mika Kousa and Pasi Eronen of
- * Nokia Corporation, consists of the "PSK" (Pre-Shared Key) ciphersuites
- * support (see RFC 4279) to OpenSSL.
- *
- * No patent licenses or other rights except those expressly stated in
- * the OpenSSL open source license shall be deemed granted or received
- * expressly, by implication, estoppel, or otherwise.
- *
- * No assurances are provided by Nokia that the Contribution does not
- * infringe the patent or other intellectual property rights of any third
- * party or that the license provides you with all the necessary rights
- * to make use of the Contribution.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. IN
- * ADDITION TO THE DISCLAIMERS INCLUDED IN THE LICENSE, NOKIA
- * SPECIFICALLY DISCLAIMS ANY LIABILITY FOR CLAIMS BROUGHT BY YOU OR ANY
- * OTHER ENTITY BASED ON INFRINGEMENT OF INTELLECTUAL PROPERTY RIGHTS OR
- * OTHERWISE.
- */
 
 #include <stdio.h>
 #include "ssl_locl.h"
@@ -155,8 +129,10 @@ static unsigned char ssl3_pad_2[48]={
 	0x5c,0x5c,0x5c,0x5c,0x5c,0x5c,0x5c,0x5c,
 	0x5c,0x5c,0x5c,0x5c,0x5c,0x5c,0x5c,0x5c,
 	0x5c,0x5c,0x5c,0x5c,0x5c,0x5c,0x5c,0x5c };
-static int ssl3_handshake_mac(SSL *s, int md_nid,
+
+static int ssl3_handshake_mac(SSL *s, EVP_MD_CTX *in_ctx,
 	const char *sender, int len, unsigned char *p);
+
 static int ssl3_generate_key_block(SSL *s, unsigned char *km, int num)
 	{
 	EVP_MD_CTX m5;
@@ -170,7 +146,6 @@ static int ssl3_generate_key_block(SSL *s, unsigned char *km, int num)
 #endif
 	k=0;
 	EVP_MD_CTX_init(&m5);
-	EVP_MD_CTX_set_flags(&m5, EVP_MD_CTX_FLAG_NON_FIPS_ALLOW);
 	EVP_MD_CTX_init(&s1);
 	for (i=0; (int)i<num; i+=MD5_DIGEST_LENGTH)
 		{
@@ -215,7 +190,7 @@ static int ssl3_generate_key_block(SSL *s, unsigned char *km, int num)
 
 int ssl3_change_cipher_state(SSL *s, int which)
 	{
-	unsigned char *p,*mac_secret;
+	unsigned char *p,*key_block,*mac_secret;
 	unsigned char exp_key[EVP_MAX_KEY_LENGTH];
 	unsigned char exp_iv[EVP_MAX_IV_LENGTH];
 	unsigned char *ms,*key,*iv,*er1,*er2;
@@ -232,14 +207,13 @@ int ssl3_change_cipher_state(SSL *s, int which)
 	is_exp=SSL_C_IS_EXPORT(s->s3->tmp.new_cipher);
 	c=s->s3->tmp.new_sym_enc;
 	m=s->s3->tmp.new_hash;
-	/* m == NULL will lead to a crash later */
-	OPENSSL_assert(m);
 #ifndef OPENSSL_NO_COMP
 	if (s->s3->tmp.new_compression == NULL)
 		comp=NULL;
 	else
 		comp=s->s3->tmp.new_compression->method;
 #endif
+	key_block=s->s3->tmp.key_block;
 
 	if (which & SSL3_CC_READ)
 		{
@@ -251,8 +225,7 @@ int ssl3_change_cipher_state(SSL *s, int which)
 			/* make sure it's intialized in case we exit later with an error */
 			EVP_CIPHER_CTX_init(s->enc_read_ctx);
 		dd= s->enc_read_ctx;
-
-		ssl_replace_hash(&s->read_hash,m);
+		s->read_hash=m;
 #ifndef OPENSSL_NO_COMP
 		/* COMPRESS */
 		if (s->expand != NULL)
@@ -288,7 +261,7 @@ int ssl3_change_cipher_state(SSL *s, int which)
 			/* make sure it's intialized in case we exit later with an error */
 			EVP_CIPHER_CTX_init(s->enc_write_ctx);
 		dd= s->enc_write_ctx;
-		ssl_replace_hash(&s->write_hash,m);
+		s->write_hash=m;
 #ifndef OPENSSL_NO_COMP
 		/* COMPRESS */
 		if (s->compress != NULL)
@@ -315,8 +288,6 @@ int ssl3_change_cipher_state(SSL *s, int which)
 
 	p=s->s3->tmp.key_block;
 	i=EVP_MD_size(m);
-	if (i < 0)
-		goto err2;
 	cl=EVP_CIPHER_key_length(c);
 	j=is_exp ? (cl < SSL_C_EXPORT_KEYLENGTH(s->s3->tmp.new_cipher) ?
 		 cl : SSL_C_EXPORT_KEYLENGTH(s->s3->tmp.new_cipher)) : cl;
@@ -397,7 +368,7 @@ int ssl3_setup_key_block(SSL *s)
 	if (s->s3->tmp.key_block_length != 0)
 		return(1);
 
-	if (!ssl_cipher_get_evp(s->session,&c,&hash,NULL,NULL,&comp))
+	if (!ssl_cipher_get_evp(s->session,&c,&hash,&comp))
 		{
 		SSLerr(SSL_F_SSL3_SETUP_KEY_BLOCK,SSL_R_CIPHER_OR_HASH_UNAVAILABLE);
 		return(0);
@@ -411,11 +382,7 @@ int ssl3_setup_key_block(SSL *s)
 	s->s3->tmp.new_compression=comp;
 #endif
 
-	num=EVP_MD_size(hash);
-	if (num < 0)
-		return 0;
-
-	num=EVP_CIPHER_key_length(c)+num+EVP_CIPHER_iv_length(c);
+	num=EVP_CIPHER_key_length(c)+EVP_MD_size(hash)+EVP_CIPHER_iv_length(c);
 	num*=2;
 
 	ssl3_cleanup_key_block(s);
@@ -437,11 +404,11 @@ int ssl3_setup_key_block(SSL *s)
 
 		if (s->session->cipher != NULL)
 			{
-			if (s->session->cipher->algorithm_enc == SSL_eNULL)
+			if ((s->session->cipher->algorithms & SSL_ENC_MASK) == SSL_eNULL)
 				s->s3->need_empty_fragments = 0;
 			
 #ifndef OPENSSL_NO_RC4
-			if (s->session->cipher->algorithm_enc == SSL_RC4)
+			if ((s->session->cipher->algorithms & SSL_ENC_MASK) == SSL_RC4)
 				s->s3->need_empty_fragments = 0;
 #endif
 			}
@@ -512,9 +479,6 @@ int ssl3_enc(SSL *s, int send)
 
 			/* we need to add 'i-1' padding bytes */
 			l+=i;
-			/* the last of these zero bytes will be overwritten
-			 * with the padding length. */
-			memset(&rec->input[rec->length], 0, i);
 			rec->length+=i;
 			rec->input[l-1]=(i-1);
 			}
@@ -554,142 +518,47 @@ int ssl3_enc(SSL *s, int send)
 
 void ssl3_init_finished_mac(SSL *s)
 	{
-	if (s->s3->handshake_buffer) BIO_free(s->s3->handshake_buffer);
-	if (s->s3->handshake_dgst) ssl3_free_digest_list(s);
-    s->s3->handshake_buffer=BIO_new(BIO_s_mem());	
-	(void)BIO_set_close(s->s3->handshake_buffer,BIO_CLOSE);
+	EVP_DigestInit_ex(&(s->s3->finish_dgst1),s->ctx->md5, NULL);
+	EVP_DigestInit_ex(&(s->s3->finish_dgst2),s->ctx->sha1, NULL);
 	}
-
-void ssl3_free_digest_list(SSL *s) 
-	{
-	int i;
-	if (!s->s3->handshake_dgst) return;
-	for (i=0;i<SSL_MAX_DIGEST;i++) 
-		{
-		if (s->s3->handshake_dgst[i])
-			EVP_MD_CTX_destroy(s->s3->handshake_dgst[i]);
-		}
-	OPENSSL_free(s->s3->handshake_dgst);
-	s->s3->handshake_dgst=NULL;
-	}	
-
-
 
 void ssl3_finish_mac(SSL *s, const unsigned char *buf, int len)
 	{
-	if (s->s3->handshake_buffer && !(s->s3->flags & TLS1_FLAGS_KEEP_HANDSHAKE)) 
-		{
-		BIO_write (s->s3->handshake_buffer,(void *)buf,len);
-		} 
-	else 
-		{
-		int i;
-		for (i=0;i< SSL_MAX_DIGEST;i++) 
-			{
-			if (s->s3->handshake_dgst[i]!= NULL)
-			EVP_DigestUpdate(s->s3->handshake_dgst[i],buf,len);
-			}
-		}	
+	EVP_DigestUpdate(&(s->s3->finish_dgst1),buf,len);
+	EVP_DigestUpdate(&(s->s3->finish_dgst2),buf,len);
 	}
 
-int ssl3_digest_cached_records(SSL *s)
+int ssl3_cert_verify_mac(SSL *s, EVP_MD_CTX *ctx, unsigned char *p)
 	{
-	int i;
-	long mask;
-	const EVP_MD *md;
-	long hdatalen;
-	void *hdata;
-
-	/* Allocate handshake_dgst array */
-	ssl3_free_digest_list(s);
-	s->s3->handshake_dgst = OPENSSL_malloc(SSL_MAX_DIGEST * sizeof(EVP_MD_CTX *));
-	memset(s->s3->handshake_dgst,0,SSL_MAX_DIGEST *sizeof(EVP_MD_CTX *));
-	hdatalen = BIO_get_mem_data(s->s3->handshake_buffer,&hdata);
-	if (hdatalen <= 0)
-		{
-		SSLerr(SSL_F_SSL3_DIGEST_CACHED_RECORDS, SSL_R_BAD_HANDSHAKE_LENGTH);
-		return 0;
-		}
-
-	/* Loop through bitso of algorithm2 field and create MD_CTX-es */
-	for (i=0;ssl_get_handshake_digest(i,&mask,&md); i++) 
-		{
-		if ((mask & ssl_get_algorithm2(s)) && md) 
-			{
-			s->s3->handshake_dgst[i]=EVP_MD_CTX_create();
-#ifdef OPENSSL_FIPS
-			if (EVP_MD_nid(md) == NID_md5)
-				{
-				EVP_MD_CTX_set_flags(s->s3->handshake_dgst[i],
-						EVP_MD_CTX_FLAG_NON_FIPS_ALLOW);
-				}
-#endif
-			EVP_DigestInit_ex(s->s3->handshake_dgst[i],md,NULL);
-			EVP_DigestUpdate(s->s3->handshake_dgst[i],hdata,hdatalen);
-			} 
-		else 
-			{	
-			s->s3->handshake_dgst[i]=NULL;
-			}
-		}
-	if (!(s->s3->flags & TLS1_FLAGS_KEEP_HANDSHAKE))
-		{
-		/* Free handshake_buffer BIO */
-		BIO_free(s->s3->handshake_buffer);
-		s->s3->handshake_buffer = NULL;
-		}
-
-	return 1;
+	return(ssl3_handshake_mac(s,ctx,NULL,0,p));
 	}
 
-int ssl3_cert_verify_mac(SSL *s, int md_nid, unsigned char *p)
-	{
-	return(ssl3_handshake_mac(s,md_nid,NULL,0,p));
-	}
-int ssl3_final_finish_mac(SSL *s, 
+int ssl3_final_finish_mac(SSL *s, EVP_MD_CTX *ctx1, EVP_MD_CTX *ctx2,
 	     const char *sender, int len, unsigned char *p)
 	{
 	int ret;
-	ret=ssl3_handshake_mac(s,NID_md5,sender,len,p);
+
+	ret=ssl3_handshake_mac(s,ctx1,sender,len,p);
 	p+=ret;
-	ret+=ssl3_handshake_mac(s,NID_sha1,sender,len,p);
+	ret+=ssl3_handshake_mac(s,ctx2,sender,len,p);
 	return(ret);
 	}
-static int ssl3_handshake_mac(SSL *s, int md_nid,
+
+static int ssl3_handshake_mac(SSL *s, EVP_MD_CTX *in_ctx,
 	     const char *sender, int len, unsigned char *p)
 	{
 	unsigned int ret;
 	int npad,n;
 	unsigned int i;
 	unsigned char md_buf[EVP_MAX_MD_SIZE];
-	EVP_MD_CTX ctx,*d=NULL;
+	EVP_MD_CTX ctx;
 
-	if (s->s3->handshake_buffer) 
-		if (!ssl3_digest_cached_records(s))
-			return 0;
-
-	/* Search for digest of specified type in the handshake_dgst
-	 * array*/
-	for (i=0;i<SSL_MAX_DIGEST;i++) 
-		{
-		  if (s->s3->handshake_dgst[i]&&EVP_MD_CTX_type(s->s3->handshake_dgst[i])==md_nid) 
-		  	{
-		  	d=s->s3->handshake_dgst[i];
-			break;
-			}
-		}
-	if (!d) {
-		SSLerr(SSL_F_SSL3_HANDSHAKE_MAC,SSL_R_NO_REQUIRED_DIGEST);
-		return 0;
-	}	
 	EVP_MD_CTX_init(&ctx);
-	EVP_MD_CTX_set_flags(&ctx, EVP_MD_CTX_FLAG_NON_FIPS_ALLOW);
-	EVP_MD_CTX_copy_ex(&ctx,d);
-	n=EVP_MD_CTX_size(&ctx);
-	if (n < 0)
-		return 0;
+	EVP_MD_CTX_copy_ex(&ctx,in_ctx);
 
+	n=EVP_MD_CTX_size(&ctx);
 	npad=(48/n)*n;
+
 	if (sender != NULL)
 		EVP_DigestUpdate(&ctx,sender,len);
 	EVP_DigestUpdate(&ctx,s->session->master_key,
@@ -709,16 +578,15 @@ static int ssl3_handshake_mac(SSL *s, int md_nid,
 	return((int)ret);
 	}
 
-int n_ssl3_mac(SSL *ssl, unsigned char *md, int send)
+int ssl3_mac(SSL *ssl, unsigned char *md, int send)
 	{
 	SSL3_RECORD *rec;
 	unsigned char *mac_sec,*seq;
 	EVP_MD_CTX md_ctx;
-	const EVP_MD_CTX *hash;
+	const EVP_MD *hash;
 	unsigned char *p,rec_char;
 	unsigned int md_size;
 	int npad;
-	int t;
 
 	if (send)
 		{
@@ -735,16 +603,13 @@ int n_ssl3_mac(SSL *ssl, unsigned char *md, int send)
 		hash=ssl->read_hash;
 		}
 
-	t=EVP_MD_CTX_size(hash);
-	if (t < 0)
-		return -1;
-	md_size=t;
+	md_size=EVP_MD_size(hash);
 	npad=(48/md_size)*md_size;
 
 	/* Chop the digest off the end :-) */
 	EVP_MD_CTX_init(&md_ctx);
 
-	EVP_MD_CTX_copy_ex( &md_ctx,hash);
+	EVP_DigestInit_ex(  &md_ctx,hash, NULL);
 	EVP_DigestUpdate(&md_ctx,mac_sec,md_size);
 	EVP_DigestUpdate(&md_ctx,ssl3_pad_1,npad);
 	EVP_DigestUpdate(&md_ctx,seq,8);
@@ -756,7 +621,7 @@ int n_ssl3_mac(SSL *ssl, unsigned char *md, int send)
 	EVP_DigestUpdate(&md_ctx,rec->input,rec->length);
 	EVP_DigestFinal_ex( &md_ctx,md,NULL);
 
-	EVP_MD_CTX_copy_ex( &md_ctx,hash);
+	EVP_DigestInit_ex(  &md_ctx,hash, NULL);
 	EVP_DigestUpdate(&md_ctx,mac_sec,md_size);
 	EVP_DigestUpdate(&md_ctx,ssl3_pad_2,npad);
 	EVP_DigestUpdate(&md_ctx,md,md_size);
@@ -849,12 +714,6 @@ int ssl3_alert_code(int code)
 	case SSL_AD_INTERNAL_ERROR:	return(SSL3_AD_HANDSHAKE_FAILURE);
 	case SSL_AD_USER_CANCELLED:	return(SSL3_AD_HANDSHAKE_FAILURE);
 	case SSL_AD_NO_RENEGOTIATION:	return(-1); /* Don't send it :-) */
-	case SSL_AD_UNSUPPORTED_EXTENSION: return(SSL3_AD_HANDSHAKE_FAILURE);
-	case SSL_AD_CERTIFICATE_UNOBTAINABLE: return(SSL3_AD_HANDSHAKE_FAILURE);
-	case SSL_AD_UNRECOGNIZED_NAME:	return(SSL3_AD_HANDSHAKE_FAILURE);
-	case SSL_AD_BAD_CERTIFICATE_STATUS_RESPONSE: return(SSL3_AD_HANDSHAKE_FAILURE);
-	case SSL_AD_BAD_CERTIFICATE_HASH_VALUE: return(SSL3_AD_HANDSHAKE_FAILURE);
-	case SSL_AD_UNKNOWN_PSK_IDENTITY:return(TLS1_AD_UNKNOWN_PSK_IDENTITY);
 	default:			return(-1);
 		}
 	}

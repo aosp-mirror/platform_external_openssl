@@ -361,10 +361,8 @@ again:
 	case BIO_CTRL_DUP:
 		dbio=(BIO *)ptr;
 		dctx=(BIO_ENC_CTX *)dbio->ptr;
-		EVP_CIPHER_CTX_init(&dctx->cipher);
-		ret = EVP_CIPHER_CTX_copy(&dctx->cipher,&ctx->cipher);
-		if (ret)
-			dbio->init=1;
+		memcpy(&(dctx->cipher),&(ctx->cipher),sizeof(ctx->cipher));
+		dbio->init=1;
 		break;
 	default:
 		ret=BIO_ctrl(b->next_bio,cmd,num,ptr);

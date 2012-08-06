@@ -65,6 +65,11 @@ long ssl23_default_timeout(void)
 	return(300);
 	}
 
+IMPLEMENT_ssl23_meth_func(sslv23_base_method,
+			ssl_undefined_function,
+			ssl_undefined_function,
+			ssl_bad_method)
+
 int ssl23_num_ciphers(void)
 	{
 	return(ssl3_num_ciphers()
@@ -74,7 +79,7 @@ int ssl23_num_ciphers(void)
 	    );
 	}
 
-const SSL_CIPHER *ssl23_get_cipher(unsigned int u)
+SSL_CIPHER *ssl23_get_cipher(unsigned int u)
 	{
 	unsigned int uu=ssl3_num_ciphers();
 
@@ -90,10 +95,16 @@ const SSL_CIPHER *ssl23_get_cipher(unsigned int u)
 
 /* This function needs to check if the ciphers required are actually
  * available */
-const SSL_CIPHER *ssl23_get_cipher_by_char(const unsigned char *p)
+SSL_CIPHER *ssl23_get_cipher_by_char(const unsigned char *p)
 	{
-	const SSL_CIPHER *cp;
+	SSL_CIPHER c,*cp;
+	unsigned long id;
+	int n;
 
+	n=ssl3_num_ciphers();
+	id=0x03000000|((unsigned long)p[0]<<16L)|
+		((unsigned long)p[1]<<8L)|(unsigned long)p[2];
+	c.id=id;
 	cp=ssl3_get_cipher_by_char(p);
 #ifndef OPENSSL_NO_SSL2
 	if (cp == NULL)

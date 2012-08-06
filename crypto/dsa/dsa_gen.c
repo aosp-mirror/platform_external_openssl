@@ -74,109 +74,67 @@
 #ifndef OPENSSL_NO_SHA
 
 #include <stdio.h>
+#include <time.h>
 #include "cryptlib.h"
 #include <openssl/evp.h>
 #include <openssl/bn.h>
+#include <openssl/dsa.h>
 #include <openssl/rand.h>
 #include <openssl/sha.h>
-#include "dsa_locl.h"
 
-#ifdef OPENSSL_FIPS
-#include <openssl/fips.h>
-#endif
+static int dsa_builtin_paramgen(DSA *ret, int bits,
+		unsigned char *seed_in, int seed_len,
+		int *counter_ret, unsigned long *h_ret, BN_GENCB *cb);
 
 int DSA_generate_parameters_ex(DSA *ret, int bits,
-		const unsigned char *seed_in, int seed_len,
+		unsigned char *seed_in, int seed_len,
 		int *counter_ret, unsigned long *h_ret, BN_GENCB *cb)
 	{
-#ifdef OPENSSL_FIPS
-	if (FIPS_mode() && !(ret->meth->flags & DSA_FLAG_FIPS_METHOD)
-			&& !(ret->flags & DSA_FLAG_NON_FIPS_ALLOW))
-		{
-		DSAerr(DSA_F_DSA_GENERATE_PARAMETERS_EX, DSA_R_NON_FIPS_DSA_METHOD);
-		return 0;
-		}
-#endif
 	if(ret->meth->dsa_paramgen)
 		return ret->meth->dsa_paramgen(ret, bits, seed_in, seed_len,
 				counter_ret, h_ret, cb);
-#ifdef OPENSSL_FIPS
-	else if (FIPS_mode())
-		{
-		return FIPS_dsa_generate_parameters_ex(ret, bits, 
-							seed_in, seed_len,
-							counter_ret, h_ret, cb);
-		}
-#endif
-	else
-		{
-		const EVP_MD *evpmd;
-		size_t qbits = bits >= 2048 ? 256 : 160;
-
-		if (bits >= 2048)
-			{
-			qbits = 256;
-			evpmd = EVP_sha256();
-			}
-		else
-			{
-			qbits = 160;
-			evpmd = EVP_sha1();
-			}
-
-		return dsa_builtin_paramgen(ret, bits, qbits, evpmd,
-			seed_in, seed_len, NULL, counter_ret, h_ret, cb);
-		}
+	return dsa_builtin_paramgen(ret, bits, seed_in, seed_len,
+			counter_ret, h_ret, cb);
 	}
 
-int dsa_builtin_paramgen(DSA *ret, size_t bits, size_t qbits,
-	const EVP_MD *evpmd, const unsigned char *seed_in, size_t seed_len,
-	unsigned char *seed_out,
-	int *counter_ret, unsigned long *h_ret, BN_GENCB *cb)
+static int dsa_builtin_paramgen(DSA *ret, int bits,
+		unsigned char *seed_in, int seed_len,
+		int *counter_ret, unsigned long *h_ret, BN_GENCB *cb)
 	{
 	int ok=0;
-	unsigned char seed[SHA256_DIGEST_LENGTH];
-	unsigned char md[SHA256_DIGEST_LENGTH];
-	unsigned char buf[SHA256_DIGEST_LENGTH],buf2[SHA256_DIGEST_LENGTH];
+	unsigned char seed[SHA_DIGEST_LENGTH];
+	unsigned char md[SHA_DIGEST_LENGTH];
+	unsigned char buf[SHA_DIGEST_LENGTH],buf2[SHA_DIGEST_LENGTH];
 	BIGNUM *r0,*W,*X,*c,*test;
 	BIGNUM *g=NULL,*q=NULL,*p=NULL;
 	BN_MONT_CTX *mont=NULL;
-	int i, k, n=0, m=0, qsize = qbits >> 3;
+	int k,n=0,i,b,m=0;
 	int counter=0;
 	int r=0;
 	BN_CTX *ctx=NULL;
 	unsigned int h=2;
 
-	if (qsize != SHA_DIGEST_LENGTH && qsize != SHA224_DIGEST_LENGTH &&
-	    qsize != SHA256_DIGEST_LENGTH)
-		/* invalid q size */
-		return 0;
-
-	if (evpmd == NULL)
-		/* use SHA1 as default */
-		evpmd = EVP_sha1();
-
-	if (bits < 512)
-		bits = 512;
-
-	bits = (bits+63)/64*64;
+	if (bits < 512) bits=512;
+	bits=(bits+63)/64*64;
 
 	/* NB: seed_len == 0 is special case: copy generated seed to
  	 * seed_in if it is not NULL.
  	 */
-	if (seed_len && (seed_len < (size_t)qsize))
-		seed_in = NULL;		/* seed buffer too small -- ignore */
-	if (seed_len > (size_t)qsize) 
-		seed_len = qsize;	/* App. 2.2 of FIPS PUB 186 allows larger SEED,
-					 * but our internal buffers are restricted to 160 bits*/
-	if (seed_in != NULL)
-		memcpy(seed, seed_in, seed_len);
+	if (seed_len && (seed_len < 20))
+		seed_in = NULL; /* seed buffer too small -- ignore */
+	if (seed_len > 20) 
+		seed_len = 20; /* App. 2.2 of FIPS PUB 186 allows larger SEED,
+		                * but our internal buffers are restricted to 160 bits*/
+	if ((seed_in != NULL) && (seed_len == 20))
+		{
+		memcpy(seed,seed_in,seed_len);
+		/* set seed_in to NULL to avoid it being copied back */
+		seed_in = NULL;
+		}
 
-	if ((ctx=BN_CTX_new()) == NULL)
-		goto err;
+	if ((ctx=BN_CTX_new()) == NULL) goto err;
 
-	if ((mont=BN_MONT_CTX_new()) == NULL)
-		goto err;
+	if ((mont=BN_MONT_CTX_new()) == NULL) goto err;
 
 	BN_CTX_start(ctx);
 	r0 = BN_CTX_get(ctx);
@@ -203,7 +161,7 @@ int dsa_builtin_paramgen(DSA *ret, size_t bits, size_t qbits,
 
 			if (!seed_len)
 				{
-				RAND_pseudo_bytes(seed, qsize);
+				RAND_pseudo_bytes(seed,SHA_DIGEST_LENGTH);
 				seed_is_random = 1;
 				}
 			else
@@ -211,29 +169,25 @@ int dsa_builtin_paramgen(DSA *ret, size_t bits, size_t qbits,
 				seed_is_random = 0;
 				seed_len=0; /* use random seed if 'seed_in' turns out to be bad*/
 				}
-			memcpy(buf , seed, qsize);
-			memcpy(buf2, seed, qsize);
+			memcpy(buf,seed,SHA_DIGEST_LENGTH);
+			memcpy(buf2,seed,SHA_DIGEST_LENGTH);
 			/* precompute "SEED + 1" for step 7: */
-			for (i = qsize-1; i >= 0; i--)
+			for (i=SHA_DIGEST_LENGTH-1; i >= 0; i--)
 				{
 				buf[i]++;
-				if (buf[i] != 0)
-					break;
+				if (buf[i] != 0) break;
 				}
 
 			/* step 2 */
-			if (!EVP_Digest(seed, qsize, md,   NULL, evpmd, NULL))
-				goto err;
-			if (!EVP_Digest(buf,  qsize, buf2, NULL, evpmd, NULL))
-				goto err;
-			for (i = 0; i < qsize; i++)
+			EVP_Digest(seed,SHA_DIGEST_LENGTH,md,NULL,HASH, NULL);
+			EVP_Digest(buf,SHA_DIGEST_LENGTH,buf2,NULL,HASH, NULL);
+			for (i=0; i<SHA_DIGEST_LENGTH; i++)
 				md[i]^=buf2[i];
 
 			/* step 3 */
-			md[0] |= 0x80;
-			md[qsize-1] |= 0x01;
-			if (!BN_bin2bn(md, qsize, q))
-				goto err;
+			md[0]|=0x80;
+			md[SHA_DIGEST_LENGTH-1]|=0x01;
+			if (!BN_bin2bn(md,SHA_DIGEST_LENGTH,q)) goto err;
 
 			/* step 4 */
 			r = BN_is_prime_fasttest_ex(q, DSS_prime_checks, ctx,
@@ -255,6 +209,7 @@ int dsa_builtin_paramgen(DSA *ret, size_t bits, size_t qbits,
 		/* "offset = 2" */
 
 		n=(bits-1)/160;
+		b=(bits-1)-n*160;
 
 		for (;;)
 			{
@@ -267,21 +222,18 @@ int dsa_builtin_paramgen(DSA *ret, size_t bits, size_t qbits,
 			for (k=0; k<=n; k++)
 				{
 				/* obtain "SEED + offset + k" by incrementing: */
-				for (i = qsize-1; i >= 0; i--)
+				for (i=SHA_DIGEST_LENGTH-1; i >= 0; i--)
 					{
 					buf[i]++;
-					if (buf[i] != 0)
-						break;
+					if (buf[i] != 0) break;
 					}
 
-				if (!EVP_Digest(buf, qsize, md ,NULL, evpmd,
-									NULL))
-					goto err;
+				EVP_Digest(buf,SHA_DIGEST_LENGTH,md,NULL,HASH, NULL);
 
 				/* step 8 */
-				if (!BN_bin2bn(md, qsize, r0))
+				if (!BN_bin2bn(md,SHA_DIGEST_LENGTH,r0))
 					goto err;
-				if (!BN_lshift(r0,r0,(qsize << 3)*k)) goto err;
+				if (!BN_lshift(r0,r0,160*k)) goto err;
 				if (!BN_add(W,W,r0)) goto err;
 				}
 
@@ -355,10 +307,9 @@ err:
 			ok=0;
 			goto err;
 			}
+		if (seed_in != NULL) memcpy(seed_in,seed,20);
 		if (counter_ret != NULL) *counter_ret=counter;
 		if (h_ret != NULL) *h_ret=h;
-		if (seed_out)
-			memcpy(seed_out, seed, qsize);
 		}
 	if(ctx)
 		{

@@ -69,7 +69,7 @@ static CONF_METHOD *default_CONF_method=NULL;
 
 /* Init a 'CONF' structure from an old LHASH */
 
-void CONF_set_nconf(CONF *conf, LHASH_OF(CONF_VALUE) *hash)
+void CONF_set_nconf(CONF *conf, LHASH *hash)
 	{
 	if (default_CONF_method == NULL)
 		default_CONF_method = NCONF_default();
@@ -87,10 +87,9 @@ int CONF_set_default_method(CONF_METHOD *meth)
 	return 1;
 	}
 
-LHASH_OF(CONF_VALUE) *CONF_load(LHASH_OF(CONF_VALUE) *conf, const char *file,
-				long *eline)
+LHASH *CONF_load(LHASH *conf, const char *file, long *eline)
 	{
-	LHASH_OF(CONF_VALUE) *ltmp;
+	LHASH *ltmp;
 	BIO *in=NULL;
 
 #ifdef OPENSSL_SYS_VMS
@@ -111,11 +110,10 @@ LHASH_OF(CONF_VALUE) *CONF_load(LHASH_OF(CONF_VALUE) *conf, const char *file,
 	}
 
 #ifndef OPENSSL_NO_FP_API
-LHASH_OF(CONF_VALUE) *CONF_load_fp(LHASH_OF(CONF_VALUE) *conf, FILE *fp,
-				   long *eline)
+LHASH *CONF_load_fp(LHASH *conf, FILE *fp,long *eline)
 	{
 	BIO *btmp;
-	LHASH_OF(CONF_VALUE) *ltmp;
+	LHASH *ltmp;
 	if(!(btmp = BIO_new_fp(fp, BIO_NOCLOSE))) {
 		CONFerr(CONF_F_CONF_LOAD_FP,ERR_R_BUF_LIB);
 		return NULL;
@@ -126,8 +124,7 @@ LHASH_OF(CONF_VALUE) *CONF_load_fp(LHASH_OF(CONF_VALUE) *conf, FILE *fp,
 	}
 #endif
 
-LHASH_OF(CONF_VALUE) *CONF_load_bio(LHASH_OF(CONF_VALUE) *conf, BIO *bp,
-				    long *eline)
+LHASH *CONF_load_bio(LHASH *conf, BIO *bp,long *eline)
 	{
 	CONF ctmp;
 	int ret;
@@ -140,8 +137,7 @@ LHASH_OF(CONF_VALUE) *CONF_load_bio(LHASH_OF(CONF_VALUE) *conf, BIO *bp,
 	return NULL;
 	}
 
-STACK_OF(CONF_VALUE) *CONF_get_section(LHASH_OF(CONF_VALUE) *conf,
-				       const char *section)
+STACK_OF(CONF_VALUE) *CONF_get_section(LHASH *conf,const char *section)
 	{
 	if (conf == NULL)
 		{
@@ -155,8 +151,7 @@ STACK_OF(CONF_VALUE) *CONF_get_section(LHASH_OF(CONF_VALUE) *conf,
 		}
 	}
 
-char *CONF_get_string(LHASH_OF(CONF_VALUE) *conf,const char *group,
-		      const char *name)
+char *CONF_get_string(LHASH *conf,const char *group,const char *name)
 	{
 	if (conf == NULL)
 		{
@@ -170,8 +165,7 @@ char *CONF_get_string(LHASH_OF(CONF_VALUE) *conf,const char *group,
 		}
 	}
 
-long CONF_get_number(LHASH_OF(CONF_VALUE) *conf,const char *group,
-		     const char *name)
+long CONF_get_number(LHASH *conf,const char *group,const char *name)
 	{
 	int status;
 	long result = 0;
@@ -195,7 +189,7 @@ long CONF_get_number(LHASH_OF(CONF_VALUE) *conf,const char *group,
 	return result;
 	}
 
-void CONF_free(LHASH_OF(CONF_VALUE) *conf)
+void CONF_free(LHASH *conf)
 	{
 	CONF ctmp;
 	CONF_set_nconf(&ctmp, conf);
@@ -203,7 +197,7 @@ void CONF_free(LHASH_OF(CONF_VALUE) *conf)
 	}
 
 #ifndef OPENSSL_NO_FP_API
-int CONF_dump_fp(LHASH_OF(CONF_VALUE) *conf, FILE *out)
+int CONF_dump_fp(LHASH *conf, FILE *out)
 	{
 	BIO *btmp;
 	int ret;
@@ -218,7 +212,7 @@ int CONF_dump_fp(LHASH_OF(CONF_VALUE) *conf, FILE *out)
 	}
 #endif
 
-int CONF_dump_bio(LHASH_OF(CONF_VALUE) *conf, BIO *out)
+int CONF_dump_bio(LHASH *conf, BIO *out)
 	{
 	CONF ctmp;
 	CONF_set_nconf(&ctmp, conf);

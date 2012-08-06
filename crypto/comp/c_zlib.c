@@ -136,6 +136,15 @@ struct zlib_state
 
 static int zlib_stateful_ex_idx = -1;
 
+static void zlib_stateful_free_ex_data(void *obj, void *item,
+	CRYPTO_EX_DATA *ad, int ind,long argl, void *argp)
+	{
+	struct zlib_state *state = (struct zlib_state *)item;
+	inflateEnd(&state->istream);
+	deflateEnd(&state->ostream);
+	OPENSSL_free(state);
+	}
+
 static int zlib_stateful_init(COMP_CTX *ctx)
 	{
 	int err;
@@ -179,12 +188,6 @@ static int zlib_stateful_init(COMP_CTX *ctx)
 
 static void zlib_stateful_finish(COMP_CTX *ctx)
 	{
-	struct zlib_state *state =
-		(struct zlib_state *)CRYPTO_get_ex_data(&ctx->ex_data,
-			zlib_stateful_ex_idx);
-	inflateEnd(&state->istream);
-	deflateEnd(&state->ostream);
-	OPENSSL_free(state);
 	CRYPTO_free_ex_data(CRYPTO_EX_INDEX_COMP,ctx,&ctx->ex_data);
 	}
 
@@ -399,7 +402,7 @@ COMP_METHOD *COMP_zlib(void)
 			if (zlib_stateful_ex_idx == -1)
 				zlib_stateful_ex_idx =
 					CRYPTO_get_ex_new_index(CRYPTO_EX_INDEX_COMP,
-						0,NULL,NULL,NULL,NULL);
+						0,NULL,NULL,NULL,zlib_stateful_free_ex_data);
 			CRYPTO_w_unlock(CRYPTO_LOCK_COMP);
 			if (zlib_stateful_ex_idx == -1)
 				goto err;
@@ -724,7 +727,6 @@ static long bio_zlib_ctrl(BIO *b, int cmd, long num, void *ptr)
 	case BIO_CTRL_RESET:
 		ctx->ocount = 0;
 		ctx->odone = 0;
-		ret = 1;
 		break;
 
 	case BIO_CTRL_FLUSH:
@@ -769,7 +771,7 @@ static long bio_zlib_ctrl(BIO *b, int cmd, long num, void *ptr)
 				}
 			ctx->obufsize = obs;
 			}
-		ret = 1;
+
 		break;
 
 	case BIO_C_DO_STATE_MACHINE:

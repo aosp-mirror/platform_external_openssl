@@ -61,12 +61,16 @@
 #include <openssl/bn.h>
 #include <openssl/evp.h>
 #include <openssl/objects.h>
-#ifndef OPENSSL_NO_ENGINE
-#include <openssl/engine.h>
-#endif
-#include <openssl/x509.h>
 #include <openssl/asn1.h>
-#include "asn1_locl.h"
+#ifndef OPENSSL_NO_RSA
+#include <openssl/rsa.h>
+#endif
+#ifndef OPENSSL_NO_DSA
+#include <openssl/dsa.h>
+#endif
+#ifndef OPENSSL_NO_EC
+#include <openssl/ec.h>
+#endif
 
 EVP_PKEY *d2i_PrivateKey(int type, EVP_PKEY **a, const unsigned char **pp,
 	     long length)
@@ -81,43 +85,47 @@ EVP_PKEY *d2i_PrivateKey(int type, EVP_PKEY **a, const unsigned char **pp,
 			return(NULL);
 			}
 		}
-	else
-		{
-		ret= *a;
-#ifndef OPENSSL_NO_ENGINE
-		if (ret->engine)
-			{
-			ENGINE_finish(ret->engine);
-			ret->engine = NULL;
-			}
-#endif
-		}
+	else	ret= *a;
 
-	if (!EVP_PKEY_set_type(ret, type))
+	ret->save_type=type;
+	ret->type=EVP_PKEY_type(type);
+	switch (ret->type)
 		{
-		ASN1err(ASN1_F_D2I_PRIVATEKEY,ASN1_R_UNKNOWN_PUBLIC_KEY_TYPE);
-		goto err;
-		}
-
-	if (!ret->ameth->old_priv_decode ||
-			!ret->ameth->old_priv_decode(ret, pp, length))
-		{
-		if (ret->ameth->priv_decode) 
-			{
-			PKCS8_PRIV_KEY_INFO *p8=NULL;
-			p8=d2i_PKCS8_PRIV_KEY_INFO(NULL,pp,length);
-			if (!p8) goto err;
-			EVP_PKEY_free(ret);
-			ret = EVP_PKCS82PKEY(p8);
-			PKCS8_PRIV_KEY_INFO_free(p8);
-
-			} 
-		else 
+#ifndef OPENSSL_NO_RSA
+	case EVP_PKEY_RSA:
+		if ((ret->pkey.rsa=d2i_RSAPrivateKey(NULL,
+			(const unsigned char **)pp,length)) == NULL) /* TMP UGLY CAST */
 			{
 			ASN1err(ASN1_F_D2I_PRIVATEKEY,ERR_R_ASN1_LIB);
 			goto err;
 			}
-		}	
+		break;
+#endif
+#ifndef OPENSSL_NO_DSA
+	case EVP_PKEY_DSA:
+		if ((ret->pkey.dsa=d2i_DSAPrivateKey(NULL,
+			(const unsigned char **)pp,length)) == NULL) /* TMP UGLY CAST */
+			{
+			ASN1err(ASN1_F_D2I_PRIVATEKEY,ERR_R_ASN1_LIB);
+			goto err;
+			}
+		break;
+#endif
+#ifndef OPENSSL_NO_EC
+	case EVP_PKEY_EC:
+		if ((ret->pkey.ec = d2i_ECPrivateKey(NULL, 
+			(const unsigned char **)pp, length)) == NULL)
+			{
+			ASN1err(ASN1_F_D2I_PRIVATEKEY, ERR_R_ASN1_LIB);
+			goto err;
+			}
+		break;
+#endif
+	default:
+		ASN1err(ASN1_F_D2I_PRIVATEKEY,ASN1_R_UNKNOWN_PUBLIC_KEY_TYPE);
+		goto err;
+		/* break; */
+		}
 	if (a != NULL) (*a)=ret;
 	return(ret);
 err:
@@ -138,7 +146,8 @@ EVP_PKEY *d2i_AutoPrivateKey(EVP_PKEY **a, const unsigned char **pp,
 	 * by analyzing it we can determine the passed structure: this
 	 * assumes the input is surrounded by an ASN1 SEQUENCE.
 	 */
-	inkey = d2i_ASN1_SEQUENCE_ANY(NULL, &p, length);
+	inkey = d2i_ASN1_SET_OF_ASN1_TYPE(NULL, &p, length, d2i_ASN1_TYPE, 
+			ASN1_TYPE_free, V_ASN1_SEQUENCE, V_ASN1_UNIVERSAL);
 	/* Since we only need to discern "traditional format" RSA and DSA
 	 * keys we can just count the elements.
          */
@@ -146,24 +155,6 @@ EVP_PKEY *d2i_AutoPrivateKey(EVP_PKEY **a, const unsigned char **pp,
 		keytype = EVP_PKEY_DSA;
 	else if (sk_ASN1_TYPE_num(inkey) == 4)
 		keytype = EVP_PKEY_EC;
-	else if (sk_ASN1_TYPE_num(inkey) == 3)  
-		{ /* This seems to be PKCS8, not traditional format */
-			PKCS8_PRIV_KEY_INFO *p8 = d2i_PKCS8_PRIV_KEY_INFO(NULL,pp,length);
-			EVP_PKEY *ret;
-
-			sk_ASN1_TYPE_pop_free(inkey, ASN1_TYPE_free);
-			if (!p8) 
-				{
-				ASN1err(ASN1_F_D2I_AUTOPRIVATEKEY,ASN1_R_UNSUPPORTED_PUBLIC_KEY_TYPE);
-				return NULL;
-				}
-			ret = EVP_PKCS82PKEY(p8);
-			PKCS8_PRIV_KEY_INFO_free(p8);
-			if (a) {
-				*a = ret;
-			}	
-			return ret;
-		}
 	else keytype = EVP_PKEY_RSA;
 	sk_ASN1_TYPE_pop_free(inkey, ASN1_TYPE_free);
 	return d2i_PrivateKey(keytype, a, pp, length);

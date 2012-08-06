@@ -59,7 +59,6 @@
 #include <stdio.h>
 #include "rmd_locl.h"
 #include <openssl/opensslv.h>
-#include <openssl/crypto.h>
 
 const char RMD160_version[]="RIPE-MD160" OPENSSL_VERSION_PTEXT;
 
@@ -70,14 +69,16 @@ const char RMD160_version[]="RIPE-MD160" OPENSSL_VERSION_PTEXT;
      void ripemd160_block(RIPEMD160_CTX *c, unsigned long *p,size_t num);
 #  endif
 
-fips_md_init(RIPEMD160)
+int RIPEMD160_Init(RIPEMD160_CTX *c)
 	{
-	memset (c,0,sizeof(*c));
 	c->A=RIPEMD160_A;
 	c->B=RIPEMD160_B;
 	c->C=RIPEMD160_C;
 	c->D=RIPEMD160_D;
 	c->E=RIPEMD160_E;
+	c->Nl=0;
+	c->Nh=0;
+	c->num=0;
 	return 1;
 	}
 

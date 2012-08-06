@@ -6,8 +6,7 @@
 # things perfect.
 #
 
-$0 =~ m/(.*[\/\\])[^\/\\]+$/; $dir=$1;
-push(@INC,"${dir}","${dir}../../perlasm");
+push(@INC,"perlasm","../../perlasm");
 require "x86asm.pl";
 
 &asm_init($ARGV[0],"crypt586.pl");
@@ -23,7 +22,7 @@ sub fcrypt_body
 	{
 	local($name,$do_ip)=@_;
 
-	&function_begin($name);
+	&function_begin($name,"EXTRN   _DES_SPtrans:DWORD");
 
 	&comment("");
 	&comment("Load the 2 words");
