@@ -545,7 +545,6 @@ include $(LOCAL_PATH)/android-config.mk
 LOCAL_SHARED_LIBRARIES := $(log_shared_libraries)
 
 ifeq ($(TARGET_ARCH),arm)
-LOCAL_NDK_VERSION := 5
 LOCAL_SDK_VERSION := 9
 endif
 
@@ -580,7 +579,6 @@ include $(LOCAL_PATH)/android-config.mk
 LOCAL_SHARED_LIBRARIES := $(log_shared_libraries)
 
 ifeq ($(TARGET_ARCH),arm)
-LOCAL_NDK_VERSION := 5
 LOCAL_SDK_VERSION := 9
 # Use the NDK prebuilt libz and libdl.
 LOCAL_LDFLAGS += -lz -ldl
