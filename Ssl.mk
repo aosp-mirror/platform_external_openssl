@@ -56,7 +56,6 @@ include $(CLEAR_VARS)
 include $(LOCAL_PATH)/android-config.mk
 
 ifeq ($(TARGET_ARCH),arm)
-LOCAL_NDK_VERSION := 5
 LOCAL_SDK_VERSION := 9
 endif
 LOCAL_SRC_FILES += $(local_src_files)
@@ -72,7 +71,6 @@ include $(CLEAR_VARS)
 include $(LOCAL_PATH)/android-config.mk
 
 ifeq ($(TARGET_ARCH),arm)
-LOCAL_NDK_VERSION := 5
 LOCAL_SDK_VERSION := 9
 endif
 LOCAL_SRC_FILES += $(local_src_files)
