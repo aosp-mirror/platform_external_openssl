@@ -139,11 +139,14 @@ function import() {
   perl crypto/sha/asm/sha512-armv4.pl      > crypto/sha/asm/sha512-armv4.s
 
   # Generate mips asm
-  perl crypto/aes/asm/aes-mips.pl          > crypto/aes/asm/aes-mips.s
-  perl crypto/bn/asm/mips.pl               > crypto/bn/asm/bn-mips.s
-  perl crypto/bn/asm/mips-mont.pl          > crypto/bn/asm/mips-mont.s
-  perl crypto/sha/asm/sha1-mips.pl         > crypto/sha/asm/sha1-mips.s
-  perl crypto/sha/asm/sha512-mips.pl       > crypto/sha/asm/sha256-mips.s
+  # The perl scripts expect to run the target compiler as $CC to determine
+  # the endianess of the target. Setting CC to true is a hack that forces the scripts
+  # to generate little endian output
+  CC=true perl crypto/aes/asm/aes-mips.pl o32      > crypto/aes/asm/aes-mips.s
+  CC=true perl crypto/bn/asm/mips.pl o32           > crypto/bn/asm/bn-mips.s
+  CC=true perl crypto/bn/asm/mips-mont.pl o32      > crypto/bn/asm/mips-mont.s
+  CC=true perl crypto/sha/asm/sha1-mips.pl o32     > crypto/sha/asm/sha1-mips.s
+  CC=true perl crypto/sha/asm/sha512-mips.pl o32   > crypto/sha/asm/sha256-mips.s
 
   # Setup android.testssl directory
   mkdir android.testssl
