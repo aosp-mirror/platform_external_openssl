@@ -538,6 +538,8 @@ local_as_flags := -x assembler-with-cpp
 
 local_c_includes += $(log_c_includes)
 
+local_additional_dependencies := $(LOCAL_PATH)/android-config.mk $(LOCAL_PATH)/Crypto.mk
+
 #######################################
 # target static library
 include $(CLEAR_VARS)
@@ -571,6 +573,7 @@ ifeq ($(TARGET_ARCH),x86)
 endif
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE:= libcrypto_static
+LOCAL_ADDITIONAL_DEPENDENCIES := $(local_additional_dependencies)
 include $(BUILD_STATIC_LIBRARY)
 
 #######################################
@@ -583,10 +586,10 @@ LOCAL_SHARED_LIBRARIES := $(log_shared_libraries)
 ifeq ($(TARGET_ARCH),arm)
 LOCAL_NDK_VERSION := 5
 LOCAL_SDK_VERSION := 9
-# Use the NDK prebuilt libz and libdl.
-LOCAL_LDFLAGS += -lz -ldl
+# Use the NDK prebuilt libdl.
+LOCAL_LDFLAGS += -ldl
 else
-LOCAL_SHARED_LIBRARIES += libz libdl
+LOCAL_SHARED_LIBRARIES += libdl
 endif
 
 LOCAL_SRC_FILES += $(local_src_files)
@@ -610,6 +613,7 @@ ifeq ($(TARGET_ARCH),x86)
 endif
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE:= libcrypto
+LOCAL_ADDITIONAL_DEPENDENCIES := $(local_additional_dependencies)
 include $(BUILD_SHARED_LIBRARY)
 
 #######################################
@@ -622,10 +626,10 @@ LOCAL_CFLAGS += $(local_c_flags) -DPURIFY
 LOCAL_ASFLAGS += $(local_as_flags)
 LOCAL_C_INCLUDES += $(local_c_includes)
 LOCAL_SRC_FILES += $(other_arch_src_files)
-LOCAL_STATIC_LIBRARIES += libz
 LOCAL_LDLIBS += -ldl
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE:= libcrypto
+LOCAL_ADDITIONAL_DEPENDENCIES := $(local_additional_dependencies)
 include $(BUILD_HOST_SHARED_LIBRARY)
 
 ########################################
@@ -639,8 +643,8 @@ LOCAL_CFLAGS += $(local_c_flags) -DPURIFY
 LOCAL_ASFLAGS += $(local_as_flags)
 LOCAL_C_INCLUDES += $(local_c_includes)
 LOCAL_SRC_FILES += $(other_arch_src_files)
-LOCAL_STATIC_LIBRARIES += libz
 LOCAL_LDLIBS += -ldl
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE:= libcrypto_static
+LOCAL_ADDITIONAL_DEPENDENCIES := $(local_additional_dependencies)
 include $(BUILD_HOST_STATIC_LIBRARY)
