@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "AAAI63//9gs\u003d",
+        "filename": "android-config.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1010138
+      },
+      "writtenOn": "2012-08-30T00:46:40Z",
+      "side": 1,
+      "message": "whitespace",
+      "revId": "6d091b123d928b0152ceb6871487a247b0f24c12",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
