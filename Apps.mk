@@ -63,6 +63,8 @@ local_c_includes := \
 
 local_cflags := -DMONOLITH
 
+local_additional_dependencies := $(LOCAL_PATH)/android-config.mk $(LOCAL_PATH)/Apps.mk
+
 include $(CLEAR_VARS)
 LOCAL_MODULE:= openssl
 LOCAL_MODULE_TAGS := optional
@@ -70,6 +72,7 @@ LOCAL_SRC_FILES := $(local_src_files)
 LOCAL_SHARED_LIBRARIES := $(local_shared_libraries)
 LOCAL_C_INCLUDES := $(local_c_includes)
 LOCAL_CFLAGS := $(local_cflags)
+LOCAL_ADDITIONAL_DEPENDENCIES := $(local_additional_dependencies)
 include $(LOCAL_PATH)/android-config.mk
 include $(BUILD_EXECUTABLE)
 
@@ -80,5 +83,6 @@ LOCAL_SRC_FILES := $(local_src_files)
 LOCAL_SHARED_LIBRARIES := $(local_shared_libraries)
 LOCAL_C_INCLUDES := $(local_c_includes)
 LOCAL_CFLAGS := $(local_cflags)
+LOCAL_ADDITIONAL_DEPENDENCIES := $(local_additional_dependencies)
 include $(LOCAL_PATH)/android-config.mk
 include $(BUILD_HOST_EXECUTABLE)
