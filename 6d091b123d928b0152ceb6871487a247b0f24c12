@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "AAAI6X//9Ps\u003d",
+        "filename": "Apps.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1003224
+      },
+      "writtenOn": "2012-08-30T00:57:15Z",
+      "side": 1,
+      "message": "(i\u0027d been putting them directly below LOCAL_MODULE so i could grep -A1 to find anywhere i\u0027d missed, but it doesn\u0027t really matter.)",
+      "revId": "6d091b123d928b0152ceb6871487a247b0f24c12",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "AAAI6X//9Pk\u003d",
+        "filename": "android-config.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1003224
+      },
+      "writtenOn": "2012-08-30T00:57:15Z",
+      "side": 1,
+      "message": "excluded",
+      "revId": "6d091b123d928b0152ceb6871487a247b0f24c12",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "AAAI63//9gs\u003d",
         "filename": "android-config.mk",
         "patchSetId": 1
