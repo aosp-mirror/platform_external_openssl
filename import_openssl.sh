@@ -148,6 +148,23 @@ function import() {
   CC=true perl crypto/sha/asm/sha1-mips.pl o32     > crypto/sha/asm/sha1-mips.s
   CC=true perl crypto/sha/asm/sha512-mips.pl o32   > crypto/sha/asm/sha256-mips.s
 
+  # Generate x86 asm
+  perl crypto/aes/asm/aes-586.pl      elf  > crypto/aes/asm/aes-586.s
+  perl crypto/aes/asm/vpaes-x86.pl    elf  > crypto/aes/asm/vpaes-x86.s
+  perl crypto/aes/asm/aesni-x86.pl    elf  > crypto/aes/asm/aesni-x86.s
+  perl crypto/bn/asm/bn-586.pl        elf  > crypto/bn/asm/bn-586.s
+  perl crypto/bn/asm/co-586.pl        elf  > crypto/bn/asm/co-586.s
+  perl crypto/bn/asm/x86-mont.pl      elf  > crypto/bn/asm/x86-mont.s
+  perl crypto/bn/asm/x86-gf2m.pl      elf  > crypto/bn/asm/x86-gf2m.s
+  perl crypto/modes/asm/ghash-x86.pl  elf  > crypto/modes/asm/ghash-x86.s
+  perl crypto/sha/asm/sha1-586.pl     elf  > crypto/sha/asm/sha1-586.s
+  perl crypto/sha/asm/sha256-586.pl   elf  > crypto/sha/asm/sha256-586.s
+  perl crypto/sha/asm/sha512-586.pl   elf  > crypto/sha/asm/sha512-586.s
+  perl crypto/md5/asm/md5-586.pl      elf  > crypto/md5/asm/md5-586.s
+  perl crypto/des/asm/des-586.pl      elf  > crypto/des/asm/des-586.s
+  perl crypto/des/asm/crypt586.pl     elf  > crypto/des/asm/crypt586.s
+  perl crypto/bf/asm/bf-586.pl        elf  > crypto/bf/asm/bf-586.s
+
   # Setup android.testssl directory
   mkdir android.testssl
   cat test/testssl | \
