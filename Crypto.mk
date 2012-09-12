@@ -1,5 +1,7 @@
 arm_cflags := -DOPENSSL_BN_ASM_GF2m -DOPENSSL_BN_ASM_MONT -DGHASH_ASM -DAES_ASM -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM
 mips_cflags := -DOPENSSL_BN_ASM_MONT -DAES_ASM -DSHA1_ASM -DSHA256_ASM
+x86_cflags := -DOPENSSL_BN_ASM_GF2m -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_PART_WORDS -DAES_ASM -DGHASH_ASM \
+	      -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DMD5_ASM -DDES_PTR -DDES_RISC1 -DDES_UNROLL
 
 arm_src_files := \
 	crypto/aes/asm/aes-armv4.s \
@@ -17,6 +19,29 @@ mips_src_files := \
 	crypto/bn/asm/mips-mont.s \
 	crypto/sha/asm/sha1-mips.s \
 	crypto/sha/asm/sha256-mips.s
+
+x86_src_files := \
+	crypto/aes/asm/aes-586.s \
+	crypto/aes/asm/vpaes-x86.s \
+	crypto/aes/asm/aesni-x86.s \
+	crypto/bn/asm/bn-586.s \
+	crypto/bn/asm/co-586.s \
+	crypto/bn/asm/x86-mont.s \
+	crypto/bn/asm/x86-gf2m.s \
+	crypto/modes/asm/ghash-x86.s \
+	crypto/sha/asm/sha1-586.s \
+	crypto/sha/asm/sha256-586.s \
+	crypto/sha/asm/sha512-586.s \
+	crypto/md5/asm/md5-586.s \
+	crypto/des/asm/des-586.s \
+	crypto/des/asm/crypt586.s \
+	crypto/bf/asm/bf-586.s
+
+x86_exclude_files := \
+	crypto/aes/aes_cbc.c \
+	crypto/des/des_enc.c \
+	crypto/des/fcrypt_b.c \
+	crypto/bf/bf_enc.c
 
 other_arch_src_files := \
 	crypto/aes/aes_core.c \
@@ -567,7 +592,9 @@ ifeq ($(TARGET_ARCH),mips)
     endif
 endif
 ifeq ($(TARGET_ARCH),x86)
-	LOCAL_SRC_FILES += $(other_arch_src_files)
+      LOCAL_SRC_FILES += $(x86_src_files)
+      LOCAL_SRC_FILES := $(filter-out $(x86_exclude_files),$(LOCAL_SRC_FILES))
+      LOCAL_CFLAGS += $(x86_cflags)
 endif
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE:= libcrypto_static
@@ -606,7 +633,9 @@ ifeq ($(TARGET_ARCH),mips)
     endif
 endif
 ifeq ($(TARGET_ARCH),x86)
-	LOCAL_SRC_FILES += $(other_arch_src_files)
+      LOCAL_SRC_FILES += $(x86_src_files)
+      LOCAL_SRC_FILES := $(filter-out $(x86_exclude_files),$(LOCAL_SRC_FILES))
+      LOCAL_CFLAGS += $(x86_cflags)
 endif
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE:= libcrypto
