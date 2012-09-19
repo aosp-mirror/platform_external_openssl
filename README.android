@@ -23,7 +23,6 @@ The following steps are recommended for porting new OpenSSL versions.
 
 2) Update the variables in openssl.config and openssl.version as appropriate.
    At the very least you will need to update the openssl.version.
-   Similarly update ThirdPartyProject.prop.
 
 3) Run:
 
