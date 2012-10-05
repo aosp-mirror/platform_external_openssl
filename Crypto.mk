@@ -3,38 +3,38 @@ mips_cflags := -DOPENSSL_BN_ASM_MONT -DAES_ASM -DSHA1_ASM -DSHA256_ASM
 x86_cflags := -DOPENSSL_BN_ASM_GF2m -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_PART_WORDS -DAES_ASM -DGHASH_ASM -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DMD5_ASM -DDES_PTR -DDES_RISC1 -DDES_UNROLL
 
 arm_src_files := \
- crypto/aes/asm/aes-armv4.s \
- crypto/bn/asm/armv4-gf2m.s \
- crypto/bn/asm/armv4-mont.s \
+ crypto/aes/asm/aes-armv4.S \
+ crypto/bn/asm/armv4-gf2m.S \
+ crypto/bn/asm/armv4-mont.S \
  crypto/bn/bn_asm.c \
- crypto/modes/asm/ghash-armv4.s \
- crypto/sha/asm/sha1-armv4-large.s \
- crypto/sha/asm/sha256-armv4.s \
- crypto/sha/asm/sha512-armv4.s
+ crypto/modes/asm/ghash-armv4.S \
+ crypto/sha/asm/sha1-armv4-large.S \
+ crypto/sha/asm/sha256-armv4.S \
+ crypto/sha/asm/sha512-armv4.S
 
 mips_src_files := \
- crypto/aes/asm/aes-mips.s \
- crypto/bn/asm/bn-mips.s \
- crypto/bn/asm/mips-mont.s \
- crypto/sha/asm/sha1-mips.s \
- crypto/sha/asm/sha256-mips.s
+ crypto/aes/asm/aes-mips.S \
+ crypto/bn/asm/bn-mips.S \
+ crypto/bn/asm/mips-mont.S \
+ crypto/sha/asm/sha1-mips.S \
+ crypto/sha/asm/sha256-mips.S
 
 x86_src_files := \
- crypto/aes/asm/aes-586.s \
- crypto/aes/asm/vpaes-x86.s \
- crypto/aes/asm/aesni-x86.s \
- crypto/bn/asm/bn-586.s \
- crypto/bn/asm/co-586.s \
- crypto/bn/asm/x86-mont.s \
- crypto/bn/asm/x86-gf2m.s \
- crypto/modes/asm/ghash-x86.s \
- crypto/sha/asm/sha1-586.s \
- crypto/sha/asm/sha256-586.s \
- crypto/sha/asm/sha512-586.s \
- crypto/md5/asm/md5-586.s \
- crypto/des/asm/des-586.s \
- crypto/des/asm/crypt586.s \
- crypto/bf/asm/bf-586.s
+ crypto/aes/asm/aes-586.S \
+ crypto/aes/asm/vpaes-x86.S \
+ crypto/aes/asm/aesni-x86.S \
+ crypto/bn/asm/bn-586.S \
+ crypto/bn/asm/co-586.S \
+ crypto/bn/asm/x86-mont.S \
+ crypto/bn/asm/x86-gf2m.S \
+ crypto/modes/asm/ghash-x86.S \
+ crypto/sha/asm/sha1-586.S \
+ crypto/sha/asm/sha256-586.S \
+ crypto/sha/asm/sha512-586.S \
+ crypto/md5/asm/md5-586.S \
+ crypto/des/asm/des-586.S \
+ crypto/des/asm/crypt586.S \
+ crypto/bf/asm/bf-586.S
 
 x86_exclude_files := \
  crypto/aes/aes_cbc.c \
@@ -558,8 +558,6 @@ local_c_includes := \
 
 local_c_flags := -DNO_WINDOWS_BRAINDEATH
 
-local_as_flags := -x assembler-with-cpp
-
 local_c_includes += $(log_c_includes)
 
 local_additional_dependencies := $(LOCAL_PATH)/android-config.mk $(LOCAL_PATH)/Crypto.mk
@@ -578,7 +576,6 @@ endif
 
 LOCAL_SRC_FILES += $(local_src_files)
 LOCAL_CFLAGS += $(local_c_flags)
-LOCAL_ASFLAGS += $(local_as_flags)
 LOCAL_C_INCLUDES += $(local_c_includes)
 ifeq ($(TARGET_ARCH),arm)
  LOCAL_SRC_FILES += $(arm_src_files)
@@ -620,7 +617,6 @@ endif
 
 LOCAL_SRC_FILES += $(local_src_files)
 LOCAL_CFLAGS += $(local_c_flags)
-LOCAL_ASFLAGS += $(local_as_flags)
 LOCAL_C_INCLUDES += $(local_c_includes)
 ifeq ($(TARGET_ARCH),arm)
   LOCAL_SRC_FILES += $(arm_src_files)
@@ -658,7 +654,6 @@ else
   LOCAL_SRC_FILES += $(other_arch_src_files)
 endif
 LOCAL_CFLAGS += $(local_c_flags) -DPURIFY
-LOCAL_ASFLAGS += $(local_as_flags)
 LOCAL_C_INCLUDES += $(local_c_includes)
 LOCAL_LDLIBS += -ldl
 LOCAL_MODULE_TAGS := optional
@@ -681,7 +676,6 @@ else
   LOCAL_SRC_FILES += $(other_arch_src_files)
 endif
 LOCAL_CFLAGS += $(local_c_flags) -DPURIFY
-LOCAL_ASFLAGS += $(local_as_flags)
 LOCAL_C_INCLUDES += $(local_c_includes)
 LOCAL_LDLIBS += -ldl
 LOCAL_MODULE_TAGS := optional

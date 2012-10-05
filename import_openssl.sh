@@ -130,40 +130,40 @@ function import() {
   done
 
   # Generate arm asm
-  perl crypto/aes/asm/aes-armv4.pl         > crypto/aes/asm/aes-armv4.s
-  perl crypto/bn/asm/armv4-gf2m.pl         > crypto/bn/asm/armv4-gf2m.s
-  perl crypto/bn/asm/armv4-mont.pl         > crypto/bn/asm/armv4-mont.s
-  perl crypto/modes/asm/ghash-armv4.pl     > crypto/modes/asm/ghash-armv4.s
-  perl crypto/sha/asm/sha1-armv4-large.pl  > crypto/sha/asm/sha1-armv4-large.s
-  perl crypto/sha/asm/sha256-armv4.pl      > crypto/sha/asm/sha256-armv4.s
-  perl crypto/sha/asm/sha512-armv4.pl      > crypto/sha/asm/sha512-armv4.s
+  perl crypto/aes/asm/aes-armv4.pl         > crypto/aes/asm/aes-armv4.S
+  perl crypto/bn/asm/armv4-gf2m.pl         > crypto/bn/asm/armv4-gf2m.S
+  perl crypto/bn/asm/armv4-mont.pl         > crypto/bn/asm/armv4-mont.S
+  perl crypto/modes/asm/ghash-armv4.pl     > crypto/modes/asm/ghash-armv4.S
+  perl crypto/sha/asm/sha1-armv4-large.pl  > crypto/sha/asm/sha1-armv4-large.S
+  perl crypto/sha/asm/sha256-armv4.pl      > crypto/sha/asm/sha256-armv4.S
+  perl crypto/sha/asm/sha512-armv4.pl      > crypto/sha/asm/sha512-armv4.S
 
   # Generate mips asm
   # The perl scripts expect to run the target compiler as $CC to determine
   # the endianess of the target. Setting CC to true is a hack that forces the scripts
   # to generate little endian output
-  CC=true perl crypto/aes/asm/aes-mips.pl o32      > crypto/aes/asm/aes-mips.s
-  CC=true perl crypto/bn/asm/mips.pl o32           > crypto/bn/asm/bn-mips.s
-  CC=true perl crypto/bn/asm/mips-mont.pl o32      > crypto/bn/asm/mips-mont.s
-  CC=true perl crypto/sha/asm/sha1-mips.pl o32     > crypto/sha/asm/sha1-mips.s
-  CC=true perl crypto/sha/asm/sha512-mips.pl o32   > crypto/sha/asm/sha256-mips.s
+  CC=true perl crypto/aes/asm/aes-mips.pl o32      > crypto/aes/asm/aes-mips.S
+  CC=true perl crypto/bn/asm/mips.pl o32           > crypto/bn/asm/bn-mips.S
+  CC=true perl crypto/bn/asm/mips-mont.pl o32      > crypto/bn/asm/mips-mont.S
+  CC=true perl crypto/sha/asm/sha1-mips.pl o32     > crypto/sha/asm/sha1-mips.S
+  CC=true perl crypto/sha/asm/sha512-mips.pl o32   > crypto/sha/asm/sha256-mips.S
 
   # Generate x86 asm
-  perl crypto/aes/asm/aes-586.pl      elf  > crypto/aes/asm/aes-586.s
-  perl crypto/aes/asm/vpaes-x86.pl    elf  > crypto/aes/asm/vpaes-x86.s
-  perl crypto/aes/asm/aesni-x86.pl    elf  > crypto/aes/asm/aesni-x86.s
-  perl crypto/bn/asm/bn-586.pl        elf  > crypto/bn/asm/bn-586.s
-  perl crypto/bn/asm/co-586.pl        elf  > crypto/bn/asm/co-586.s
-  perl crypto/bn/asm/x86-mont.pl      elf  > crypto/bn/asm/x86-mont.s
-  perl crypto/bn/asm/x86-gf2m.pl      elf  > crypto/bn/asm/x86-gf2m.s
-  perl crypto/modes/asm/ghash-x86.pl  elf  > crypto/modes/asm/ghash-x86.s
-  perl crypto/sha/asm/sha1-586.pl     elf  > crypto/sha/asm/sha1-586.s
-  perl crypto/sha/asm/sha256-586.pl   elf  > crypto/sha/asm/sha256-586.s
-  perl crypto/sha/asm/sha512-586.pl   elf  > crypto/sha/asm/sha512-586.s
-  perl crypto/md5/asm/md5-586.pl      elf  > crypto/md5/asm/md5-586.s
-  perl crypto/des/asm/des-586.pl      elf  > crypto/des/asm/des-586.s
-  perl crypto/des/asm/crypt586.pl     elf  > crypto/des/asm/crypt586.s
-  perl crypto/bf/asm/bf-586.pl        elf  > crypto/bf/asm/bf-586.s
+  perl crypto/aes/asm/aes-586.pl      elf  > crypto/aes/asm/aes-586.S
+  perl crypto/aes/asm/vpaes-x86.pl    elf  > crypto/aes/asm/vpaes-x86.S
+  perl crypto/aes/asm/aesni-x86.pl    elf  > crypto/aes/asm/aesni-x86.S
+  perl crypto/bn/asm/bn-586.pl        elf  > crypto/bn/asm/bn-586.S
+  perl crypto/bn/asm/co-586.pl        elf  > crypto/bn/asm/co-586.S
+  perl crypto/bn/asm/x86-mont.pl      elf  > crypto/bn/asm/x86-mont.S
+  perl crypto/bn/asm/x86-gf2m.pl      elf  > crypto/bn/asm/x86-gf2m.S
+  perl crypto/modes/asm/ghash-x86.pl  elf  > crypto/modes/asm/ghash-x86.S
+  perl crypto/sha/asm/sha1-586.pl     elf  > crypto/sha/asm/sha1-586.S
+  perl crypto/sha/asm/sha256-586.pl   elf  > crypto/sha/asm/sha256-586.S
+  perl crypto/sha/asm/sha512-586.pl   elf  > crypto/sha/asm/sha512-586.S
+  perl crypto/md5/asm/md5-586.pl      elf  > crypto/md5/asm/md5-586.S
+  perl crypto/des/asm/des-586.pl      elf  > crypto/des/asm/des-586.S
+  perl crypto/des/asm/crypt586.pl     elf  > crypto/des/asm/crypt586.S
+  perl crypto/bf/asm/bf-586.pl        elf  > crypto/bf/asm/bf-586.S
 
   # Setup android.testssl directory
   mkdir android.testssl
