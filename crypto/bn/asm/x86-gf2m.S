@@ -240,11 +240,15 @@ _mul_1x1_ialu:
 .align	16
 bn_GF2m_mul_2x2:
 .L_bn_GF2m_mul_2x2_begin:
-	leal	OPENSSL_ia32cap_P,%edx
+	call	.L000PIC_me_up
+.L000PIC_me_up:
+	popl	%edx
+	leal	_GLOBAL_OFFSET_TABLE_+[.-.L000PIC_me_up](%edx),%edx
+	movl	OPENSSL_ia32cap_P@GOT(%edx),%edx
 	movl	(%edx),%eax
 	movl	4(%edx),%edx
 	testl	$8388608,%eax
-	jz	.L000ialu
+	jz	.L001ialu
 	pushl	%ebp
 	pushl	%ebx
 	pushl	%esi
@@ -279,7 +283,7 @@ bn_GF2m_mul_2x2:
 	emms
 	ret
 .align	16
-.L000ialu:
+.L001ialu:
 	pushl	%ebp
 	pushl	%ebx
 	pushl	%esi
