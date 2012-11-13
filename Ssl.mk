@@ -57,9 +57,8 @@ local_additional_dependencies := $(LOCAL_PATH)/android-config.mk $(LOCAL_PATH)/S
 include $(CLEAR_VARS)
 include $(LOCAL_PATH)/android-config.mk
 
-ifeq ($(TARGET_ARCH),arm)
 LOCAL_SDK_VERSION := 9
-endif
+
 LOCAL_SRC_FILES += $(local_src_files)
 LOCAL_C_INCLUDES += $(local_c_includes)
 LOCAL_SHARED_LIBRARIES = $(log_shared_libraries)
@@ -73,9 +72,8 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 include $(LOCAL_PATH)/android-config.mk
 
-ifeq ($(TARGET_ARCH),arm)
 LOCAL_SDK_VERSION := 9
-endif
+
 LOCAL_SRC_FILES += $(local_src_files)
 LOCAL_C_INCLUDES += $(local_c_includes)
 LOCAL_SHARED_LIBRARIES += libcrypto $(log_shared_libraries)
