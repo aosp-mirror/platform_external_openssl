@@ -569,9 +569,7 @@ include $(LOCAL_PATH)/android-config.mk
 
 LOCAL_SHARED_LIBRARIES := $(log_shared_libraries)
 
-ifeq ($(TARGET_ARCH),arm)
 LOCAL_SDK_VERSION := 9
-endif
 
 LOCAL_SRC_FILES += $(local_src_files)
 LOCAL_CFLAGS += $(local_c_flags)
@@ -605,13 +603,8 @@ include $(LOCAL_PATH)/android-config.mk
 
 LOCAL_SHARED_LIBRARIES := $(log_shared_libraries)
 
-ifeq ($(TARGET_ARCH),arm)
 LOCAL_SDK_VERSION := 9
-# Use the NDK prebuilt libdl.
 LOCAL_LDFLAGS += -ldl
-else
-LOCAL_SHARED_LIBRARIES += libdl
-endif
 
 LOCAL_SRC_FILES += $(local_src_files)
 LOCAL_CFLAGS += $(local_c_flags)
