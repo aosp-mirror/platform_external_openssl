@@ -1,0 +1,7 @@
+Code-Review+2: Brian Carlstrom <bdc@google.com>
+Verified+1: Brian Carlstrom <bdc@google.com>
+Submitted-by: Brian Carlstrom <bdc@google.com>
+Submitted-at: Tue, 13 Nov 2012 22:07:33 -0800
+Reviewed-on: https://android-review.googlesource.com/46341
+Project: platform/external/openssl
+Branch: refs/heads/master
