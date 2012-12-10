@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "M18P38Rk",
+        "filename": "Crypto.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1003723
+      },
+      "writtenOn": "2012-12-10T17:48:53Z",
+      "side": 1,
+      "message": "what is getting used from this file? OPENSSL_rdtsc and OPENSSL_cleanse from the look of it?",
+      "revId": "2ced6226693ef6b5b9ba6ddb34e3de3cf9cf5f31",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
