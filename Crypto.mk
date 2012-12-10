@@ -34,13 +34,15 @@ x86_src_files := \
  crypto/md5/asm/md5-586.S \
  crypto/des/asm/des-586.S \
  crypto/des/asm/crypt586.S \
- crypto/bf/asm/bf-586.S
+ crypto/bf/asm/bf-586.S \
+ crypto/x86cpuid.S
 
 x86_exclude_files := \
  crypto/aes/aes_cbc.c \
  crypto/des/des_enc.c \
  crypto/des/fcrypt_b.c \
- crypto/bf/bf_enc.c
+ crypto/bf/bf_enc.c \
+ crypto/mem_clr.c
 
 other_arch_src_files := \
  crypto/aes/aes_core.c \
