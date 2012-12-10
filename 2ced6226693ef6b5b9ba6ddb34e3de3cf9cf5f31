@@ -16,6 +16,24 @@
       "revId": "2ced6226693ef6b5b9ba6ddb34e3de3cf9cf5f31",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "M3S7phqI",
+        "filename": "Crypto.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1000411
+      },
+      "writtenOn": "2012-12-10T20:00:30Z",
+      "side": 1,
+      "message": "It\u0027s to avoid a link conflict, because mem_clr.c defines a generic implementation of OPENSSL_clearse, and x86cpuid.S provides another one.\n\nI\u0027ve updated the commit message to explain that.",
+      "parentUuid": "M18P38Rk",
+      "revId": "2ced6226693ef6b5b9ba6ddb34e3de3cf9cf5f31",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
