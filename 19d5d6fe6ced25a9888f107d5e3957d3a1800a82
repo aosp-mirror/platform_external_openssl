@@ -1,0 +1,8 @@
+Code-Review+1: David Turner <digit@android.com>
+Verified+1: David Turner <digit@android.com>
+Code-Review+2: Brian Carlstrom <bdc@google.com>
+Submitted-by: David Turner <digit@android.com>
+Submitted-at: Tue, 11 Dec 2012 02:32:57 -0800
+Reviewed-on: https://android-review.googlesource.com/47912
+Project: platform/external/openssl
+Branch: refs/heads/master
