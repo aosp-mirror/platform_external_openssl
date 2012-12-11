@@ -1,6 +1,6 @@
 arm_cflags := -DOPENSSL_BN_ASM_GF2m -DOPENSSL_BN_ASM_MONT -DGHASH_ASM -DAES_ASM -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM
 mips_cflags := -DOPENSSL_BN_ASM_MONT -DAES_ASM -DSHA1_ASM -DSHA256_ASM
-x86_cflags := -DOPENSSL_BN_ASM_GF2m -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_PART_WORDS -DAES_ASM -DGHASH_ASM -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DMD5_ASM -DDES_PTR -DDES_RISC1 -DDES_UNROLL
+x86_cflags := -DOPENSSL_BN_ASM_GF2m -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_PART_WORDS -DAES_ASM -DGHASH_ASM -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DMD5_ASM -DDES_PTR -DDES_RISC1 -DDES_UNROLL -DOPENSSL_CPUID_OBJ
 
 arm_src_files := \
  crypto/aes/asm/aes-armv4.S \
@@ -34,13 +34,15 @@ x86_src_files := \
  crypto/md5/asm/md5-586.S \
  crypto/des/asm/des-586.S \
  crypto/des/asm/crypt586.S \
- crypto/bf/asm/bf-586.S
+ crypto/bf/asm/bf-586.S \
+ crypto/x86cpuid.S
 
 x86_exclude_files := \
  crypto/aes/aes_cbc.c \
  crypto/des/des_enc.c \
  crypto/des/fcrypt_b.c \
- crypto/bf/bf_enc.c
+ crypto/bf/bf_enc.c \
+ crypto/mem_clr.c
 
 other_arch_src_files := \
  crypto/aes/aes_core.c \
