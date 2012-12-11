@@ -138,6 +138,12 @@ function gen_asm_x86 () {
   perl "$1" elf -fPIC > "$OUT"
 }
 
+function gen_asm_x86_64 () {
+  local OUT
+  OUT=$(default_asm_file "$@")
+  perl "$1" elf > "$OUT"
+}
+
 function import() {
   declare -r OPENSSL_SOURCE=$1
 
@@ -204,6 +210,23 @@ function import() {
   gen_asm_x86 crypto/des/asm/des-586.pl
   gen_asm_x86 crypto/des/asm/crypt586.pl
   gen_asm_x86 crypto/bf/asm/bf-586.pl
+
+  # Generate x86_64 asm
+  gen_asm_x86_64 crypto/x86_64cpuid.pl
+  gen_asm_x86_64 crypto/sha/asm/sha1-x86_64.pl
+  gen_asm_x86_64 crypto/sha/asm/sha512-x86_64.pl
+  gen_asm_x86_64 crypto/modes/asm/ghash-x86_64.pl
+  gen_asm_x86_64 crypto/aes/asm/aesni-x86_64.pl
+  gen_asm_x86_64 crypto/aes/asm/vpaes-x86_64.pl
+  gen_asm_x86_64 crypto/aes/asm/bsaes-x86_64.pl
+  gen_asm_x86_64 crypto/aes/asm/aes-x86_64.pl
+  gen_asm_x86_64 crypto/md5/asm/md5-x86_64.pl
+  gen_asm_x86_64 crypto/bn/asm/modexp512-x86_64.pl
+  gen_asm_x86_64 crypto/bn/asm/x86_64-mont.pl
+  gen_asm_x86_64 crypto/bn/asm/x86_64-gf2m.pl
+  gen_asm_x86_64 crypto/bn/asm/x86_64-mont5.pl
+  gen_asm_x86_64 crypto/rc4/asm/rc4-x86_64.pl
+  gen_asm_x86_64 crypto/rc4/asm/rc4-md5-x86_64.pl
 
   # Setup android.testssl directory
   mkdir android.testssl
