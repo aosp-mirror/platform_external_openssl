@@ -57,7 +57,9 @@ local_additional_dependencies := $(LOCAL_PATH)/android-config.mk $(LOCAL_PATH)/S
 include $(CLEAR_VARS)
 include $(LOCAL_PATH)/android-config.mk
 
+ifneq (,$(TARGET_BUILD_APPS))
 LOCAL_SDK_VERSION := 9
+endif
 
 LOCAL_SRC_FILES += $(local_src_files)
 LOCAL_C_INCLUDES += $(local_c_includes)
@@ -72,7 +74,9 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 include $(LOCAL_PATH)/android-config.mk
 
+ifneq (,$(TARGET_BUILD_APPS))
 LOCAL_SDK_VERSION := 9
+endif
 
 LOCAL_SRC_FILES += $(local_src_files)
 LOCAL_C_INCLUDES += $(local_c_includes)
