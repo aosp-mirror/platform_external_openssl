@@ -571,7 +571,9 @@ include $(LOCAL_PATH)/android-config.mk
 
 LOCAL_SHARED_LIBRARIES := $(log_shared_libraries)
 
+ifneq (,$(TARGET_BUILD_APPS))
 LOCAL_SDK_VERSION := 9
+endif
 
 LOCAL_SRC_FILES += $(local_src_files)
 LOCAL_CFLAGS += $(local_c_flags)
@@ -605,7 +607,9 @@ include $(LOCAL_PATH)/android-config.mk
 
 LOCAL_SHARED_LIBRARIES := $(log_shared_libraries)
 
+ifneq (,$(TARGET_BUILD_APPS))
 LOCAL_SDK_VERSION := 9
+endif
 LOCAL_LDFLAGS += -ldl
 
 LOCAL_SRC_FILES += $(local_src_files)
