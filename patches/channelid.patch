@@ -1,0 +1,987 @@
+diff -ur openssl/crypto/evp/evp.h openssl.channelid/crypto/evp/evp.h
+--- openssl/crypto/evp/evp.h	2012-05-16 12:44:09.000000000 -0400
++++ openssl.channelid/crypto/evp/evp.h	2012-08-28 16:19:15.195752493 -0400
+@@ -922,6 +922,7 @@
+ #endif
+ 
+ EVP_PKEY *	EVP_PKEY_new(void);
++EVP_PKEY *	EVP_PKEY_dup(EVP_PKEY *pkey);
+ void		EVP_PKEY_free(EVP_PKEY *pkey);
+ 
+ EVP_PKEY *	d2i_PublicKey(int type,EVP_PKEY **a, const unsigned char **pp,
+diff -ur openssl/crypto/evp/p_lib.c openssl.channelid/crypto/evp/p_lib.c
+--- openssl/crypto/evp/p_lib.c	2011-02-01 09:46:34.000000000 -0500
++++ openssl.channelid/crypto/evp/p_lib.c	2012-08-29 16:22:27.467810070 -0400
+@@ -200,6 +200,12 @@
+ 	return(ret);
+ 	}
+ 
++EVP_PKEY *EVP_PKEY_dup(EVP_PKEY *pkey)
++	{
++	CRYPTO_add(&pkey->references, 1, CRYPTO_LOCK_EVP_PKEY);
++	return pkey;
++	}
++
+ /* Setup a public key ASN1 method and ENGINE from a NID or a string.
+  * If pkey is NULL just return 1 or 0 if the algorithm exists.
+  */
+diff -ur openssl/ssl/s3_both.c openssl.channelid/ssl/s3_both.c
+--- openssl/ssl/s3_both.c	2012-08-28 16:04:21.173349370 -0400
++++ openssl.channelid/ssl/s3_both.c	2012-08-28 16:04:40.583618671 -0400
+@@ -544,7 +544,8 @@
+ 		ssl3_take_mac(s);
+ #endif
+ 	/* Feed this message into MAC computation. */
+-	ssl3_finish_mac(s, (unsigned char *)s->init_buf->data, s->init_num + 4);
++	if (*s->init_buf->data != SSL3_MT_ENCRYPTED_EXTENSIONS)
++		ssl3_finish_mac(s, (unsigned char *)s->init_buf->data, s->init_num + 4);
+ 	if (s->msg_callback)
+ 		s->msg_callback(0, s->version, SSL3_RT_HANDSHAKE, s->init_buf->data, (size_t)s->init_num + 4, s, s->msg_callback_arg);
+ 	*ok=1;
+diff -ur openssl/ssl/s3_clnt.c openssl.channelid/ssl/s3_clnt.c
+--- openssl/ssl/s3_clnt.c	2012-08-28 16:04:21.173349370 -0400
++++ openssl.channelid/ssl/s3_clnt.c	2012-08-28 16:04:42.563646142 -0400
+@@ -465,14 +465,14 @@
+ 				SSL3_ST_CW_CHANGE_A,SSL3_ST_CW_CHANGE_B);
+ 			if (ret <= 0) goto end;
+ 
+-
+-#if defined(OPENSSL_NO_TLSEXT) || defined(OPENSSL_NO_NEXTPROTONEG)
+ 			s->state=SSL3_ST_CW_FINISHED_A;
+-#else
++#if !defined(OPENSSL_NO_TLSEXT)
++			if (s->s3->tlsext_channel_id_valid)
++				s->state=SSL3_ST_CW_CHANNEL_ID_A;
++# if !defined(OPENSSL_NO_NEXTPROTONEG)
+ 			if (s->s3->next_proto_neg_seen)
+ 				s->state=SSL3_ST_CW_NEXT_PROTO_A;
+-			else
+-				s->state=SSL3_ST_CW_FINISHED_A;
++# endif
+ #endif
+ 			s->init_num=0;
+ 
+@@ -506,6 +506,18 @@
+ 		case SSL3_ST_CW_NEXT_PROTO_B:
+ 			ret=ssl3_send_next_proto(s);
+ 			if (ret <= 0) goto end;
++			if (s->s3->tlsext_channel_id_valid)
++				s->state=SSL3_ST_CW_CHANNEL_ID_A;
++			else
++				s->state=SSL3_ST_CW_FINISHED_A;
++			break;
++#endif
++
++#if !defined(OPENSSL_NO_TLSEXT)
++		case SSL3_ST_CW_CHANNEL_ID_A:
++		case SSL3_ST_CW_CHANNEL_ID_B:
++			ret=ssl3_send_channel_id(s);
++			if (ret <= 0) goto end;
+ 			s->state=SSL3_ST_CW_FINISHED_A;
+ 			break;
+ #endif
+@@ -3339,7 +3351,8 @@
+ 	return(0);
+ 	}
+ 
+-#if !defined(OPENSSL_NO_TLSEXT) && !defined(OPENSSL_NO_NEXTPROTONEG)
++#if !defined(OPENSSL_NO_TLSEXT)
++# if !defined(OPENSSL_NO_NEXTPROTONEG)
+ int ssl3_send_next_proto(SSL *s)
+ 	{
+ 	unsigned int len, padding_len;
+@@ -3363,7 +3376,116 @@
+ 
+ 	return ssl3_do_write(s, SSL3_RT_HANDSHAKE);
+ }
+-#endif  /* !OPENSSL_NO_TLSEXT && !OPENSSL_NO_NEXTPROTONEG */
++# endif  /* !OPENSSL_NO_NEXTPROTONEG */
++
++int ssl3_send_channel_id(SSL *s)
++	{
++	unsigned char *d;
++	int ret = -1, public_key_len;
++	EVP_MD_CTX md_ctx;
++	size_t sig_len;
++	ECDSA_SIG *sig = NULL;
++	unsigned char *public_key = NULL, *derp, *der_sig = NULL;
++
++	if (s->state != SSL3_ST_CW_CHANNEL_ID_A)
++		return ssl3_do_write(s, SSL3_RT_HANDSHAKE);
++
++	d = (unsigned char *)s->init_buf->data;
++	*(d++)=SSL3_MT_ENCRYPTED_EXTENSIONS;
++	l2n3(2 + 2 + TLSEXT_CHANNEL_ID_SIZE, d);
++	s2n(TLSEXT_TYPE_channel_id, d);
++	s2n(TLSEXT_CHANNEL_ID_SIZE, d);
++
++	EVP_MD_CTX_init(&md_ctx);
++
++	public_key_len = i2d_PublicKey(s->tlsext_channel_id_private, NULL);
++	if (public_key_len <= 0)
++		{
++		SSLerr(SSL_F_SSL3_SEND_CHANNEL_ID,SSL_R_CANNOT_SERIALIZE_PUBLIC_KEY);
++		goto err;
++		}
++	// i2d_PublicKey will produce an ANSI X9.62 public key which, for a
++	// P-256 key, is 0x04 (meaning uncompressed) followed by the x and y
++	// field elements as 32-byte, big-endian numbers.
++	if (public_key_len != 65)
++		{
++		SSLerr(SSL_F_SSL3_SEND_CHANNEL_ID,SSL_R_CHANNEL_ID_NOT_P256);
++		goto err;
++		}
++	public_key = OPENSSL_malloc(public_key_len);
++	if (!public_key)
++		{
++		SSLerr(SSL_F_SSL3_SEND_CHANNEL_ID,ERR_R_MALLOC_FAILURE);
++		goto err;
++		}
++
++	derp = public_key;
++	i2d_PublicKey(s->tlsext_channel_id_private, &derp);
++
++	if (EVP_DigestSignInit(&md_ctx, NULL, EVP_sha256(), NULL,
++			       s->tlsext_channel_id_private) != 1)
++		{
++		SSLerr(SSL_F_SSL3_SEND_CHANNEL_ID,SSL_R_EVP_DIGESTSIGNINIT_FAILED);
++		goto err;
++		}
++
++	if (!tls1_channel_id_hash(&md_ctx, s))
++		goto err;
++
++	if (!EVP_DigestSignFinal(&md_ctx, NULL, &sig_len))
++		{
++		SSLerr(SSL_F_SSL3_SEND_CHANNEL_ID,SSL_R_EVP_DIGESTSIGNFINAL_FAILED);
++		goto err;
++		}
++
++	der_sig = OPENSSL_malloc(sig_len);
++	if (!der_sig)
++		{
++		SSLerr(SSL_F_SSL3_SEND_CHANNEL_ID,ERR_R_MALLOC_FAILURE);
++		goto err;
++		}
++
++	if (!EVP_DigestSignFinal(&md_ctx, der_sig, &sig_len))
++		{
++		SSLerr(SSL_F_SSL3_SEND_CHANNEL_ID,SSL_R_EVP_DIGESTSIGNFINAL_FAILED);
++		goto err;
++		}
++
++	derp = der_sig;
++	sig = d2i_ECDSA_SIG(NULL, &derp, sig_len);
++	if (sig == NULL)
++		{
++		SSLerr(SSL_F_SSL3_SEND_CHANNEL_ID,SSL_R_D2I_ECDSA_SIG);
++		goto err;
++		}
++
++	// The first byte of public_key will be 0x4, denoting an uncompressed key.
++	memcpy(d, public_key + 1, 64);
++	d += 64;
++	memset(d, 0, 2 * 32);
++	BN_bn2bin(sig->r, d + 32 - BN_num_bytes(sig->r));
++	d += 32;
++	BN_bn2bin(sig->s, d + 32 - BN_num_bytes(sig->s));
++	d += 32;
++
++	s->state = SSL3_ST_CW_CHANNEL_ID_B;
++	s->init_num = 4 + 2 + 2 + TLSEXT_CHANNEL_ID_SIZE;
++	s->init_off = 0;
++
++	ret = ssl3_do_write(s, SSL3_RT_HANDSHAKE);
++
++err:
++	EVP_MD_CTX_cleanup(&md_ctx);
++	if (public_key)
++		OPENSSL_free(public_key);
++	if (der_sig)
++		OPENSSL_free(der_sig);
++	if (sig)
++		ECDSA_SIG_free(sig);
++
++	return ret;
++	}
++#endif  /* !OPENSSL_NO_TLSEXT */
+ 
+ /* Check to see if handshake is full or resumed. Usually this is just a
+  * case of checking to see if a cache hit has occurred. In the case of
+diff -ur openssl/ssl/s3_lib.c openssl.channelid/ssl/s3_lib.c
+--- openssl/ssl/s3_lib.c	2012-08-28 16:04:21.173349370 -0400
++++ openssl.channelid/ssl/s3_lib.c	2012-08-28 16:19:15.195752493 -0400
+@@ -2951,6 +2951,11 @@
+ #ifndef OPENSSL_NO_SRP
+ 	SSL_SRP_CTX_init(s);
+ #endif
++#if !defined(OPENSSL_NO_TLSEXT)
++	s->tlsext_channel_id_enabled = s->ctx->tlsext_channel_id_enabled;
++	if (s->ctx->tlsext_channel_id_private)
++		s->tlsext_channel_id_private = EVP_PKEY_dup(s->ctx->tlsext_channel_id_private);
++#endif
+ 	s->method->ssl_clear(s);
+ 	return(1);
+ err:
+@@ -3074,6 +3079,10 @@
+ 		s->next_proto_negotiated_len = 0;
+ 		}
+ #endif
++
++#if !defined(OPENSSL_NO_TLSEXT)
++	s->s3->tlsext_channel_id_valid = 0;
++#endif
+ 	}
+ 
+ #ifndef OPENSSL_NO_SRP
+@@ -3348,6 +3357,35 @@
+ 		ret = 1;
+ 		break;
+ #endif
++	case SSL_CTRL_CHANNEL_ID:
++		if (!s->server)
++			break;
++		s->tlsext_channel_id_enabled = 1;
++		ret = 1;
++		break;
++
++	case SSL_CTRL_SET_CHANNEL_ID:
++		if (s->server)
++			break;
++		s->tlsext_channel_id_enabled = 1;
++		if (EVP_PKEY_bits(parg) != 256)
++			{
++			SSLerr(SSL_F_SSL3_CTRL,SSL_R_CHANNEL_ID_NOT_P256);
++			break;
++			}
++		if (s->tlsext_channel_id_private)
++			EVP_PKEY_free(s->tlsext_channel_id_private);
++		s->tlsext_channel_id_private = (EVP_PKEY*) parg;
++		ret = 1;
++		break;
++
++	case SSL_CTRL_GET_CHANNEL_ID:
++		if (!s->server)
++			break;
++		if (!s->s3->tlsext_channel_id_valid)
++			break;
++		memcpy(parg, s->s3->tlsext_channel_id, larg < 64 ? larg : 64);
++		return 64;
+ 
+ #endif /* !OPENSSL_NO_TLSEXT */
+ 	default:
+@@ -3569,6 +3607,12 @@
+ 			}
+ 		return 1;
+ 		}
++	case SSL_CTRL_CHANNEL_ID:
++		/* must be called on a server */
++		if (ctx->method->ssl_accept == ssl_undefined_function)
++			return 0;
++		ctx->tlsext_channel_id_enabled=1;
++		return 1;
+ 
+ #ifdef TLSEXT_TYPE_opaque_prf_input
+ 	case SSL_CTRL_SET_TLSEXT_OPAQUE_PRF_INPUT_CB_ARG:
+@@ -3637,6 +3681,18 @@
+ 			}
+ 		break;
+ 
++	case SSL_CTRL_SET_CHANNEL_ID:
++		ctx->tlsext_channel_id_enabled = 1;
++		if (EVP_PKEY_bits(parg) != 256)
++			{
++			SSLerr(SSL_F_SSL3_CTX_CTRL,SSL_R_CHANNEL_ID_NOT_P256);
++			break;
++			}
++		if (ctx->tlsext_channel_id_private)
++			EVP_PKEY_free(ctx->tlsext_channel_id_private);
++		ctx->tlsext_channel_id_private = (EVP_PKEY*) parg;
++		break;
++
+ 	default:
+ 		return(0);
+ 		}
+diff -ur openssl/ssl/s3_srvr.c openssl.channelid/ssl/s3_srvr.c
+--- openssl/ssl/s3_srvr.c	2012-08-28 16:04:21.173349370 -0400
++++ openssl.channelid/ssl/s3_srvr.c	2012-08-28 16:04:40.593618810 -0400
+@@ -158,8 +158,11 @@
+ #include <openssl/buffer.h>
+ #include <openssl/rand.h>
+ #include <openssl/objects.h>
++#include <openssl/ec.h>
++#include <openssl/ecdsa.h>
+ #include <openssl/evp.h>
+ #include <openssl/hmac.h>
++#include <openssl/sha.h>
+ #include <openssl/x509.h>
+ #ifndef OPENSSL_NO_DH
+ #include <openssl/dh.h>
+@@ -621,15 +624,8 @@
+ 				 * the client uses its key from the certificate
+ 				 * for key exchange.
+ 				 */
+-#if defined(OPENSSL_NO_TLSEXT) || defined(OPENSSL_NO_NEXTPROTONEG)
+-				s->state=SSL3_ST_SR_FINISHED_A;
+-#else
+-				if (s->s3->next_proto_neg_seen)
+-					s->state=SSL3_ST_SR_NEXT_PROTO_A;
+-				else
+-					s->state=SSL3_ST_SR_FINISHED_A;
+-#endif
+ 				s->init_num = 0;
++				s->state=SSL3_ST_SR_POST_CLIENT_CERT;
+ 				}
+ 			else if (TLS1_get_version(s) >= TLS1_2_VERSION)
+ 				{
+@@ -689,16 +685,28 @@
+ 			ret=ssl3_get_cert_verify(s);
+ 			if (ret <= 0) goto end;
+ 
+-#if defined(OPENSSL_NO_TLSEXT) || defined(OPENSSL_NO_NEXTPROTONEG)
+-			s->state=SSL3_ST_SR_FINISHED_A;
+-#else
+-			if (s->s3->next_proto_neg_seen)
++			s->state=SSL3_ST_SR_POST_CLIENT_CERT;
++			s->init_num=0;
++			break;
++
++		case SSL3_ST_SR_POST_CLIENT_CERT: {
++			char next_proto_neg = 0;
++			char channel_id = 0;
++#if !defined(OPENSSL_NO_TLSEXT)
++# if !defined(OPENSSL_NO_NEXTPROTONEG)
++			next_proto_neg = s->s3->next_proto_neg_seen;
++# endif
++			channel_id = s->s3->tlsext_channel_id_valid;
++#endif
++
++			if (next_proto_neg)
+ 				s->state=SSL3_ST_SR_NEXT_PROTO_A;
++			else if (channel_id)
++				s->state=SSL3_ST_SR_CHANNEL_ID_A;
+ 			else
+ 				s->state=SSL3_ST_SR_FINISHED_A;
+-#endif
+-			s->init_num=0;
+ 			break;
++		}
+ 
+ #if !defined(OPENSSL_NO_TLSEXT) && !defined(OPENSSL_NO_NEXTPROTONEG)
+ 		case SSL3_ST_SR_NEXT_PROTO_A:
+@@ -706,6 +714,19 @@
+ 			ret=ssl3_get_next_proto(s);
+ 			if (ret <= 0) goto end;
+ 			s->init_num = 0;
++			if (s->s3->tlsext_channel_id_valid)
++				s->state=SSL3_ST_SR_CHANNEL_ID_A;
++			else
++				s->state=SSL3_ST_SR_FINISHED_A;
++			break;
++#endif
++
++#if !defined(OPENSSL_NO_TLSEXT)
++		case SSL3_ST_SR_CHANNEL_ID_A:
++		case SSL3_ST_SR_CHANNEL_ID_B:
++			ret=ssl3_get_channel_id(s);
++			if (ret <= 0) goto end;
++			s->init_num = 0;
+ 			s->state=SSL3_ST_SR_FINISHED_A;
+ 			break;
+ #endif
+@@ -777,16 +798,7 @@
+ 			if (ret <= 0) goto end;
+ 			s->state=SSL3_ST_SW_FLUSH;
+ 			if (s->hit)
+-				{
+-#if defined(OPENSSL_NO_TLSEXT) || defined(OPENSSL_NO_NEXTPROTONEG)
+-				s->s3->tmp.next_state=SSL3_ST_SR_FINISHED_A;
+-#else
+-				if (s->s3->next_proto_neg_seen)
+-					s->s3->tmp.next_state=SSL3_ST_SR_NEXT_PROTO_A;
+-				else
+-					s->s3->tmp.next_state=SSL3_ST_SR_FINISHED_A;
+-#endif
+-				}
++				s->s3->tmp.next_state=SSL3_ST_SR_POST_CLIENT_CERT;
+ 			else
+ 				s->s3->tmp.next_state=SSL_ST_OK;
+ 			s->init_num=0;
+@@ -3679,4 +3691,140 @@
+ 	return 1;
+ 	}
+ # endif
++
++/* ssl3_get_channel_id reads and verifies a ClientID handshake message. */
++int ssl3_get_channel_id(SSL *s)
++	{
++	int ret = -1, ok;
++	long n;
++	const unsigned char *p;
++	unsigned short extension_type, extension_len;
++	EC_GROUP* p256 = NULL;
++	EC_KEY* key = NULL;
++	EC_POINT* point = NULL;
++	ECDSA_SIG sig;
++	BIGNUM x, y;
++
++	if (s->state == SSL3_ST_SR_CHANNEL_ID_A && s->init_num == 0)
++		{
++		/* The first time that we're called we take the current
++		 * handshake hash and store it. */
++		EVP_MD_CTX md_ctx;
++		unsigned int len;
++
++		EVP_MD_CTX_init(&md_ctx);
++		EVP_DigestInit_ex(&md_ctx, EVP_sha256(), NULL);
++		if (!tls1_channel_id_hash(&md_ctx, s))
++			return -1;
++		len = sizeof(s->s3->tlsext_channel_id);
++		EVP_DigestFinal(&md_ctx, s->s3->tlsext_channel_id, &len);
++		EVP_MD_CTX_cleanup(&md_ctx);
++		}
++
++	n = s->method->ssl_get_message(s,
++		SSL3_ST_SR_CHANNEL_ID_A,
++		SSL3_ST_SR_CHANNEL_ID_B,
++		SSL3_MT_ENCRYPTED_EXTENSIONS,
++		2 + 2 + TLSEXT_CHANNEL_ID_SIZE,
++		&ok);
++
++	if (!ok)
++		return((int)n);
++
++	ssl3_finish_mac(s, (unsigned char*)s->init_buf->data, s->init_num + 4);
++
++	/* s->state doesn't reflect whether ChangeCipherSpec has been received
++	 * in this handshake, but s->s3->change_cipher_spec does (will be reset
++	 * by ssl3_get_finished). */
++	if (!s->s3->change_cipher_spec)
++		{
++		SSLerr(SSL_F_SSL3_GET_CHANNEL_ID,SSL_R_GOT_CHANNEL_ID_BEFORE_A_CCS);
++		return -1;
++		}
++
++	if (n != 2 + 2 + TLSEXT_CHANNEL_ID_SIZE)
++		{
++		SSLerr(SSL_F_SSL3_GET_CHANNEL_ID,SSL_R_INVALID_MESSAGE);
++		return -1;
++		}
++
++	p = (unsigned char *)s->init_msg;
++
++	/* The payload looks like:
++	 *   uint16 extension_type
++	 *   uint16 extension_len;
++	 *   uint8 x[32];
++	 *   uint8 y[32];
++	 *   uint8 r[32];
++	 *   uint8 s[32];
++	 */
++	n2s(p, extension_type);
++	n2s(p, extension_len);
++
++	if (extension_type != TLSEXT_TYPE_channel_id ||
++	    extension_len != TLSEXT_CHANNEL_ID_SIZE)
++		{
++		SSLerr(SSL_F_SSL3_GET_CHANNEL_ID,SSL_R_INVALID_MESSAGE);
++		return -1;
++		}
++
++	p256 = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
++	if (!p256)
++		{
++		SSLerr(SSL_F_SSL3_GET_CHANNEL_ID,SSL_R_NO_P256_SUPPORT);
++		return -1;
++		}
++
++	BN_init(&x);
++	BN_init(&y);
++	sig.r = BN_new();
++	sig.s = BN_new();
++
++	if (BN_bin2bn(p +  0, 32, &x) == NULL ||
++	    BN_bin2bn(p + 32, 32, &y) == NULL ||
++	    BN_bin2bn(p + 64, 32, sig.r) == NULL ||
++	    BN_bin2bn(p + 96, 32, sig.s) == NULL)
++		goto err;
++
++	point = EC_POINT_new(p256);
++	if (!point ||
++	    !EC_POINT_set_affine_coordinates_GFp(p256, point, &x, &y, NULL))
++		goto err;
++
++	key = EC_KEY_new();
++	if (!key ||
++	    !EC_KEY_set_group(key, p256) ||
++	    !EC_KEY_set_public_key(key, point))
++		goto err;
++
++	/* We stored the handshake hash in |tlsext_channel_id| the first time
++	 * that we were called. */
++	switch (ECDSA_do_verify(s->s3->tlsext_channel_id, SHA256_DIGEST_LENGTH, &sig, key)) {
++	case 1:
++		break;
++	case 0:
++		SSLerr(SSL_F_SSL3_GET_CHANNEL_ID,SSL_R_CHANNEL_ID_SIGNATURE_INVALID);
++		s->s3->tlsext_channel_id_valid = 0;
++		goto err;
++	default:
++		s->s3->tlsext_channel_id_valid = 0;
++		goto err;
++	}
++
++	memcpy(s->s3->tlsext_channel_id, p, 64);
++	ret = 1;
++
++err:
++	BN_free(&x);
++	BN_free(&y);
++	BN_free(sig.r);
++	BN_free(sig.s);
++	if (key)
++		EC_KEY_free(key);
++	if (point)
++		EC_POINT_free(point);
++	if (p256)
++		EC_GROUP_free(p256);
++	return ret;
++	}
+ #endif
+diff -ur openssl/ssl/ssl.h openssl.channelid/ssl/ssl.h
+--- openssl/ssl/ssl.h	2012-08-28 16:04:21.183349508 -0400
++++ openssl.channelid/ssl/ssl.h	2012-08-28 16:19:15.195752493 -0400
+@@ -1016,6 +1016,12 @@
+ # endif
+         /* SRTP profiles we are willing to do from RFC 5764 */
+         STACK_OF(SRTP_PROTECTION_PROFILE) *srtp_profiles;  
++
++	/* If true, a client will advertise the Channel ID extension and a
++	 * server will echo it. */
++	char tlsext_channel_id_enabled;
++	/* The client's Channel ID private key. */
++	EVP_PKEY *tlsext_channel_id_private;
+ #endif
+ 	};
+ 
+@@ -1057,6 +1063,10 @@
+ 	SSL_CTX_ctrl(ctx,SSL_CTRL_SESS_TIMEOUTS,0,NULL)
+ #define SSL_CTX_sess_cache_full(ctx) \
+ 	SSL_CTX_ctrl(ctx,SSL_CTRL_SESS_CACHE_FULL,0,NULL)
++/* SSL_CTX_enable_tls_channel_id configures a TLS server to accept TLS client
++ * IDs from clients. Returns 1 on success. */
++#define SSL_CTX_enable_tls_channel_id(ctx) \
++	SSL_CTX_ctrl(ctx,SSL_CTRL_CHANNEL_ID,0,NULL)
+ 
+ void SSL_CTX_sess_set_new_cb(SSL_CTX *ctx, int (*new_session_cb)(struct ssl_st *ssl,SSL_SESSION *sess));
+ int (*SSL_CTX_sess_get_new_cb(SSL_CTX *ctx))(struct ssl_st *ssl, SSL_SESSION *sess);
+@@ -1400,6 +1410,13 @@
+ 	                                 */
+ 	unsigned int tlsext_hb_pending; /* Indicates if a HeartbeatRequest is in flight */
+ 	unsigned int tlsext_hb_seq;     /* HeartbeatRequest sequence number */
++
++	/* Copied from the SSL_CTX. For a server, means that we'll accept
++	 * Channel IDs from clients. For a client, means that we'll advertise
++	 * support. */
++	char tlsext_channel_id_enabled;
++	/* The client's Channel ID private key. */
++	EVP_PKEY *tlsext_channel_id_private;
+ #else
+ #define session_ctx ctx
+ #endif /* OPENSSL_NO_TLSEXT */
+@@ -1659,6 +1676,9 @@
+ #define SSL_CTRL_GET_TLS_EXT_HEARTBEAT_PENDING		86
+ #define SSL_CTRL_SET_TLS_EXT_HEARTBEAT_NO_REQUESTS	87
+ #endif
++#define SSL_CTRL_CHANNEL_ID			88
++#define SSL_CTRL_GET_CHANNEL_ID			89
++#define SSL_CTRL_SET_CHANNEL_ID			90
+ #endif
+ 
+ #define DTLS_CTRL_GET_TIMEOUT		73
+@@ -1706,6 +1726,25 @@
+ #define SSL_set_tmp_ecdh(ssl,ecdh) \
+ 	SSL_ctrl(ssl,SSL_CTRL_SET_TMP_ECDH,0,(char *)ecdh)
+ 
++/* SSL_enable_tls_channel_id configures a TLS server to accept TLS client
++ * IDs from clients. Returns 1 on success. */
++#define SSL_enable_tls_channel_id(ctx) \
++	SSL_ctrl(ctx,SSL_CTRL_CHANNEL_ID,0,NULL)
++/* SSL_set1_tls_channel_id configures a TLS client to send a TLS Channel ID to
++ * compatible servers. private_key must be a P-256 EVP_PKEY*. Returns 1 on
++ * success. */
++#define SSL_set1_tls_channel_id(s, private_key) \
++	SSL_ctrl(s,SSL_CTRL_SET_CHANNEL_ID,0,(void*)private_key)
++#define SSL_CTX_set1_tls_channel_id(ctx, private_key) \
++	SSL_CTX_ctrl(ctx,SSL_CTRL_SET_CHANNEL_ID,0,(void*)private_key)
++/* SSL_get_tls_channel_id gets the client's TLS Channel ID from a server SSL*
++ * and copies up to the first |channel_id_len| bytes into |channel_id|. The
++ * Channel ID consists of the client's P-256 public key as an (x,y) pair where
++ * each is a 32-byte, big-endian field element. Returns 0 if the client didn't
++ * offer a Channel ID and the length of the complete Channel ID otherwise. */
++#define SSL_get_tls_channel_id(ctx, channel_id, channel_id_len) \
++	SSL_ctrl(ctx,SSL_CTRL_GET_CHANNEL_ID,channel_id_len,(void*)channel_id)
++
+ #define SSL_CTX_add_extra_chain_cert(ctx,x509) \
+ 	SSL_CTX_ctrl(ctx,SSL_CTRL_EXTRA_CHAIN_CERT,0,(char *)x509)
+ #define SSL_CTX_get_extra_chain_certs(ctx,px509) \
+@@ -2207,6 +2246,7 @@
+ #define SSL_F_SSL3_GET_CERTIFICATE_REQUEST		 135
+ #define SSL_F_SSL3_GET_CERT_STATUS			 289
+ #define SSL_F_SSL3_GET_CERT_VERIFY			 136
++#define SSL_F_SSL3_GET_CHANNEL_ID			 317
+ #define SSL_F_SSL3_GET_CLIENT_CERTIFICATE		 137
+ #define SSL_F_SSL3_GET_CLIENT_HELLO			 138
+ #define SSL_F_SSL3_GET_CLIENT_KEY_EXCHANGE		 139
+@@ -2226,6 +2266,7 @@
+ #define SSL_F_SSL3_READ_BYTES				 148
+ #define SSL_F_SSL3_READ_N				 149
+ #define SSL_F_SSL3_SEND_CERTIFICATE_REQUEST		 150
++#define SSL_F_SSL3_SEND_CHANNEL_ID			 318
+ #define SSL_F_SSL3_SEND_CLIENT_CERTIFICATE		 151
+ #define SSL_F_SSL3_SEND_CLIENT_KEY_EXCHANGE		 152
+ #define SSL_F_SSL3_SEND_CLIENT_VERIFY			 153
+@@ -2391,12 +2432,15 @@
+ #define SSL_R_BIO_NOT_SET				 128
+ #define SSL_R_BLOCK_CIPHER_PAD_IS_WRONG			 129
+ #define SSL_R_BN_LIB					 130
++#define SSL_R_CANNOT_SERIALIZE_PUBLIC_KEY		 376
+ #define SSL_R_CA_DN_LENGTH_MISMATCH			 131
+ #define SSL_R_CA_DN_TOO_LONG				 132
+ #define SSL_R_CCS_RECEIVED_EARLY			 133
+ #define SSL_R_CERTIFICATE_VERIFY_FAILED			 134
+ #define SSL_R_CERT_LENGTH_MISMATCH			 135
+ #define SSL_R_CHALLENGE_IS_DIFFERENT			 136
++#define SSL_R_CHANNEL_ID_NOT_P256			 375
++#define SSL_R_CHANNEL_ID_SIGNATURE_INVALID		 371
+ #define SSL_R_CIPHER_CODE_WRONG_LENGTH			 137
+ #define SSL_R_CIPHER_OR_HASH_UNAVAILABLE		 138
+ #define SSL_R_CIPHER_TABLE_SRC_ERROR			 139
+@@ -2409,6 +2453,7 @@
+ #define SSL_R_CONNECTION_ID_IS_DIFFERENT		 143
+ #define SSL_R_CONNECTION_TYPE_NOT_SET			 144
+ #define SSL_R_COOKIE_MISMATCH				 308
++#define SSL_R_D2I_ECDSA_SIG				 379
+ #define SSL_R_DATA_BETWEEN_CCS_AND_FINISHED		 145
+ #define SSL_R_DATA_LENGTH_TOO_LONG			 146
+ #define SSL_R_DECRYPTION_FAILED				 147
+@@ -2426,9 +2471,12 @@
+ #define SSL_R_ENCRYPTED_LENGTH_TOO_LONG			 150
+ #define SSL_R_ERROR_GENERATING_TMP_RSA_KEY		 282
+ #define SSL_R_ERROR_IN_RECEIVED_CIPHER_LIST		 151
++#define SSL_R_EVP_DIGESTSIGNFINAL_FAILED		 377
++#define SSL_R_EVP_DIGESTSIGNINIT_FAILED			 378
+ #define SSL_R_EXCESSIVE_MESSAGE_SIZE			 152
+ #define SSL_R_EXTRA_DATA_IN_MESSAGE			 153
+ #define SSL_R_GOT_A_FIN_BEFORE_A_CCS			 154
++#define SSL_R_GOT_CHANNEL_ID_BEFORE_A_CCS		 372
+ #define SSL_R_GOT_NEXT_PROTO_BEFORE_A_CCS		 355
+ #define SSL_R_GOT_NEXT_PROTO_WITHOUT_EXTENSION		 356
+ #define SSL_R_HTTPS_PROXY_REQUEST			 155
+@@ -2438,6 +2486,7 @@
+ #define SSL_R_INVALID_CHALLENGE_LENGTH			 158
+ #define SSL_R_INVALID_COMMAND				 280
+ #define SSL_R_INVALID_COMPRESSION_ALGORITHM		 341
++#define SSL_R_INVALID_MESSAGE				 374
+ #define SSL_R_INVALID_PURPOSE				 278
+ #define SSL_R_INVALID_SRP_USERNAME			 357
+ #define SSL_R_INVALID_STATUS_RESPONSE			 328
+@@ -2492,6 +2541,7 @@
+ #define SSL_R_NO_COMPRESSION_SPECIFIED			 187
+ #define SSL_R_NO_GOST_CERTIFICATE_SENT_BY_PEER		 330
+ #define SSL_R_NO_METHOD_SPECIFIED			 188
++#define SSL_R_NO_P256_SUPPORT				 373
+ #define SSL_R_NO_PRIVATEKEY				 189
+ #define SSL_R_NO_PRIVATE_KEY_ASSIGNED			 190
+ #define SSL_R_NO_PROTOCOLS_AVAILABLE			 191
+diff -ur openssl/ssl/ssl3.h openssl.channelid/ssl/ssl3.h
+--- openssl/ssl/ssl3.h	2012-08-28 16:04:21.183349508 -0400
++++ openssl.channelid/ssl/ssl3.h	2012-08-28 16:04:40.593618810 -0400
+@@ -539,6 +539,17 @@
+ 	/* Set if we saw the Next Protocol Negotiation extension from our peer. */
+ 	int next_proto_neg_seen;
+ #endif
++
++	/* In a client, this means that the server supported Channel ID and that
++	 * a Channel ID was sent. In a server it means that we echoed support
++	 * for Channel IDs and that tlsext_channel_id will be valid after the
++	 * handshake. */
++	char tlsext_channel_id_valid;
++	/* For a server:
++	 *     If |tlsext_channel_id_valid| is true, then this contains the
++	 *     verified Channel ID from the client: a P256 point, (x,y), where
++	 *     each are big-endian values. */
++	unsigned char tlsext_channel_id[64];
+ 	} SSL3_STATE;
+ 
+ #endif
+@@ -581,6 +592,8 @@
+ #define SSL3_ST_CW_CHANGE_B		(0x1A1|SSL_ST_CONNECT)
+ #define SSL3_ST_CW_NEXT_PROTO_A		(0x200|SSL_ST_CONNECT)
+ #define SSL3_ST_CW_NEXT_PROTO_B		(0x201|SSL_ST_CONNECT)
++#define SSL3_ST_CW_CHANNEL_ID_A		(0x210|SSL_ST_CONNECT)
++#define SSL3_ST_CW_CHANNEL_ID_B		(0x211|SSL_ST_CONNECT)
+ #define SSL3_ST_CW_FINISHED_A		(0x1B0|SSL_ST_CONNECT)
+ #define SSL3_ST_CW_FINISHED_B		(0x1B1|SSL_ST_CONNECT)
+ /* read from server */
+@@ -631,8 +644,11 @@
+ #define SSL3_ST_SR_CERT_VRFY_B		(0x1A1|SSL_ST_ACCEPT)
+ #define SSL3_ST_SR_CHANGE_A		(0x1B0|SSL_ST_ACCEPT)
+ #define SSL3_ST_SR_CHANGE_B		(0x1B1|SSL_ST_ACCEPT)
++#define SSL3_ST_SR_POST_CLIENT_CERT	(0x1BF|SSL_ST_ACCEPT)
+ #define SSL3_ST_SR_NEXT_PROTO_A		(0x210|SSL_ST_ACCEPT)
+ #define SSL3_ST_SR_NEXT_PROTO_B		(0x211|SSL_ST_ACCEPT)
++#define SSL3_ST_SR_CHANNEL_ID_A		(0x220|SSL_ST_ACCEPT)
++#define SSL3_ST_SR_CHANNEL_ID_B		(0x221|SSL_ST_ACCEPT)
+ #define SSL3_ST_SR_FINISHED_A		(0x1C0|SSL_ST_ACCEPT)
+ #define SSL3_ST_SR_FINISHED_B		(0x1C1|SSL_ST_ACCEPT)
+ /* write to client */
+@@ -658,6 +674,7 @@
+ #define SSL3_MT_FINISHED			20
+ #define SSL3_MT_CERTIFICATE_STATUS		22
+ #define SSL3_MT_NEXT_PROTO			67
++#define SSL3_MT_ENCRYPTED_EXTENSIONS		203
+ #define DTLS1_MT_HELLO_VERIFY_REQUEST    3
+ 
+ 
+diff -ur openssl/ssl/ssl_err.c openssl.channelid/ssl/ssl_err.c
+--- openssl/ssl/ssl_err.c	2012-08-28 16:04:21.183349508 -0400
++++ openssl.channelid/ssl/ssl_err.c	2012-08-28 16:04:40.593618810 -0400
+@@ -151,6 +151,7 @@
+ {ERR_FUNC(SSL_F_SSL3_GET_CERTIFICATE_REQUEST),	"SSL3_GET_CERTIFICATE_REQUEST"},
+ {ERR_FUNC(SSL_F_SSL3_GET_CERT_STATUS),	"SSL3_GET_CERT_STATUS"},
+ {ERR_FUNC(SSL_F_SSL3_GET_CERT_VERIFY),	"SSL3_GET_CERT_VERIFY"},
++{ERR_FUNC(SSL_F_SSL3_GET_CHANNEL_ID),	"SSL3_GET_CHANNEL_ID"},
+ {ERR_FUNC(SSL_F_SSL3_GET_CLIENT_CERTIFICATE),	"SSL3_GET_CLIENT_CERTIFICATE"},
+ {ERR_FUNC(SSL_F_SSL3_GET_CLIENT_HELLO),	"SSL3_GET_CLIENT_HELLO"},
+ {ERR_FUNC(SSL_F_SSL3_GET_CLIENT_KEY_EXCHANGE),	"SSL3_GET_CLIENT_KEY_EXCHANGE"},
+@@ -170,6 +171,7 @@
+ {ERR_FUNC(SSL_F_SSL3_READ_BYTES),	"SSL3_READ_BYTES"},
+ {ERR_FUNC(SSL_F_SSL3_READ_N),	"SSL3_READ_N"},
+ {ERR_FUNC(SSL_F_SSL3_SEND_CERTIFICATE_REQUEST),	"SSL3_SEND_CERTIFICATE_REQUEST"},
++{ERR_FUNC(SSL_F_SSL3_SEND_CHANNEL_ID),	"SSL3_SEND_CHANNEL_ID"},
+ {ERR_FUNC(SSL_F_SSL3_SEND_CLIENT_CERTIFICATE),	"SSL3_SEND_CLIENT_CERTIFICATE"},
+ {ERR_FUNC(SSL_F_SSL3_SEND_CLIENT_KEY_EXCHANGE),	"SSL3_SEND_CLIENT_KEY_EXCHANGE"},
+ {ERR_FUNC(SSL_F_SSL3_SEND_CLIENT_VERIFY),	"SSL3_SEND_CLIENT_VERIFY"},
+@@ -338,12 +340,15 @@
+ {ERR_REASON(SSL_R_BIO_NOT_SET)           ,"bio not set"},
+ {ERR_REASON(SSL_R_BLOCK_CIPHER_PAD_IS_WRONG),"block cipher pad is wrong"},
+ {ERR_REASON(SSL_R_BN_LIB)                ,"bn lib"},
++{ERR_REASON(SSL_R_CANNOT_SERIALIZE_PUBLIC_KEY),"cannot serialize public key"},
+ {ERR_REASON(SSL_R_CA_DN_LENGTH_MISMATCH) ,"ca dn length mismatch"},
+ {ERR_REASON(SSL_R_CA_DN_TOO_LONG)        ,"ca dn too long"},
+ {ERR_REASON(SSL_R_CCS_RECEIVED_EARLY)    ,"ccs received early"},
+ {ERR_REASON(SSL_R_CERTIFICATE_VERIFY_FAILED),"certificate verify failed"},
+ {ERR_REASON(SSL_R_CERT_LENGTH_MISMATCH)  ,"cert length mismatch"},
+ {ERR_REASON(SSL_R_CHALLENGE_IS_DIFFERENT),"challenge is different"},
++{ERR_REASON(SSL_R_CHANNEL_ID_NOT_P256)   ,"channel id not p256"},
++{ERR_REASON(SSL_R_CHANNEL_ID_SIGNATURE_INVALID),"Channel ID signature invalid"},
+ {ERR_REASON(SSL_R_CIPHER_CODE_WRONG_LENGTH),"cipher code wrong length"},
+ {ERR_REASON(SSL_R_CIPHER_OR_HASH_UNAVAILABLE),"cipher or hash unavailable"},
+ {ERR_REASON(SSL_R_CIPHER_TABLE_SRC_ERROR),"cipher table src error"},
+@@ -356,6 +361,7 @@
+ {ERR_REASON(SSL_R_CONNECTION_ID_IS_DIFFERENT),"connection id is different"},
+ {ERR_REASON(SSL_R_CONNECTION_TYPE_NOT_SET),"connection type not set"},
+ {ERR_REASON(SSL_R_COOKIE_MISMATCH)       ,"cookie mismatch"},
++{ERR_REASON(SSL_R_D2I_ECDSA_SIG)         ,"d2i ecdsa sig"},
+ {ERR_REASON(SSL_R_DATA_BETWEEN_CCS_AND_FINISHED),"data between ccs and finished"},
+ {ERR_REASON(SSL_R_DATA_LENGTH_TOO_LONG)  ,"data length too long"},
+ {ERR_REASON(SSL_R_DECRYPTION_FAILED)     ,"decryption failed"},
+@@ -373,9 +379,12 @@
+ {ERR_REASON(SSL_R_ENCRYPTED_LENGTH_TOO_LONG),"encrypted length too long"},
+ {ERR_REASON(SSL_R_ERROR_GENERATING_TMP_RSA_KEY),"error generating tmp rsa key"},
+ {ERR_REASON(SSL_R_ERROR_IN_RECEIVED_CIPHER_LIST),"error in received cipher list"},
++{ERR_REASON(SSL_R_EVP_DIGESTSIGNFINAL_FAILED),"evp digestsignfinal failed"},
++{ERR_REASON(SSL_R_EVP_DIGESTSIGNINIT_FAILED),"evp digestsigninit failed"},
+ {ERR_REASON(SSL_R_EXCESSIVE_MESSAGE_SIZE),"excessive message size"},
+ {ERR_REASON(SSL_R_EXTRA_DATA_IN_MESSAGE) ,"extra data in message"},
+ {ERR_REASON(SSL_R_GOT_A_FIN_BEFORE_A_CCS),"got a fin before a ccs"},
++{ERR_REASON(SSL_R_GOT_CHANNEL_ID_BEFORE_A_CCS),"got Channel ID before a ccs"},
+ {ERR_REASON(SSL_R_GOT_NEXT_PROTO_BEFORE_A_CCS),"got next proto before a ccs"},
+ {ERR_REASON(SSL_R_GOT_NEXT_PROTO_WITHOUT_EXTENSION),"got next proto without seeing extension"},
+ {ERR_REASON(SSL_R_HTTPS_PROXY_REQUEST)   ,"https proxy request"},
+@@ -385,6 +394,7 @@
+ {ERR_REASON(SSL_R_INVALID_CHALLENGE_LENGTH),"invalid challenge length"},
+ {ERR_REASON(SSL_R_INVALID_COMMAND)       ,"invalid command"},
+ {ERR_REASON(SSL_R_INVALID_COMPRESSION_ALGORITHM),"invalid compression algorithm"},
++{ERR_REASON(SSL_R_INVALID_MESSAGE)       ,"invalid message"},
+ {ERR_REASON(SSL_R_INVALID_PURPOSE)       ,"invalid purpose"},
+ {ERR_REASON(SSL_R_INVALID_SRP_USERNAME)  ,"invalid srp username"},
+ {ERR_REASON(SSL_R_INVALID_STATUS_RESPONSE),"invalid status response"},
+@@ -439,6 +449,7 @@
+ {ERR_REASON(SSL_R_NO_COMPRESSION_SPECIFIED),"no compression specified"},
+ {ERR_REASON(SSL_R_NO_GOST_CERTIFICATE_SENT_BY_PEER),"Peer haven't sent GOST certificate, required for selected ciphersuite"},
+ {ERR_REASON(SSL_R_NO_METHOD_SPECIFIED)   ,"no method specified"},
++{ERR_REASON(SSL_R_NO_P256_SUPPORT)       ,"no p256 support"},
+ {ERR_REASON(SSL_R_NO_PRIVATEKEY)         ,"no privatekey"},
+ {ERR_REASON(SSL_R_NO_PRIVATE_KEY_ASSIGNED),"no private key assigned"},
+ {ERR_REASON(SSL_R_NO_PROTOCOLS_AVAILABLE),"no protocols available"},
+diff -ur openssl/ssl/ssl_lib.c openssl.channelid/ssl/ssl_lib.c
+--- openssl/ssl/ssl_lib.c	2012-08-28 16:04:21.183349508 -0400
++++ openssl.channelid/ssl/ssl_lib.c	2012-08-29 16:19:55.815717788 -0400
+@@ -562,6 +562,8 @@
+ 		sk_OCSP_RESPID_pop_free(s->tlsext_ocsp_ids, OCSP_RESPID_free);
+ 	if (s->tlsext_ocsp_resp)
+ 		OPENSSL_free(s->tlsext_ocsp_resp);
++	if (s->tlsext_channel_id_private)
++		EVP_PKEY_free(s->tlsext_channel_id_private);
+ #endif
+ 
+ 	if (s->client_CA != NULL)
+@@ -1946,6 +1948,11 @@
+ 		ssl_buf_freelist_free(a->rbuf_freelist);
+ #endif
+ 
++#ifndef OPENSSL_NO_TLSEXT
++	if (a->tlsext_channel_id_private)
++		EVP_PKEY_free(a->tlsext_channel_id_private);
++#endif
++
+ 	OPENSSL_free(a);
+ 	}
+ 
+diff -ur openssl/ssl/ssl_locl.h openssl.channelid/ssl/ssl_locl.h
+--- openssl/ssl/ssl_locl.h	2012-08-28 16:04:21.183349508 -0400
++++ openssl.channelid/ssl/ssl_locl.h	2012-08-28 16:04:40.603618948 -0400
+@@ -369,6 +369,7 @@
+  * (currently this also goes into algorithm2) */
+ #define TLS1_STREAM_MAC 0x04
+ 
++#define TLSEXT_CHANNEL_ID_SIZE 128
+ 
+ 
+ /*
+@@ -996,6 +997,7 @@
+ int ssl3_check_finished(SSL *s);
+ # ifndef OPENSSL_NO_NEXTPROTONEG
+ int ssl3_send_next_proto(SSL *s);
++int ssl3_send_channel_id(SSL *s);
+ # endif
+ #endif
+ 
+@@ -1018,6 +1020,7 @@
+ #ifndef OPENSSL_NO_NEXTPROTONEG
+ int ssl3_get_next_proto(SSL *s);
+ #endif
++int ssl3_get_channel_id(SSL *s);
+ 
+ int dtls1_send_hello_request(SSL *s);
+ int dtls1_send_server_hello(SSL *s);
+@@ -1114,7 +1117,9 @@
+ int tls12_get_sigid(const EVP_PKEY *pk);
+ const EVP_MD *tls12_get_hash(unsigned char hash_alg);
+ 
++int tls1_channel_id_hash(EVP_MD_CTX *ctx, SSL *s);
+ #endif
++
+ EVP_MD_CTX* ssl_replace_hash(EVP_MD_CTX **hash,const EVP_MD *md) ;
+ void ssl_clear_hash_ctx(EVP_MD_CTX **hash);
+ int ssl_add_serverhello_renegotiate_ext(SSL *s, unsigned char *p, int *len,
+diff -ur openssl/ssl/t1_lib.c openssl.channelid/ssl/t1_lib.c
+--- openssl/ssl/t1_lib.c	2012-08-28 16:04:21.193349647 -0400
++++ openssl.channelid/ssl/t1_lib.c	2012-08-28 16:04:40.603618948 -0400
+@@ -649,6 +649,16 @@
+ 		}
+ #endif
+ 
++	if (s->tlsext_channel_id_enabled)
++		{
++		/* The client advertises an emtpy extension to indicate its
++		 * support for Channel ID. */
++		if (limit - ret - 4 < 0)
++			return NULL;
++		s2n(TLSEXT_TYPE_channel_id,ret);
++		s2n(0,ret);
++		}
++
+         if(SSL_get_srtp_profiles(s))
+                 {
+                 int el;
+@@ -855,6 +865,16 @@
+ 		}
+ #endif
+ 
++	/* If the client advertised support for Channel ID, and we have it
++	 * enabled, then we want to echo it back. */
++	if (s->s3->tlsext_channel_id_valid)
++		{
++		if (limit - ret - 4 < 0)
++			return NULL;
++		s2n(TLSEXT_TYPE_channel_id,ret);
++		s2n(0,ret);
++		}
++
+ 	if ((extdatalen = ret-p-2)== 0) 
+ 		return p;
+ 
+@@ -1331,6 +1351,9 @@
+ 			}
+ #endif
+ 
++		else if (type == TLSEXT_TYPE_channel_id && s->tlsext_channel_id_enabled)
++			s->s3->tlsext_channel_id_valid = 1;
++
+ 		/* session ticket processed earlier */
+ 		else if (type == TLSEXT_TYPE_use_srtp)
+                         {
+@@ -1558,6 +1581,9 @@
+ 			s->s3->next_proto_neg_seen = 1;
+ 			}
+ #endif
++		else if (type == TLSEXT_TYPE_channel_id)
++			s->s3->tlsext_channel_id_valid = 1;
++
+ 		else if (type == TLSEXT_TYPE_renegotiate)
+ 			{
+ 			if(!ssl_parse_serverhello_renegotiate_ext(s, data, size, al))
+@@ -2580,3 +2606,37 @@
+ 	return ret;
+ 	}
+ #endif
++
++#if !defined(OPENSSL_NO_TLSEXT)
++/* tls1_channel_id_hash calculates the signed data for a Channel ID on the given
++ * SSL connection and writes it to |md|.
++ */
++int
++tls1_channel_id_hash(EVP_MD_CTX *md, SSL *s)
++	{
++	EVP_MD_CTX ctx;
++	unsigned char temp_digest[EVP_MAX_MD_SIZE];
++	unsigned temp_digest_len;
++	int i;
++	static const char kClientIDMagic[] = "TLS Channel ID signature";
++
++	if (s->s3->handshake_buffer)
++		if (!ssl3_digest_cached_records(s))
++			return 0;
++
++	EVP_DigestUpdate(md, kClientIDMagic, sizeof(kClientIDMagic));
++
++	EVP_MD_CTX_init(&ctx);
++	for (i = 0; i < SSL_MAX_DIGEST; i++)
++		{
++		if (s->s3->handshake_dgst[i] == NULL)
++			continue;
++		EVP_MD_CTX_copy_ex(&ctx, s->s3->handshake_dgst[i]);
++		EVP_DigestFinal_ex(&ctx, temp_digest, &temp_digest_len);
++		EVP_DigestUpdate(md, temp_digest, temp_digest_len);
++		}
++	EVP_MD_CTX_cleanup(&ctx);
++
++	return 1;
++	}
++#endif
+diff -ur openssl/ssl/tls1.h openssl.channelid/ssl/tls1.h
+--- openssl/ssl/tls1.h	2012-08-28 16:04:21.193349647 -0400
++++ openssl.channelid/ssl/tls1.h	2012-08-28 16:04:40.603618948 -0400
+@@ -248,6 +248,9 @@
+ #define TLSEXT_TYPE_next_proto_neg		13172
+ #endif
+ 
++/* This is not an IANA defined extension number */
++#define TLSEXT_TYPE_channel_id			30031
++
+ /* NameType value from RFC 3546 */
+ #define TLSEXT_NAMETYPE_host_name 0
+ /* status request value from RFC 3546 */

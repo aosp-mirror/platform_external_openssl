@@ -649,6 +649,16 @@ unsigned char *ssl_add_clienthello_tlsext(SSL *s, unsigned char *p, unsigned cha
 		}
 #endif
 
+	if (s->tlsext_channel_id_enabled)
+		{
+		/* The client advertises an emtpy extension to indicate its
+		 * support for Channel ID. */
+		if (limit - ret - 4 < 0)
+			return NULL;
+		s2n(TLSEXT_TYPE_channel_id,ret);
+		s2n(0,ret);
+		}
+
         if(SSL_get_srtp_profiles(s))
                 {
                 int el;
@@ -854,6 +864,16 @@ unsigned char *ssl_add_serverhello_tlsext(SSL *s, unsigned char *p, unsigned cha
 			}
 		}
 #endif
+
+	/* If the client advertised support for Channel ID, and we have it
+	 * enabled, then we want to echo it back. */
+	if (s->s3->tlsext_channel_id_valid)
+		{
+		if (limit - ret - 4 < 0)
+			return NULL;
+		s2n(TLSEXT_TYPE_channel_id,ret);
+		s2n(0,ret);
+		}
 
 	if ((extdatalen = ret-p-2)== 0) 
 		return p;
@@ -1327,6 +1347,9 @@ int ssl_parse_clienthello_tlsext(SSL *s, unsigned char **p, unsigned char *d, in
 			}
 #endif
 
+		else if (type == TLSEXT_TYPE_channel_id && s->tlsext_channel_id_enabled)
+			s->s3->tlsext_channel_id_valid = 1;
+
 		/* session ticket processed earlier */
 		else if (type == TLSEXT_TYPE_use_srtp)
                         {
@@ -1554,6 +1577,9 @@ int ssl_parse_serverhello_tlsext(SSL *s, unsigned char **p, unsigned char *d, in
 			s->s3->next_proto_neg_seen = 1;
 			}
 #endif
+		else if (type == TLSEXT_TYPE_channel_id)
+			s->s3->tlsext_channel_id_valid = 1;
+
 		else if (type == TLSEXT_TYPE_renegotiate)
 			{
 			if(!ssl_parse_serverhello_renegotiate_ext(s, data, size, al))
@@ -2574,5 +2600,39 @@ tls1_heartbeat(SSL *s)
 	OPENSSL_free(buf);
 
 	return ret;
+	}
+#endif
+
+#if !defined(OPENSSL_NO_TLSEXT)
+/* tls1_channel_id_hash calculates the signed data for a Channel ID on the given
+ * SSL connection and writes it to |md|.
+ */
+int
+tls1_channel_id_hash(EVP_MD_CTX *md, SSL *s)
+	{
+	EVP_MD_CTX ctx;
+	unsigned char temp_digest[EVP_MAX_MD_SIZE];
+	unsigned temp_digest_len;
+	int i;
+	static const char kClientIDMagic[] = "TLS Channel ID signature";
+
+	if (s->s3->handshake_buffer)
+		if (!ssl3_digest_cached_records(s))
+			return 0;
+
+	EVP_DigestUpdate(md, kClientIDMagic, sizeof(kClientIDMagic));
+
+	EVP_MD_CTX_init(&ctx);
+	for (i = 0; i < SSL_MAX_DIGEST; i++)
+		{
+		if (s->s3->handshake_dgst[i] == NULL)
+			continue;
+		EVP_MD_CTX_copy_ex(&ctx, s->s3->handshake_dgst[i]);
+		EVP_DigestFinal_ex(&ctx, temp_digest, &temp_digest_len);
+		EVP_DigestUpdate(md, temp_digest, temp_digest_len);
+		}
+	EVP_MD_CTX_cleanup(&ctx);
+
+	return 1;
 	}
 #endif
