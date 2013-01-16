@@ -549,6 +549,17 @@ typedef struct ssl3_state_st
 	/* Set if we saw the Next Protocol Negotiation extension from our peer. */
 	int next_proto_neg_seen;
 #endif
+
+	/* In a client, this means that the server supported Channel ID and that
+	 * a Channel ID was sent. In a server it means that we echoed support
+	 * for Channel IDs and that tlsext_channel_id will be valid after the
+	 * handshake. */
+	char tlsext_channel_id_valid;
+	/* For a server:
+	 *     If |tlsext_channel_id_valid| is true, then this contains the
+	 *     verified Channel ID from the client: a P256 point, (x,y), where
+	 *     each are big-endian values. */
+	unsigned char tlsext_channel_id[64];
 	} SSL3_STATE;
 
 #endif
@@ -591,6 +602,8 @@ typedef struct ssl3_state_st
 #define SSL3_ST_CW_CHANGE_B		(0x1A1|SSL_ST_CONNECT)
 #define SSL3_ST_CW_NEXT_PROTO_A		(0x200|SSL_ST_CONNECT)
 #define SSL3_ST_CW_NEXT_PROTO_B		(0x201|SSL_ST_CONNECT)
+#define SSL3_ST_CW_CHANNEL_ID_A		(0x210|SSL_ST_CONNECT)
+#define SSL3_ST_CW_CHANNEL_ID_B		(0x211|SSL_ST_CONNECT)
 #define SSL3_ST_CW_FINISHED_A		(0x1B0|SSL_ST_CONNECT)
 #define SSL3_ST_CW_FINISHED_B		(0x1B1|SSL_ST_CONNECT)
 /* read from server */
@@ -640,8 +653,11 @@ typedef struct ssl3_state_st
 #define SSL3_ST_SR_CERT_VRFY_B		(0x1A1|SSL_ST_ACCEPT)
 #define SSL3_ST_SR_CHANGE_A		(0x1B0|SSL_ST_ACCEPT)
 #define SSL3_ST_SR_CHANGE_B		(0x1B1|SSL_ST_ACCEPT)
+#define SSL3_ST_SR_POST_CLIENT_CERT	(0x1BF|SSL_ST_ACCEPT)
 #define SSL3_ST_SR_NEXT_PROTO_A		(0x210|SSL_ST_ACCEPT)
 #define SSL3_ST_SR_NEXT_PROTO_B		(0x211|SSL_ST_ACCEPT)
+#define SSL3_ST_SR_CHANNEL_ID_A		(0x220|SSL_ST_ACCEPT)
+#define SSL3_ST_SR_CHANNEL_ID_B		(0x221|SSL_ST_ACCEPT)
 #define SSL3_ST_SR_FINISHED_A		(0x1C0|SSL_ST_ACCEPT)
 #define SSL3_ST_SR_FINISHED_B		(0x1C1|SSL_ST_ACCEPT)
 /* write to client */
@@ -667,6 +683,7 @@ typedef struct ssl3_state_st
 #define SSL3_MT_FINISHED			20
 #define SSL3_MT_CERTIFICATE_STATUS		22
 #define SSL3_MT_NEXT_PROTO			67
+#define SSL3_MT_ENCRYPTED_EXTENSIONS		203
 #define DTLS1_MT_HELLO_VERIFY_REQUEST    3
 
 

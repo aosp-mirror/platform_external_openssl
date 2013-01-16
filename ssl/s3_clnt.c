@@ -471,14 +471,14 @@ int ssl3_connect(SSL *s)
 				SSL3_ST_CW_CHANGE_A,SSL3_ST_CW_CHANGE_B);
 			if (ret <= 0) goto end;
 
-
-#if defined(OPENSSL_NO_TLSEXT) || defined(OPENSSL_NO_NEXTPROTONEG)
 			s->state=SSL3_ST_CW_FINISHED_A;
-#else
+#if !defined(OPENSSL_NO_TLSEXT)
+			if (s->s3->tlsext_channel_id_valid)
+				s->state=SSL3_ST_CW_CHANNEL_ID_A;
+# if !defined(OPENSSL_NO_NEXTPROTONEG)
 			if (s->s3->next_proto_neg_seen)
 				s->state=SSL3_ST_CW_NEXT_PROTO_A;
-			else
-				s->state=SSL3_ST_CW_FINISHED_A;
+# endif
 #endif
 			s->init_num=0;
 
@@ -511,6 +511,18 @@ int ssl3_connect(SSL *s)
 		case SSL3_ST_CW_NEXT_PROTO_A:
 		case SSL3_ST_CW_NEXT_PROTO_B:
 			ret=ssl3_send_next_proto(s);
+			if (ret <= 0) goto end;
+			if (s->s3->tlsext_channel_id_valid)
+				s->state=SSL3_ST_CW_CHANNEL_ID_A;
+			else
+				s->state=SSL3_ST_CW_FINISHED_A;
+			break;
+#endif
+
+#if !defined(OPENSSL_NO_TLSEXT)
+		case SSL3_ST_CW_CHANNEL_ID_A:
+		case SSL3_ST_CW_CHANNEL_ID_B:
+			ret=ssl3_send_channel_id(s);
 			if (ret <= 0) goto end;
 			s->state=SSL3_ST_CW_FINISHED_A;
 			break;
@@ -3354,7 +3366,8 @@ err:
 	return(0);
 	}
 
-#if !defined(OPENSSL_NO_TLSEXT) && !defined(OPENSSL_NO_NEXTPROTONEG)
+#if !defined(OPENSSL_NO_TLSEXT)
+# if !defined(OPENSSL_NO_NEXTPROTONEG)
 int ssl3_send_next_proto(SSL *s)
 	{
 	unsigned int len, padding_len;
@@ -3378,7 +3391,116 @@ int ssl3_send_next_proto(SSL *s)
 
 	return ssl3_do_write(s, SSL3_RT_HANDSHAKE);
 }
-#endif  /* !OPENSSL_NO_TLSEXT && !OPENSSL_NO_NEXTPROTONEG */
+# endif  /* !OPENSSL_NO_NEXTPROTONEG */
+
+int ssl3_send_channel_id(SSL *s)
+	{
+	unsigned char *d;
+	int ret = -1, public_key_len;
+	EVP_MD_CTX md_ctx;
+	size_t sig_len;
+	ECDSA_SIG *sig = NULL;
+	unsigned char *public_key = NULL, *derp, *der_sig = NULL;
+
+	if (s->state != SSL3_ST_CW_CHANNEL_ID_A)
+		return ssl3_do_write(s, SSL3_RT_HANDSHAKE);
+
+	d = (unsigned char *)s->init_buf->data;
+	*(d++)=SSL3_MT_ENCRYPTED_EXTENSIONS;
+	l2n3(2 + 2 + TLSEXT_CHANNEL_ID_SIZE, d);
+	s2n(TLSEXT_TYPE_channel_id, d);
+	s2n(TLSEXT_CHANNEL_ID_SIZE, d);
+
+	EVP_MD_CTX_init(&md_ctx);
+
+	public_key_len = i2d_PublicKey(s->tlsext_channel_id_private, NULL);
+	if (public_key_len <= 0)
+		{
+		SSLerr(SSL_F_SSL3_SEND_CHANNEL_ID,SSL_R_CANNOT_SERIALIZE_PUBLIC_KEY);
+		goto err;
+		}
+	// i2d_PublicKey will produce an ANSI X9.62 public key which, for a
+	// P-256 key, is 0x04 (meaning uncompressed) followed by the x and y
+	// field elements as 32-byte, big-endian numbers.
+	if (public_key_len != 65)
+		{
+		SSLerr(SSL_F_SSL3_SEND_CHANNEL_ID,SSL_R_CHANNEL_ID_NOT_P256);
+		goto err;
+		}
+	public_key = OPENSSL_malloc(public_key_len);
+	if (!public_key)
+		{
+		SSLerr(SSL_F_SSL3_SEND_CHANNEL_ID,ERR_R_MALLOC_FAILURE);
+		goto err;
+		}
+
+	derp = public_key;
+	i2d_PublicKey(s->tlsext_channel_id_private, &derp);
+
+	if (EVP_DigestSignInit(&md_ctx, NULL, EVP_sha256(), NULL,
+			       s->tlsext_channel_id_private) != 1)
+		{
+		SSLerr(SSL_F_SSL3_SEND_CHANNEL_ID,SSL_R_EVP_DIGESTSIGNINIT_FAILED);
+		goto err;
+		}
+
+	if (!tls1_channel_id_hash(&md_ctx, s))
+		goto err;
+
+	if (!EVP_DigestSignFinal(&md_ctx, NULL, &sig_len))
+		{
+		SSLerr(SSL_F_SSL3_SEND_CHANNEL_ID,SSL_R_EVP_DIGESTSIGNFINAL_FAILED);
+		goto err;
+		}
+
+	der_sig = OPENSSL_malloc(sig_len);
+	if (!der_sig)
+		{
+		SSLerr(SSL_F_SSL3_SEND_CHANNEL_ID,ERR_R_MALLOC_FAILURE);
+		goto err;
+		}
+
+	if (!EVP_DigestSignFinal(&md_ctx, der_sig, &sig_len))
+		{
+		SSLerr(SSL_F_SSL3_SEND_CHANNEL_ID,SSL_R_EVP_DIGESTSIGNFINAL_FAILED);
+		goto err;
+		}
+
+	derp = der_sig;
+	sig = d2i_ECDSA_SIG(NULL, &derp, sig_len);
+	if (sig == NULL)
+		{
+		SSLerr(SSL_F_SSL3_SEND_CHANNEL_ID,SSL_R_D2I_ECDSA_SIG);
+		goto err;
+		}
+
+	// The first byte of public_key will be 0x4, denoting an uncompressed key.
+	memcpy(d, public_key + 1, 64);
+	d += 64;
+	memset(d, 0, 2 * 32);
+	BN_bn2bin(sig->r, d + 32 - BN_num_bytes(sig->r));
+	d += 32;
+	BN_bn2bin(sig->s, d + 32 - BN_num_bytes(sig->s));
+	d += 32;
+
+	s->state = SSL3_ST_CW_CHANNEL_ID_B;
+	s->init_num = 4 + 2 + 2 + TLSEXT_CHANNEL_ID_SIZE;
+	s->init_off = 0;
+
+	ret = ssl3_do_write(s, SSL3_RT_HANDSHAKE);
+
+err:
+	EVP_MD_CTX_cleanup(&md_ctx);
+	if (public_key)
+		OPENSSL_free(public_key);
+	if (der_sig)
+		OPENSSL_free(der_sig);
+	if (sig)
+		ECDSA_SIG_free(sig);
+
+	return ret;
+	}
+#endif  /* !OPENSSL_NO_TLSEXT */
 
 /* Check to see if handshake is full or resumed. Usually this is just a
  * case of checking to see if a cache hit has occurred. In the case of
