@@ -579,6 +579,8 @@ void SSL_free(SSL *s)
 		sk_OCSP_RESPID_pop_free(s->tlsext_ocsp_ids, OCSP_RESPID_free);
 	if (s->tlsext_ocsp_resp)
 		OPENSSL_free(s->tlsext_ocsp_resp);
+	if (s->tlsext_channel_id_private)
+		EVP_PKEY_free(s->tlsext_channel_id_private);
 #endif
 
 	if (s->client_CA != NULL)
@@ -1999,6 +2001,11 @@ void SSL_CTX_free(SSL_CTX *a)
 		ssl_buf_freelist_free(a->wbuf_freelist);
 	if (a->rbuf_freelist)
 		ssl_buf_freelist_free(a->rbuf_freelist);
+#endif
+
+#ifndef OPENSSL_NO_TLSEXT
+	if (a->tlsext_channel_id_private)
+		EVP_PKEY_free(a->tlsext_channel_id_private);
 #endif
 
 	OPENSSL_free(a);
