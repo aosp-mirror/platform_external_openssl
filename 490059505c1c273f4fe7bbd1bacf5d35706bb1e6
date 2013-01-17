@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "OZqI4mj8",
+        "filename": "ssl/s3_clnt.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2013-01-17T00:28:25Z",
+      "side": 1,
+      "message": "This is different. Should it have broken something before?",
+      "revId": "490059505c1c273f4fe7bbd1bacf5d35706bb1e6",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
