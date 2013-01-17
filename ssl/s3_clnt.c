@@ -202,18 +202,6 @@ int ssl3_connect(SSL *s)
 	
 	s->in_handshake++;
 	if (!SSL_in_init(s) || SSL_in_before(s)) SSL_clear(s); 
-#if 0	/* Send app data in separate packet, otherwise, some particular site
-	 * (only one site so far) closes the socket.
-	 * Note: there is a very small chance that two TCP packets
-	 * could be arriving at server combined into a single TCP packet,
-	 * then trigger that site to break. We haven't encounter that though.
-	 */
-	if (SSL_get_mode(s) & SSL_MODE_HANDSHAKE_CUTTHROUGH)
-		{
-		/* Send app data along with CCS/Finished */
-		s->s3->flags |= SSL3_FLAGS_DELAY_CLIENT_FINISHED;
-		}
-#endif
 
 #ifndef OPENSSL_NO_HEARTBEATS
 	/* If we're awaiting a HeartbeatResponse, pretend we
@@ -227,6 +215,24 @@ int ssl3_connect(SSL *s)
 		}
 #endif
 
+// BEGIN android-added
+#if 0
+/* Send app data in separate packet, otherwise, some particular site
+ * (only one site so far) closes the socket. http://b/2511073
+ * Note: there is a very small chance that two TCP packets
+ * could be arriving at server combined into a single TCP packet,
+ * then trigger that site to break. We haven't encounter that though.
+ */
+// END android-added
+	if (SSL_get_mode(s) & SSL_MODE_HANDSHAKE_CUTTHROUGH)
+		{
+		/* Send app data along with CCS/Finished */
+		s->s3->flags |= SSL3_FLAGS_DELAY_CLIENT_FINISHED;
+		}
+
+// BEGIN android-added
+#endif
+// END android-added
 	for (;;)
 		{
 		state=s->state;
