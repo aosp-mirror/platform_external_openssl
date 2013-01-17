@@ -16,6 +16,24 @@
       "revId": "490059505c1c273f4fe7bbd1bacf5d35706bb1e6",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "OZw9JdbU",
+        "filename": "ssl/s3_clnt.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1003723
+      },
+      "writtenOn": "2013-01-17T07:00:10Z",
+      "side": 1,
+      "message": "right good catch. I vaguely remember the #if 0 this was a local modification by hwu. digging in, I see \n\ncommit 5f06f48e30a40f86ee704147d46e5e37383122fd\nAuthor: Huahui Wu \u003chwu@google.com\u003e\nDate:   Tue Mar 30 13:50:18 2010 -0400\n\n    Re-enable the cut-through (a.k.a false start) feature in openSSL.\n    This will save one RTT for SSL handshake.\n    b/2511073 explains the details.\n    \n    Change-Id: I01cd02d2df375bc02eec12814308f0a6e63b8ae1",
+      "parentUuid": "OZqI4mj8",
+      "revId": "490059505c1c273f4fe7bbd1bacf5d35706bb1e6",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
