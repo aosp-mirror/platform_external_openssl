@@ -1,4 +1,4 @@
-progs.patch:
+progs.patch
 
 Fixup sources under the apps/ directory that are not built under the android environment.
 
@@ -19,7 +19,7 @@ sha1_armv4_large.patch
 This patch eliminates memory stores to addresses below SP.
 
 
-mips_private.patch:
+mips_private.patch
 
 Fix duplicate defines of labels AES_set_encrypt_key and AES_set_decrypt_key
 by prefixing Mips version with private_ .
@@ -30,3 +30,14 @@ channelid.patch
 
 Implements TLS Channel ID support as both a client and a server.
 See http://tools.ietf.org/html/draft-balfanz-tls-channelid-00.
+
+
+constant_time_memcmp.patch
+
+This patch adds a constant time memcmp function and replaces several of the
+memcmps on sensitive data with it.
+
+
+constant_time_cbc.patch
+
+implement CBC decoding in constant time CVE-2013-0169
