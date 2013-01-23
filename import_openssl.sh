@@ -141,7 +141,7 @@ function gen_asm_x86 () {
 function gen_asm_x86_64 () {
   local OUT
   OUT=$(default_asm_file "$@")
-  perl "$1" elf > "$OUT"
+  perl "$1" elf "$OUT" > "$OUT"
 }
 
 function import() {
@@ -214,6 +214,7 @@ function import() {
   # Generate x86_64 asm
   gen_asm_x86_64 crypto/x86_64cpuid.pl
   gen_asm_x86_64 crypto/sha/asm/sha1-x86_64.pl
+  gen_asm_x86_64 crypto/sha/asm/sha512-x86_64.pl crypto/sha/asm/sha256-x86_64.S
   gen_asm_x86_64 crypto/sha/asm/sha512-x86_64.pl
   gen_asm_x86_64 crypto/modes/asm/ghash-x86_64.pl
   gen_asm_x86_64 crypto/aes/asm/aesni-x86_64.pl
