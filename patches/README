@@ -30,3 +30,7 @@ channelid.patch
 
 Implements TLS Channel ID support as both a client and a server.
 See http://tools.ietf.org/html/draft-balfanz-tls-channelid-00.
+
+clang.patch
+
+Fixes two minor compilation errors when building with the Clang compiler.
