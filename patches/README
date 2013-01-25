@@ -41,3 +41,7 @@ memcmps on sensitive data with it.
 constant_time_cbc.patch
 
 implement CBC decoding in constant time CVE-2013-0169
+
+clang.patch
+
+Fixes two minor compilation errors when building with the Clang compiler.
