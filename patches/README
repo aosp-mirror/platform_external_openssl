@@ -45,3 +45,11 @@ implement CBC decoding in constant time CVE-2013-0169
 clang.patch
 
 Fixes two minor compilation errors when building with the Clang compiler.
+
+
+recursive_lock_fix.patch
+
+Small fix to get rid of unwanted recursive mutex lock in X509_PUBKEY_get.
+See http://cvs.openssl.org/chngview?cn=22568 for upstream patch, and
+https://groups.google.com/d/topic/mailing.openssl.dev/4Z67vaaTChk/discussion
+for the most recent discussion.
