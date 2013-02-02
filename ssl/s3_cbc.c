@@ -61,12 +61,12 @@
 #include <openssl/sha.h>
 
 /* MAX_HASH_BIT_COUNT_BYTES is the maximum number of bytes in the hash's length
- * field. (SHA-384 and SHA-512 have 128-bit length.) */
+ * field. (SHA-384/512 have 128-bit length.) */
 #define MAX_HASH_BIT_COUNT_BYTES 16
 
 /* MAX_HASH_BLOCK_SIZE is the maximum hash block size that we'll support.
- * Currently SHA-384 and SHA-512 have a 128-byte block size and that's the
- * largest supported by TLS.) */
+ * Currently SHA-384/512 has a 128-byte block size and that's the largest
+ * supported by TLS.) */
 #define MAX_HASH_BLOCK_SIZE 128
 
 /* Some utility functions are needed:
@@ -78,7 +78,7 @@
 #define DUPLICATE_MSB_TO_ALL(x) ( (unsigned)( (int)(x) >> (sizeof(int)*8-1) ) )
 #define DUPLICATE_MSB_TO_ALL_8(x) ((unsigned char)(DUPLICATE_MSB_TO_ALL(x)))
 
-/* constant_time_ge returns 0xff...ff if a>=b and 0 otherwise. */
+/* constant_time_ge returns 0xff if a>=b and 0x00 otherwise. */
 static unsigned constant_time_ge(unsigned a, unsigned b)
 	{
 	a -= b;
@@ -157,8 +157,6 @@ int tls1_cbc_remove_padding(const SSL* s,
 	 * workaround has been around since SSLeay so hopefully it is either
 	 * fixed now or no buggy implementation supports compression [steve]
 	 */
-	/* TODO: this isn't constant time if SSL_OP_TLS_BLOCK_PADDING_BUG is
-	 * enabled. */
 	if ( (s->options&SSL_OP_TLS_BLOCK_PADDING_BUG) && !s->expand)
 		{
 		/* First packet is even in size, so check */
@@ -229,7 +227,7 @@ int tls1_cbc_remove_padding(const SSL* s,
 	}
 
 #if defined(_M_AMD64) || defined(__x86_64__)
-#define OPENSSL_CBC_MAC_ROTATE_IN_PLACE
+#define CBC_MAC_ROTATE_IN_PLACE
 #endif
 
 /* ssl3_cbc_copy_mac copies |md_size| bytes from the end of |rec| to |out| in
@@ -243,16 +241,16 @@ int tls1_cbc_remove_padding(const SSL* s,
  *   rec->orig_len >= md_size
  *   md_size <= EVP_MAX_MD_SIZE
  *
- * If OPENSSL_CBC_MAC_ROTATE_IN_PLACE is defined then the rotation is performed with
+ * If CBC_MAC_ROTATE_IN_PLACE is defined then the rotation is performed with
  * variable accesses in a 64-byte-aligned buffer. Assuming that this fits into
  * a single cache-line, then the variable memory accesses don't actually affect
- * the timing. This has been tested to be true on Intel's x86_64 chips.
+ * the timing. This has been tested to be true on Intel amd64 chips.
  */
 void ssl3_cbc_copy_mac(unsigned char* out,
 		       const SSL3_RECORD *rec,
 		       unsigned md_size)
 	{
-#if defined(OPENSSL_CBC_MAC_ROTATE_IN_PLACE)
+#if defined(CBC_MAC_ROTATE_IN_PLACE)
 	unsigned char rotated_mac_buf[EVP_MAX_MD_SIZE*2];
 	unsigned char *rotated_mac;
 #else
@@ -272,7 +270,7 @@ void ssl3_cbc_copy_mac(unsigned char* out,
 	OPENSSL_assert(rec->orig_len >= md_size);
 	OPENSSL_assert(md_size <= EVP_MAX_MD_SIZE);
 
-#if defined(OPENSSL_CBC_MAC_ROTATE_IN_PLACE)
+#if defined(CBC_MAC_ROTATE_IN_PLACE)
 	rotated_mac = (unsigned char*) (((intptr_t)(rotated_mac_buf + 64)) & ~63);
 #endif
 
@@ -304,7 +302,7 @@ void ssl3_cbc_copy_mac(unsigned char* out,
 		}
 
 	/* Now rotate the MAC */
-#if defined(OPENSSL_CBC_MAC_ROTATE_IN_PLACE)
+#if defined(CBC_MAC_ROTATE_IN_PLACE)
 	j = 0;
 	for (i = 0; i < md_size; i++)
 		{
