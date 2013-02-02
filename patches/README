@@ -31,6 +31,7 @@ channelid.patch
 Implements TLS Channel ID support as both a client and a server.
 See http://tools.ietf.org/html/draft-balfanz-tls-channelid-00.
 
+
 clang.patch
 
 Fixes two minor compilation errors when building with the Clang compiler.
@@ -42,3 +43,15 @@ Small fix to get rid of unwanted recursive mutex lock in X509_PUBKEY_get.
 See http://cvs.openssl.org/chngview?cn=22568 for upstream patch, and
 https://groups.google.com/d/topic/mailing.openssl.dev/4Z67vaaTChk/discussion
 for the most recent discussion.
+
+
+0001-Add-and-use-a-constant-time-memcmp.patch
+
+constant time memcmp
+
+
+0002-Make-CBC-decoding-constant-time.patch
+
+Make CBC decoding constant time CVE-2013-0169
+
+

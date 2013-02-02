@@ -23,6 +23,7 @@ local_src_files:= \
 	ssl/s2_pkt.c \
 	ssl/s2_srvr.c \
 	ssl/s3_both.c \
+	ssl/s3_cbc.c \
 	ssl/s3_clnt.c \
 	ssl/s3_enc.c \
 	ssl/s3_lib.c \
