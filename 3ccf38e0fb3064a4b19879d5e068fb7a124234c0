@@ -16,6 +16,24 @@
       "revId": "3ccf38e0fb3064a4b19879d5e068fb7a124234c0",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "PgQHwiiE",
+        "filename": "crypto/evp/c_allc.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1019036
+      },
+      "writtenOn": "2013-02-05T20:41:20Z",
+      "side": 0,
+      "message": "Yes, upstream have enabled AES-NI again. Probably matters very little for Android either way. I wouldn\u0027t diverge from upstream over this.",
+      "parentUuid": "PbIqjuwU",
+      "revId": "3ccf38e0fb3064a4b19879d5e068fb7a124234c0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
