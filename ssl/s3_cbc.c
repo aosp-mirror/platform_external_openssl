@@ -53,8 +53,6 @@
  *
  */
 
-#include <stdint.h>
-
 #include "ssl_locl.h"
 
 #include <openssl/md5.h>
@@ -118,7 +116,9 @@ int ssl3_cbc_remove_padding(const SSL* s,
 	good = constant_time_ge(rec->length, padding_length+overhead);
 	/* SSLv3 requires that the padding is minimal. */
 	good &= constant_time_ge(block_size, padding_length+1);
-	rec->length -= good & (padding_length+1);
+	padding_length = good & (padding_length+1);
+	rec->length -= padding_length;
+	rec->type |= padding_length<<8;	/* kludge: pass padding length */
 	return (int)((good & 1) | (~good & -1));
 }
 
@@ -150,6 +150,21 @@ int tls1_cbc_remove_padding(const SSL* s,
 	if (overhead > rec->length)
 		return 0;
 
+	/* We can always safely skip the explicit IV. We check at the beginning
+	 * of this function that the record has at least enough space for the
+	 * IV, MAC and padding length byte. (These can be checked in
+	 * non-constant time because it's all public information.) So, if the
+	 * padding was invalid, then we didn't change |rec->length| and this is
+	 * safe. If the padding was valid then we know that we have at least
+	 * overhead+padding_length bytes of space and so this is still safe
+	 * because overhead accounts for the explicit IV. */
+	if (has_explicit_iv)
+		{
+		rec->data += block_size;
+		rec->input += block_size;
+		rec->length -= block_size;
+		}
+
 	padding_length = rec->data[rec->length-1];
 
 	/* NB: if compression is in operation the first packet may not be of
@@ -170,6 +185,13 @@ int tls1_cbc_remove_padding(const SSL* s,
 			{
 			padding_length--;
 			}
+		}
+
+	if (EVP_CIPHER_flags(s->enc_read_ctx->cipher)&EVP_CIPH_FLAG_AEAD_CIPHER)
+		{
+		/* padding is already verified */
+		rec->length -= padding_length;
+		return 1;
 		}
 
 	good = constant_time_ge(rec->length, overhead+padding_length);
@@ -205,23 +227,9 @@ int tls1_cbc_remove_padding(const SSL* s,
 	good <<= sizeof(good)*8-1;
 	good = DUPLICATE_MSB_TO_ALL(good);
 
-	rec->length -= good & (padding_length+1);
-
-	/* We can always safely skip the explicit IV. We check at the beginning
-	 * of this function that the record has at least enough space for the
-	 * IV, MAC and padding length byte. (These can be checked in
-	 * non-constant time because it's all public information.) So, if the
-	 * padding was invalid, then we didn't change |rec->length| and this is
-	 * safe. If the padding was valid then we know that we have at least
-	 * overhead+padding_length bytes of space and so this is still safe
-	 * because overhead accounts for the explicit IV. */
-	if (has_explicit_iv)
-		{
-		rec->data += block_size;
-		rec->input += block_size;
-		rec->length -= block_size;
-		rec->orig_len -= block_size;
-		}
+	padding_length = good & (padding_length+1);
+	rec->length -= padding_length;
+	rec->type |= padding_length<<8;	/* kludge: pass padding length */
 
 	return (int)((good & 1) | (~good & -1));
 	}
@@ -248,7 +256,7 @@ int tls1_cbc_remove_padding(const SSL* s,
  */
 void ssl3_cbc_copy_mac(unsigned char* out,
 		       const SSL3_RECORD *rec,
-		       unsigned md_size)
+		       unsigned md_size,unsigned orig_len)
 	{
 #if defined(CBC_MAC_ROTATE_IN_PLACE)
 	unsigned char rotated_mac_buf[EVP_MAX_MD_SIZE*2];
@@ -267,7 +275,7 @@ void ssl3_cbc_copy_mac(unsigned char* out,
 	unsigned div_spoiler;
 	unsigned rotate_offset;
 
-	OPENSSL_assert(rec->orig_len >= md_size);
+	OPENSSL_assert(orig_len >= md_size);
 	OPENSSL_assert(md_size <= EVP_MAX_MD_SIZE);
 
 #if defined(CBC_MAC_ROTATE_IN_PLACE)
@@ -275,8 +283,8 @@ void ssl3_cbc_copy_mac(unsigned char* out,
 #endif
 
 	/* This information is public so it's safe to branch based on it. */
-	if (rec->orig_len > md_size + 255 + 1)
-		scan_start = rec->orig_len - (md_size + 255 + 1);
+	if (orig_len > md_size + 255 + 1)
+		scan_start = orig_len - (md_size + 255 + 1);
 	/* div_spoiler contains a multiple of md_size that is used to cause the
 	 * modulo operation to be constant time. Without this, the time varies
 	 * based on the amount of padding when running on Intel chips at least.
@@ -289,9 +297,9 @@ void ssl3_cbc_copy_mac(unsigned char* out,
 	rotate_offset = (div_spoiler + mac_start - scan_start) % md_size;
 
 	memset(rotated_mac, 0, md_size);
-	for (i = scan_start; i < rec->orig_len;)
+	for (i = scan_start; i < orig_len;)
 		{
-		for (j = 0; j < md_size && i < rec->orig_len; i++, j++)
+		for (j = 0; j < md_size && i < orig_len; i++, j++)
 			{
 			unsigned char mac_started = constant_time_ge(i, mac_start);
 			unsigned char mac_ended = constant_time_ge(i, mac_end);
@@ -341,7 +349,9 @@ static void tls1_sha1_final_raw(void* ctx, unsigned char *md_out)
 	l2n(sha1->h3, md_out);
 	l2n(sha1->h4, md_out);
 	}
+#define LARGEST_DIGEST_CTX SHA_CTX
 
+#ifndef OPENSSL_NO_SHA256
 static void tls1_sha256_final_raw(void* ctx, unsigned char *md_out)
 	{
 	SHA256_CTX *sha256 = ctx;
@@ -352,7 +362,11 @@ static void tls1_sha256_final_raw(void* ctx, unsigned char *md_out)
 		l2n(sha256->h[i], md_out);
 		}
 	}
+#undef  LARGEST_DIGEST_CTX
+#define LARGEST_DIGEST_CTX SHA256_CTX
+#endif
 
+#ifndef OPENSSL_NO_SHA512
 static void tls1_sha512_final_raw(void* ctx, unsigned char *md_out)
 	{
 	SHA512_CTX *sha512 = ctx;
@@ -363,19 +377,30 @@ static void tls1_sha512_final_raw(void* ctx, unsigned char *md_out)
 		l2n8(sha512->h[i], md_out);
 		}
 	}
+#undef  LARGEST_DIGEST_CTX
+#define LARGEST_DIGEST_CTX SHA512_CTX
+#endif
 
 /* ssl3_cbc_record_digest_supported returns 1 iff |ctx| uses a hash function
  * which ssl3_cbc_digest_record supports. */
 char ssl3_cbc_record_digest_supported(const EVP_MD_CTX *ctx)
 	{
-	switch (ctx->digest->type)
+#ifdef OPENSSL_FIPS
+	if (FIPS_mode())
+		return 0;
+#endif
+	switch (EVP_MD_CTX_type(ctx))
 		{
 		case NID_md5:
 		case NID_sha1:
+#ifndef OPENSSL_NO_SHA256
 		case NID_sha224:
 		case NID_sha256:
+#endif
+#ifndef OPENSSL_NO_SHA512
 		case NID_sha384:
 		case NID_sha512:
+#endif
 			return 1;
 		default:
 			return 0;
@@ -413,14 +438,15 @@ void ssl3_cbc_digest_record(
 	unsigned mac_secret_length,
 	char is_sslv3)
 	{
-	unsigned char md_state[sizeof(SHA512_CTX)];
+	union {	double align;
+		unsigned char c[sizeof(LARGEST_DIGEST_CTX)]; } md_state;
 	void (*md_final_raw)(void *ctx, unsigned char *md_out);
 	void (*md_transform)(void *ctx, const unsigned char *block);
 	unsigned md_size, md_block_size = 64;
 	unsigned sslv3_pad_length = 40, header_length, variance_blocks,
 		 len, max_mac_bytes, num_blocks,
 		 num_starting_blocks, k, mac_end_offset, c, index_a, index_b;
-	uint64_t bits;
+	unsigned int bits;	/* at most 18 bits */
 	unsigned char length_bytes[MAX_HASH_BIT_COUNT_BYTES];
 	/* hmac_pad is the masked HMAC key. */
 	unsigned char hmac_pad[MAX_HASH_BLOCK_SIZE];
@@ -436,35 +462,38 @@ void ssl3_cbc_digest_record(
 	 * many possible overflows later in this function. */
 	OPENSSL_assert(data_plus_mac_plus_padding_size < 1024*1024);
 
-	switch (ctx->digest->type)
+	switch (EVP_MD_CTX_type(ctx))
 		{
 		case NID_md5:
-			MD5_Init((MD5_CTX*)md_state);
+			MD5_Init((MD5_CTX*)md_state.c);
 			md_final_raw = tls1_md5_final_raw;
 			md_transform = (void(*)(void *ctx, const unsigned char *block)) MD5_Transform;
 			md_size = 16;
 			sslv3_pad_length = 48;
 			break;
 		case NID_sha1:
-			SHA1_Init((SHA_CTX*)md_state);
+			SHA1_Init((SHA_CTX*)md_state.c);
 			md_final_raw = tls1_sha1_final_raw;
 			md_transform = (void(*)(void *ctx, const unsigned char *block)) SHA1_Transform;
 			md_size = 20;
 			break;
+#ifndef OPENSSL_NO_SHA256
 		case NID_sha224:
-			SHA224_Init((SHA256_CTX*)md_state);
+			SHA224_Init((SHA256_CTX*)md_state.c);
 			md_final_raw = tls1_sha256_final_raw;
 			md_transform = (void(*)(void *ctx, const unsigned char *block)) SHA256_Transform;
 			md_size = 224/8;
 			break;
 		case NID_sha256:
-			SHA256_Init((SHA256_CTX*)md_state);
+			SHA256_Init((SHA256_CTX*)md_state.c);
 			md_final_raw = tls1_sha256_final_raw;
 			md_transform = (void(*)(void *ctx, const unsigned char *block)) SHA256_Transform;
 			md_size = 32;
 			break;
+#endif
+#ifndef OPENSSL_NO_SHA512
 		case NID_sha384:
-			SHA384_Init((SHA512_CTX*)md_state);
+			SHA384_Init((SHA512_CTX*)md_state.c);
 			md_final_raw = tls1_sha512_final_raw;
 			md_transform = (void(*)(void *ctx, const unsigned char *block)) SHA512_Transform;
 			md_size = 384/8;
@@ -472,13 +501,14 @@ void ssl3_cbc_digest_record(
 			md_length_size = 16;
 			break;
 		case NID_sha512:
-			SHA512_Init((SHA512_CTX*)md_state);
+			SHA512_Init((SHA512_CTX*)md_state.c);
 			md_final_raw = tls1_sha512_final_raw;
 			md_transform = (void(*)(void *ctx, const unsigned char *block)) SHA512_Transform;
 			md_size = 64;
 			md_block_size = 128;
 			md_length_size = 16;
 			break;
+#endif
 		default:
 			/* ssl3_cbc_record_digest_supported should have been
 			 * called first to check that the hash function is
@@ -577,17 +607,14 @@ void ssl3_cbc_digest_record(
 		for (i = 0; i < md_block_size; i++)
 			hmac_pad[i] ^= 0x36;
 
-		md_transform(md_state, hmac_pad);
+		md_transform(md_state.c, hmac_pad);
 		}
 
-	j = 0;
-	if (md_length_size == 16)
-		{
-		memset(length_bytes, 0, 8);
-		j = 8;
-		}
-	for (i = 0; i < 8; i++)
-		length_bytes[i+j] = bits >> (8*(7-i));
+	memset(length_bytes,0,md_length_size-4);
+	length_bytes[md_length_size-4] = (unsigned char)(bits>>24);
+	length_bytes[md_length_size-3] = (unsigned char)(bits>>16);
+	length_bytes[md_length_size-2] = (unsigned char)(bits>>8);
+	length_bytes[md_length_size-1] = (unsigned char)bits;
 
 	if (k > 0)
 		{
@@ -598,21 +625,21 @@ void ssl3_cbc_digest_record(
 			 * block that the header consumes: either 7 bytes
 			 * (SHA1) or 11 bytes (MD5). */
 			unsigned overhang = header_length-md_block_size;
-			md_transform(md_state, header);
+			md_transform(md_state.c, header);
 			memcpy(first_block, header + md_block_size, overhang);
 			memcpy(first_block + overhang, data, md_block_size-overhang);
-			md_transform(md_state, first_block);
+			md_transform(md_state.c, first_block);
 			for (i = 1; i < k/md_block_size - 1; i++)
-				md_transform(md_state, data + md_block_size*i - overhang);
+				md_transform(md_state.c, data + md_block_size*i - overhang);
 			}
 		else
 			{
 			/* k is a multiple of md_block_size. */
 			memcpy(first_block, header, 13);
 			memcpy(first_block+13, data, md_block_size-13);
-			md_transform(md_state, first_block);
+			md_transform(md_state.c, first_block);
 			for (i = 1; i < k/md_block_size; i++)
-				md_transform(md_state, data + md_block_size*i - 13);
+				md_transform(md_state.c, data + md_block_size*i - 13);
 			}
 		}
 
@@ -662,8 +689,8 @@ void ssl3_cbc_digest_record(
 			block[j] = b;
 			}
 
-		md_transform(md_state, block);
-		md_final_raw(md_state, block);
+		md_transform(md_state.c, block);
+		md_final_raw(md_state.c, block);
 		/* If this is index_b, copy the hash value to |mac_out|. */
 		for (j = 0; j < md_size; j++)
 			mac_out[j] |= block[j]&is_block_b;
@@ -694,3 +721,50 @@ void ssl3_cbc_digest_record(
 		*md_out_size = md_out_size_u;
 	EVP_MD_CTX_cleanup(&md_ctx);
 	}
+
+#ifdef OPENSSL_FIPS
+
+/* Due to the need to use EVP in FIPS mode we can't reimplement digests but
+ * we can ensure the number of blocks processed is equal for all cases
+ * by digesting additional data.
+ */
+
+void tls_fips_digest_extra(
+	const EVP_CIPHER_CTX *cipher_ctx, EVP_MD_CTX *mac_ctx,
+	const unsigned char *data, size_t data_len, size_t orig_len)
+	{
+	size_t block_size, digest_pad, blocks_data, blocks_orig;
+	if (EVP_CIPHER_CTX_mode(cipher_ctx) != EVP_CIPH_CBC_MODE)
+		return;
+	block_size = EVP_MD_CTX_block_size(mac_ctx);
+	/* We are in FIPS mode if we get this far so we know we have only SHA*
+	 * digests and TLS to deal with.
+	 * Minimum digest padding length is 17 for SHA384/SHA512 and 9
+	 * otherwise.
+	 * Additional header is 13 bytes. To get the number of digest blocks
+	 * processed round up the amount of data plus padding to the nearest
+	 * block length. Block length is 128 for SHA384/SHA512 and 64 otherwise.
+	 * So we have:
+	 * blocks = (payload_len + digest_pad + 13 + block_size - 1)/block_size
+	 * equivalently:
+	 * blocks = (payload_len + digest_pad + 12)/block_size + 1
+	 * HMAC adds a constant overhead.
+	 * We're ultimately only interested in differences so this becomes
+	 * blocks = (payload_len + 29)/128
+	 * for SHA384/SHA512 and
+	 * blocks = (payload_len + 21)/64
+	 * otherwise.
+	 */
+	digest_pad = block_size == 64 ? 21 : 29;
+	blocks_orig = (orig_len + digest_pad)/block_size;
+	blocks_data = (data_len + digest_pad)/block_size;
+	/* MAC enough blocks to make up the difference between the original
+	 * and actual lengths plus one extra block to ensure this is never a
+	 * no op. The "data" pointer should always have enough space to
+	 * perform this operation as it is large enough for a maximum
+	 * length TLS buffer. 
+	 */
+	EVP_DigestSignUpdate(mac_ctx, data,
+				(blocks_orig - blocks_data + 1) * block_size);
+	}
+#endif

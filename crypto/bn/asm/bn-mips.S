@@ -582,7 +582,7 @@ bn_div_3_words:
 bn_div_3_words_internal:
 	.set	reorder
 	move	$11,$31
-	bal	bn_div_words
+	bal	bn_div_words_internal
 	move	$31,$11
 	multu	$10,$2
 	lw	$14,-2*4($7)

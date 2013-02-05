@@ -290,7 +290,7 @@ static int ssl3_get_record(SSL *s)
 	unsigned char *p;
 	unsigned char md[EVP_MAX_MD_SIZE];
 	short version;
-	unsigned mac_size;
+	unsigned mac_size, orig_len;
 	size_t extra;
 
 	rr= &(s->s3->rrec);
@@ -398,7 +398,7 @@ fprintf(stderr, "Record type=%d, Length=%d\n", rr->type, rr->length);
 
 	/* decrypt in place in 'rr->input' */
 	rr->data=rr->input;
-	rr->orig_len=rr->length;
+	orig_len=rr->length;
 
 	enc_err = s->method->ssl3_enc->enc(s,0);
 	/* enc_err is:
@@ -408,7 +408,7 @@ fprintf(stderr, "Record type=%d, Length=%d\n", rr->type, rr->length);
 	if (enc_err == 0)
 		{
 		al=SSL_AD_DECRYPTION_FAILED;
-		SSLerr(SSL_F_TLS1_ENC,SSL_R_BLOCK_CIPHER_PAD_IS_WRONG);
+		SSLerr(SSL_F_SSL3_GET_RECORD,SSL_R_BLOCK_CIPHER_PAD_IS_WRONG);
 		goto f_err;
 		}
 
@@ -434,10 +434,10 @@ printf("\n");
 		 * therefore we can safely process the record in a different
 		 * amount of time if it's too short to possibly contain a MAC.
 		 */
-		if (rr->orig_len < mac_size ||
+		if (orig_len < mac_size ||
 		    /* CBC records must have a padding length byte too. */
 		    (EVP_CIPHER_CTX_mode(s->enc_read_ctx) == EVP_CIPH_CBC_MODE &&
-		     rr->orig_len < mac_size+1))
+		     orig_len < mac_size+1))
 			{
 			al=SSL_AD_DECODE_ERROR;
 			SSLerr(SSL_F_SSL3_GET_RECORD,SSL_R_LENGTH_TOO_SHORT);
@@ -452,12 +452,12 @@ printf("\n");
 			 * without leaking the contents of the padding bytes.
 			 * */
 			mac = mac_tmp;
-			ssl3_cbc_copy_mac(mac_tmp, rr, mac_size);
+			ssl3_cbc_copy_mac(mac_tmp, rr, mac_size, orig_len);
 			rr->length -= mac_size;
 			}
 		else
 			{
-			/* In this case there's no padding, so |rec->orig_len|
+			/* In this case there's no padding, so |orig_len|
 			 * equals |rec->length| and we checked that there's
 			 * enough bytes for |mac_size| above. */
 			rr->length -= mac_size;
@@ -746,6 +746,7 @@ static int do_ssl3_write(SSL *s, int type, const unsigned char *buf,
 	 * bytes and record version number > TLS 1.0
 	 */
 	if (s->state == SSL3_ST_CW_CLNT_HELLO_B
+				&& !s->renegotiate
 				&& TLS1_get_version(s) > TLS1_VERSION)
 		*(p++) = 0x1;
 	else
@@ -1240,7 +1241,7 @@ start:
 				goto f_err;
 				}
 #ifdef SSL_AD_MISSING_SRP_USERNAME
-			if (alert_descr == SSL_AD_MISSING_SRP_USERNAME)
+			else if (alert_descr == SSL_AD_MISSING_SRP_USERNAME)
 				return(0);
 #endif
 			}
