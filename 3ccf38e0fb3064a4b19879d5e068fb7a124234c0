@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "PbIqjuwU",
+        "filename": "crypto/evp/c_allc.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1003723
+      },
+      "writtenOn": "2013-02-05T18:32:57Z",
+      "side": 0,
+      "message": "agl, noticed this diff from the original patches to 1.0.1d. Is that expected? (also in ssl_algs.c) I\u0027m guessing it is explained by the large diff in e_aes_cbc_hmac_sha1.c but wanted to confirm.",
+      "revId": "3ccf38e0fb3064a4b19879d5e068fb7a124234c0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
