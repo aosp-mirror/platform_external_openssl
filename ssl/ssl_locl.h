@@ -841,7 +841,8 @@ int ssl_verify_cert_chain(SSL *s,STACK_OF(X509) *sk);
 int ssl_undefined_function(SSL *s);
 int ssl_undefined_void_function(void);
 int ssl_undefined_const_function(const SSL *s);
-X509 *ssl_get_server_send_cert(SSL *);
+CERT_PKEY *ssl_get_server_send_pkey(const SSL *s);
+X509 *ssl_get_server_send_cert(const SSL *);
 EVP_PKEY *ssl_get_sign_pkey(SSL *s,const SSL_CIPHER *c, const EVP_MD **pmd);
 int ssl_cert_type(X509 *x,EVP_PKEY *pkey);
 void ssl_set_cert_masks(CERT *c, const SSL_CIPHER *cipher);
@@ -1101,7 +1102,8 @@ int ssl_parse_clienthello_tlsext(SSL *s, unsigned char **data, unsigned char *d,
 int ssl_parse_serverhello_tlsext(SSL *s, unsigned char **data, unsigned char *d, int n, int *al);
 int ssl_prepare_clienthello_tlsext(SSL *s);
 int ssl_prepare_serverhello_tlsext(SSL *s);
-int ssl_check_clienthello_tlsext(SSL *s);
+int ssl_check_clienthello_tlsext_early(SSL *s);
+int ssl_check_clienthello_tlsext_late(SSL *s);
 int ssl_check_serverhello_tlsext(SSL *s);
 
 #ifndef OPENSSL_NO_HEARTBEATS
@@ -1149,7 +1151,7 @@ int ssl_parse_serverhello_use_srtp_ext(SSL *s, unsigned char *d, int len,int *al
 /* s3_cbc.c */
 void ssl3_cbc_copy_mac(unsigned char* out,
 		       const SSL3_RECORD *rec,
-		       unsigned md_size);
+		       unsigned md_size,unsigned orig_len);
 int ssl3_cbc_remove_padding(const SSL* s,
 			    SSL3_RECORD *rec,
 			    unsigned block_size,
@@ -1170,5 +1172,9 @@ void ssl3_cbc_digest_record(
 	const unsigned char *mac_secret,
 	unsigned mac_secret_length,
 	char is_sslv3);
+
+void tls_fips_digest_extra(
+	const EVP_CIPHER_CTX *cipher_ctx, EVP_MD_CTX *mac_ctx,
+	const unsigned char *data, size_t data_len, size_t orig_len);
 
 #endif

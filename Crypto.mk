@@ -341,6 +341,7 @@ local_src_files := \
  crypto/evp/e_xcbc_d.c \
  crypto/evp/encode.c \
  crypto/evp/evp_acnf.c \
+ crypto/evp/evp_cnf.c \
  crypto/evp/evp_enc.c \
  crypto/evp/evp_err.c \
  crypto/evp/evp_key.c \

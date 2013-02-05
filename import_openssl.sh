@@ -322,7 +322,7 @@ function applypatches () {
   for i in $OPENSSL_PATCHES; do
     if [ ! "$skip_patch" = "patches/$i" ]; then
       echo "Applying patch $i"
-      patch -p1 < ../patches/$i || die "Could not apply patches/$i. Fix source and run: $0 regenerate patches/$i"
+      patch -p1 --merge < ../patches/$i || die "Could not apply patches/$i. Fix source and run: $0 regenerate patches/$i"
     else
       echo "Skiping patch $i"
     fi

@@ -361,7 +361,7 @@ int tls1_change_cipher_state(SSL *s, int which)
 	{
         int i;
         for (i=0; i<s->s3->tmp.key_block_length; i++)
-		printf("%02x", key_block[i]);  printf("\n");
+		printf("%02x", s->s3->tmp.key_block[i]);  printf("\n");
         }
 #endif	/* KSSL_DEBUG */
 
@@ -949,7 +949,7 @@ int tls1_mac(SSL *ssl, unsigned char *md, int send)
 	SSL3_RECORD *rec;
 	unsigned char *seq;
 	EVP_MD_CTX *hash;
-	size_t md_size;
+	size_t md_size, orig_len;
 	int i;
 	EVP_MD_CTX hmac, *mac_ctx;
 	unsigned char header[13];
@@ -996,6 +996,10 @@ int tls1_mac(SSL *ssl, unsigned char *md, int send)
 	else
 		memcpy(header, seq, 8);
 
+	/* kludge: tls1_cbc_remove_padding passes padding length in rec->type */
+	orig_len = rec->length+md_size+((unsigned int)rec->type>>8);
+	rec->type &= 0xff;
+
 	header[8]=rec->type;
 	header[9]=(unsigned char)(ssl->version>>8);
 	header[10]=(unsigned char)(ssl->version);
@@ -1014,7 +1018,7 @@ int tls1_mac(SSL *ssl, unsigned char *md, int send)
 			mac_ctx,
 			md, &md_size,
 			header, rec->input,
-			rec->length + md_size, rec->orig_len,
+			rec->length + md_size, orig_len,
 			ssl->s3->read_mac_secret,
 			ssl->s3->read_mac_secret_size,
 			0 /* not SSLv3 */);
@@ -1025,6 +1029,13 @@ int tls1_mac(SSL *ssl, unsigned char *md, int send)
 		EVP_DigestSignUpdate(mac_ctx,rec->input,rec->length);
 		t=EVP_DigestSignFinal(mac_ctx,md,&md_size);
 		OPENSSL_assert(t > 0);
+#ifdef OPENSSL_FIPS
+		if (!send && FIPS_mode())
+			tls_fips_digest_extra(
+	    				ssl->enc_read_ctx,
+					mac_ctx, rec->input,
+					rec->length, orig_len);
+#endif
 		}
 		
 	if (!stream_mac)
