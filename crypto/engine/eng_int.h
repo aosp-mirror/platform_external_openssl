@@ -179,6 +179,7 @@ struct engine_st
 	ENGINE_CTRL_FUNC_PTR ctrl;
 	ENGINE_LOAD_KEY_PTR load_privkey;
 	ENGINE_LOAD_KEY_PTR load_pubkey;
+	ENGINE_LOAD_KEY_PTR load_secret;
 
 	ENGINE_SSL_CLIENT_CERT_PTR load_ssl_client_cert;
 

@@ -487,6 +487,7 @@ int ENGINE_set_finish_function(ENGINE *e, ENGINE_GEN_INT_FUNC_PTR finish_f);
 int ENGINE_set_ctrl_function(ENGINE *e, ENGINE_CTRL_FUNC_PTR ctrl_f);
 int ENGINE_set_load_privkey_function(ENGINE *e, ENGINE_LOAD_KEY_PTR loadpriv_f);
 int ENGINE_set_load_pubkey_function(ENGINE *e, ENGINE_LOAD_KEY_PTR loadpub_f);
+int ENGINE_set_load_secret_function(ENGINE *e, ENGINE_LOAD_KEY_PTR loadsecret_f);
 int ENGINE_set_load_ssl_client_cert_function(ENGINE *e,
 				ENGINE_SSL_CLIENT_CERT_PTR loadssl_f);
 int ENGINE_set_ciphers(ENGINE *e, ENGINE_CIPHERS_PTR f);
@@ -526,6 +527,7 @@ ENGINE_GEN_INT_FUNC_PTR ENGINE_get_finish_function(const ENGINE *e);
 ENGINE_CTRL_FUNC_PTR ENGINE_get_ctrl_function(const ENGINE *e);
 ENGINE_LOAD_KEY_PTR ENGINE_get_load_privkey_function(const ENGINE *e);
 ENGINE_LOAD_KEY_PTR ENGINE_get_load_pubkey_function(const ENGINE *e);
+ENGINE_LOAD_KEY_PTR ENGINE_get_load_secret_function(const ENGINE *e);
 ENGINE_SSL_CLIENT_CERT_PTR ENGINE_get_ssl_client_cert_function(const ENGINE *e);
 ENGINE_CIPHERS_PTR ENGINE_get_ciphers(const ENGINE *e);
 ENGINE_DIGESTS_PTR ENGINE_get_digests(const ENGINE *e);
@@ -569,6 +571,8 @@ int ENGINE_finish(ENGINE *e);
 EVP_PKEY *ENGINE_load_private_key(ENGINE *e, const char *key_id,
 	UI_METHOD *ui_method, void *callback_data);
 EVP_PKEY *ENGINE_load_public_key(ENGINE *e, const char *key_id,
+	UI_METHOD *ui_method, void *callback_data);
+EVP_PKEY *ENGINE_load_secret_key(ENGINE *e, const char *key_id,
 	UI_METHOD *ui_method, void *callback_data);
 int ENGINE_load_ssl_client_cert(ENGINE *e, SSL *s,
 	STACK_OF(X509_NAME) *ca_dn, X509 **pcert, EVP_PKEY **ppkey,
@@ -777,6 +781,7 @@ void ERR_load_ENGINE_strings(void);
 #define ENGINE_F_ENGINE_LIST_REMOVE			 121
 #define ENGINE_F_ENGINE_LOAD_PRIVATE_KEY		 150
 #define ENGINE_F_ENGINE_LOAD_PUBLIC_KEY			 151
+#define ENGINE_F_ENGINE_LOAD_SECRET_KEY			 153
 #define ENGINE_F_ENGINE_LOAD_SSL_CLIENT_CERT		 194
 #define ENGINE_F_ENGINE_NEW				 122
 #define ENGINE_F_ENGINE_REMOVE				 123
@@ -811,6 +816,7 @@ void ERR_load_ENGINE_strings(void);
 #define ENGINE_R_ENGINE_SECTION_ERROR			 149
 #define ENGINE_R_FAILED_LOADING_PRIVATE_KEY		 128
 #define ENGINE_R_FAILED_LOADING_PUBLIC_KEY		 129
+#define ENGINE_R_FAILED_LOADING_SECRET_KEY		 152
 #define ENGINE_R_FINISH_FAILED				 106
 #define ENGINE_R_GET_HANDLE_FAILED			 107
 #define ENGINE_R_ID_OR_NAME_MISSING			 108

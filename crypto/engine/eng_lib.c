@@ -98,6 +98,7 @@ void engine_set_all_null(ENGINE *e)
 	e->ctrl = NULL;
 	e->load_privkey = NULL;
 	e->load_pubkey = NULL;
+	e->load_secret = NULL;
 	e->cmd_defns = NULL;
 	e->flags = 0;
 	}

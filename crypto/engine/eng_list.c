@@ -343,6 +343,7 @@ static void engine_cpy(ENGINE *dest, const ENGINE *src)
 	dest->ctrl = src->ctrl;
 	dest->load_privkey = src->load_privkey;
 	dest->load_pubkey = src->load_pubkey;
+	dest->load_secret = src->load_secret;
 	dest->cmd_defns = src->cmd_defns;
 	dest->flags = src->flags;
 	}
