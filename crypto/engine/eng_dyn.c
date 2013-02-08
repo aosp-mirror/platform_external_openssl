@@ -407,9 +407,14 @@ static int int_load(dynamic_data_ctx *ctx)
 	{
 	int num, loop;
 	/* Unless told not to, try a direct load */
-	if((ctx->dir_load != 2) && (DSO_load(ctx->dynamic_dso,
-				ctx->DYNAMIC_LIBNAME, NULL, 0)) != NULL)
-		return 1;
+	if(ctx->dir_load != 2)
+		{
+		if (DSO_load(ctx->dynamic_dso,
+				ctx->DYNAMIC_LIBNAME, NULL, 0) != NULL)
+			return 1;
+		else
+			ERR_clear_error();
+		}
 	/* If we're not allowed to use 'dirs' or we have none, fail */
 	if(!ctx->dir_load || (num = sk_OPENSSL_STRING_num(ctx->dirs)) < 1)
 		return 0;
@@ -425,6 +430,8 @@ static int int_load(dynamic_data_ctx *ctx)
 			OPENSSL_free(merge);
 			return 1;
 			}
+		else
+			ERR_clear_error();
 		OPENSSL_free(merge);
 		}
 	return 0;
