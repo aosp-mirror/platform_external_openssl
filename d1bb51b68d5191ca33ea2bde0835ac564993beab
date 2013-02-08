@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "PpA2FPQ8",
+        "filename": "crypto/engine/eng_dyn.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 411,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2013-02-08T19:46:53Z",
+      "side": 0,
+      "message": "This looks like a bug in the original code.. one would think it should be:\n\n  if (x \u0026\u0026 (DSO_load(...) !\u003d NULL))",
+      "revId": "d1bb51b68d5191ca33ea2bde0835ac564993beab",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
