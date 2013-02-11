@@ -883,7 +883,7 @@ diff -ur openssl/ssl/ssl_locl.h openssl.channelid/ssl/ssl_locl.h
 diff -ur openssl/ssl/t1_lib.c openssl.channelid/ssl/t1_lib.c
 --- openssl/ssl/t1_lib.c	2012-08-28 16:04:21.193349647 -0400
 +++ openssl.channelid/ssl/t1_lib.c	2012-08-28 16:04:40.603618948 -0400
-@@ -649,6 +649,16 @@
+@@ -649,7 +649,17 @@
  		}
  #endif
  
@@ -897,6 +897,7 @@ diff -ur openssl/ssl/t1_lib.c openssl.channelid/ssl/t1_lib.c
 +		s2n(0,ret);
 +		}
 +
+ #ifndef OPENSSL_NO_SRTP
          if(SSL_get_srtp_profiles(s))
                  {
                  int el;
