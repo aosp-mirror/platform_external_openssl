@@ -16,6 +16,24 @@
       "revId": "1a908cd36beb00836ee553e825fc13e35f694234",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "P.GQhxlI",
+        "filename": "build-config.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1019036
+      },
+      "writtenOn": "2013-02-19T18:45:23Z",
+      "side": 1,
+      "message": "OPENSSL_NO_EC_NISTP_64_GCC_128 should be defined unless you are building on a 64-bit system with support for uint128_t.",
+      "parentUuid": "P3x9kkj4",
+      "revId": "1a908cd36beb00836ee553e825fc13e35f694234",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
