@@ -285,6 +285,24 @@ function generate() {
   cleantar
 }
 
+# Find all files in a sub-directory that are encoded in ISO-8859
+# $1: Directory.
+# Out: list of files in $1 that are encoded as ISO-8859.
+function find_iso8859_files() {
+  find $1 -type f -print0 | xargs -0 file | fgrep "ISO-8859" | cut -d: -f1
+}
+
+# Convert all ISO-8859 files in a given subdirectory to UTF-8
+# $1: Directory name
+function convert_iso8859_to_utf8() {
+  declare -r iso_files=$(find_iso8859_files "$1")
+  for iso_file in $iso_files; do
+    iconv --from-code iso-8859-1 --to-code utf-8 $iso_file > $iso_file.tmp
+    rm -f $iso_file
+    mv $iso_file.tmp $iso_file
+  done
+}
+
 function untar() {
   declare -r OPENSSL_SOURCE=$1
   declare -r readonly=$2
@@ -294,11 +312,11 @@ function untar() {
 
   # Process new source
   tar -zxf $OPENSSL_SOURCE
-  mv $OPENSSL_DIR $OPENSSL_DIR_ORIG
+  convert_iso8859_to_utf8 $OPENSSL_DIR
+  cp -rfP $OPENSSL_DIR $OPENSSL_DIR_ORIG
   if [ ! -z $readonly ]; then
     find $OPENSSL_DIR_ORIG -type f -print0 | xargs -0 chmod a-w
   fi
-  tar -zxf $OPENSSL_SOURCE
 }
 
 function prune() {
