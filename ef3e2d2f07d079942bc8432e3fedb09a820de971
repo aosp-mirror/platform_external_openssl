@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "P.CTabnM",
+        "filename": "crypto/bio/b_sock.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 707,
+      "author": {
+        "id": 1019036
+      },
+      "writtenOn": "2013-02-19T18:20:25Z",
+      "side": 1,
+      "message": "ai_addrlen is a socklen_t, so I think that sizeof should be cast to that.",
+      "revId": "ef3e2d2f07d079942bc8432e3fedb09a820de971",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "P.KTOXrI",
+        "filename": "crypto/bio/b_sock.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 709,
+      "author": {
+        "id": 1019036
+      },
+      "writtenOn": "2013-02-19T18:20:25Z",
+      "side": 1,
+      "message": "This cast is correct, because addrlen is an int, but doesn\u0027t res-\u003eai_addrlen need to be cast also to an int in the previous line?",
+      "revId": "ef3e2d2f07d079942bc8432e3fedb09a820de971",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "P.MTTUlk",
+        "filename": "ssl/s3_both.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 558,
+      "author": {
+        "id": 1019036
+      },
+      "writtenOn": "2013-02-19T18:20:25Z",
+      "side": 1,
+      "message": "This hunk cannot go upstream as it\u0027s part of the channel id code.",
+      "revId": "ef3e2d2f07d079942bc8432e3fedb09a820de971",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "P.ATOSrE",
+        "filename": "ssl/s3_clnt.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 3479,
+      "author": {
+        "id": 1019036
+      },
+      "writtenOn": "2013-02-19T18:20:25Z",
+      "side": 1,
+      "message": "likewise, this is also part of the channel id code.",
+      "revId": "ef3e2d2f07d079942bc8432e3fedb09a820de971",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "P.KQ3PrI",
+        "filename": "ssl/ssl_lib.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 2678,
+      "author": {
+        "id": 1019036
+      },
+      "writtenOn": "2013-02-19T18:20:25Z",
+      "side": 1,
+      "message": "I cannot find this function anywhere, perhaps it\u0027s Android specific? But such declarations usually live in ssl_locl.h.",
+      "revId": "ef3e2d2f07d079942bc8432e3fedb09a820de971",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
