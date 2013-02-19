@@ -75,17 +75,7 @@ The following steps are recommended for porting new OpenSSL versions.
 
      m -j16
 
-Optionally, check whether build flags (located in android-config.mk
-need to be updated.  Doing this step will help ensure that the
-compiled library is appropriately optimized for speed and size.  To
-update build flags:
-
-a) source openssl.config
-b) tar -zxf openssl-*.tar.gz
-c) cd openssl-*/
-d) ./Configure $CONFIGURE_ARGS
-e) examine Makefile and compare with ../android-config.mk
-f) modify ../openssl.config as appropriate and go to step 3) above.
-
-Alternatively, ."/import_openssl.sh import" now prints the
-post-Configure Makefile for review before deleting in on import.
+Optionally, check whether build flags (located in CONFIGURE_ARGS in
+openssl.config, plus some extras in android-config.mk, need to be updated.
+Doing this step will help ensure that the compiled library is
+appropriately optimized for speed and size.

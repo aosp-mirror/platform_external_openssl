@@ -144,6 +144,42 @@ function gen_asm_x86_64 () {
   perl "$1" elf "$OUT" > "$OUT"
 }
 
+
+# Filter all items in a list that match a given pattern.
+# $1: space-separated list
+# $2: egrep pattern.
+# Out: items in $1 that match $2
+function filter_by_egrep() {
+  declare -r pattern=$1
+  shift
+  echo "$@" | tr ' ' '\n' | grep -e "$pattern" | tr '\n' ' '
+}
+
+function generate_build_config_mk() {
+  ./Configure $CONFIGURE_ARGS
+  rm -f apps/CA.pl.bak crypto/opensslconf.h.bak
+
+  declare -r tmpfile=$(mktemp)
+  (grep -e -D Makefile | grep -v CONFIGURE_ARGS= | grep -v OPTIONS= | grep -v -e -DOPENSSL_NO_DEPRECATED) > $tmpfile
+
+  declare -r cflags=$(filter_by_egrep "^-D" $(grep -e "^CFLAG=" $tmpfile))
+  declare -r depflags=$(filter_by_egrep "^-D" $(grep -e "^DEPFLAG=" $tmpfile))
+  rm -f $tmpfile
+
+  echo "Generating $(basename $1)"
+  (
+    echo "# Auto-generated from import_openssl.ssh - do not edit!"
+    echo "# This file is generated from the configure Makefile."
+    echo ""
+
+    echo "openssl_cflags := \\"
+    for cflag in $cflags $depflags; do
+      echo "  $cflag \\"
+    done
+    echo ""
+  ) > $1
+}
+
 function import() {
   declare -r OPENSSL_SOURCE=$1
 
@@ -152,18 +188,7 @@ function import() {
 
   cd $OPENSSL_DIR
 
-  # Configure source (and print Makefile defines for review, see README.android)
-  ./Configure $CONFIGURE_ARGS
-  rm -f apps/CA.pl.bak crypto/opensslconf.h.bak
-  echo
-  echo BEGIN Makefile defines to compare with android-config.mk
-  echo
-  grep -e -D Makefile | grep -v CONFIGURE_ARGS= | grep -v OPTIONS= | grep -v -e -DOPENSSL_NO_DEPRECATED
-  echo
-  echo END Makefile defines to compare with android-config.mk
-  echo
-
-  # TODO(): Fixup android-config.mk
+  generate_build_config_mk ../build-config.mk
 
   cp -f LICENSE ../NOTICE
   touch ../MODULE_LICENSE_BSD_LIKE
