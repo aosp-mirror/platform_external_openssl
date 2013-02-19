@@ -1,0 +1,88 @@
+From 666dca1c031737c2582ea361b4b850e5c178d055 Mon Sep 17 00:00:00 2001
+From: David 'Digit' Turner <digit@android.com>
+Date: Tue, 19 Feb 2013 11:53:08 +0100
+Subject: Fix Clang build.
+
+This patch fixes several warnings which end up breaking the Chromium Clang build.
+
+Change-Id: Iee9df59d6e52aaf75070e759a80eac48dd235181
+---
+ crypto/bio/b_sock.c    | 4 ++--
+ crypto/x509v3/v3_utl.c | 2 +-
+ ssl/s3_both.c          | 2 +-
+ ssl/s3_clnt.c          | 2 +-
+ ssl/ssl_lib.c          | 3 +++
+ 5 files changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/crypto/bio/b_sock.c b/crypto/bio/b_sock.c
+index 41f958b..ece8e5b 100644
+--- a/crypto/bio/b_sock.c
++++ b/crypto/bio/b_sock.c
+@@ -704,9 +704,9 @@ int BIO_get_accept_socket(char *host, int bind_mode)
+ 
+ 	if ((*p_getaddrinfo.f)(h,p,&hint,&res)) break;
+ 
+-	addrlen = res->ai_addrlen<=sizeof(server) ?
++	addrlen = res->ai_addrlen<=(int)sizeof(server) ?
+ 			res->ai_addrlen :
+-			sizeof(server);
++			(int)sizeof(server);
+ 	memcpy(&server, res->ai_addr, addrlen);
+ 
+ 	(*p_freeaddrinfo.f)(res);
+diff --git a/crypto/x509v3/v3_utl.c b/crypto/x509v3/v3_utl.c
+index e030234..87cfceb 100644
+--- a/crypto/x509v3/v3_utl.c
++++ b/crypto/x509v3/v3_utl.c
+@@ -365,7 +365,7 @@ char *hex_to_string(const unsigned char *buffer, long len)
+ 	char *tmp, *q;
+ 	const unsigned char *p;
+ 	int i;
+-	const static char hexdig[] = "0123456789ABCDEF";
++	static const char hexdig[] = "0123456789ABCDEF";
+ 	if(!buffer || !len) return NULL;
+ 	if(!(tmp = OPENSSL_malloc(len * 3 + 1))) {
+ 		X509V3err(X509V3_F_HEX_TO_STRING,ERR_R_MALLOC_FAILURE);
+diff --git a/ssl/s3_both.c b/ssl/s3_both.c
+index 514ff85..1edef20 100644
+--- a/ssl/s3_both.c
++++ b/ssl/s3_both.c
+@@ -555,7 +555,7 @@ long ssl3_get_message(SSL *s, int st1, int stn, int mt, long max, int *ok)
+ #endif
+ 
+ 	/* Feed this message into MAC computation. */
+-	if (*s->init_buf->data != SSL3_MT_ENCRYPTED_EXTENSIONS)
++	if (*(unsigned char*)s->init_buf->data != SSL3_MT_ENCRYPTED_EXTENSIONS)
+ 		ssl3_finish_mac(s, (unsigned char *)s->init_buf->data, s->init_num + 4);
+ 	if (s->msg_callback)
+ 		s->msg_callback(0, s->version, SSL3_RT_HANDSHAKE, s->init_buf->data, (size_t)s->init_num + 4, s, s->msg_callback_arg);
+diff --git a/ssl/s3_clnt.c b/ssl/s3_clnt.c
+index 3b7e3b5..1d40a2e 100644
+--- a/ssl/s3_clnt.c
++++ b/ssl/s3_clnt.c
+@@ -3476,7 +3476,7 @@ int ssl3_send_channel_id(SSL *s)
+ 		}
+ 
+ 	derp = der_sig;
+-	sig = d2i_ECDSA_SIG(NULL, &derp, sig_len);
++	sig = d2i_ECDSA_SIG(NULL, (const unsigned char**)&derp, sig_len);
+ 	if (sig == NULL)
+ 		{
+ 		SSLerr(SSL_F_SSL3_SEND_CHANNEL_ID,SSL_R_D2I_ECDSA_SIG);
+diff --git a/ssl/ssl_lib.c b/ssl/ssl_lib.c
+index 65b2ef8..450a4c8 100644
+--- a/ssl/ssl_lib.c
++++ b/ssl/ssl_lib.c
+@@ -2674,6 +2674,9 @@ const char *SSL_SESSION_get_version(const SSL_SESSION *s)
+ 		return ssl_get_version(s->ssl_version);
+ 	}
+ 
++/* Defined in ssl_ciph.c */
++extern const char* SSL_CIPHER_authentication_method(const SSL_CIPHER* cipher);
++
+ const char* SSL_authentication_method(const SSL* ssl)
+ 	{
+ 	if (ssl->cert != NULL && ssl->cert->rsa_tmp != NULL)
+-- 
+1.7.12.146.g16d26b1
+

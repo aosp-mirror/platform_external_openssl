@@ -704,9 +704,9 @@ int BIO_get_accept_socket(char *host, int bind_mode)
 
 	if ((*p_getaddrinfo.f)(h,p,&hint,&res)) break;
 
-	addrlen = res->ai_addrlen<=sizeof(server) ?
+	addrlen = res->ai_addrlen<=(int)sizeof(server) ?
 			res->ai_addrlen :
-			sizeof(server);
+			(int)sizeof(server);
 	memcpy(&server, res->ai_addr, addrlen);
 
 	(*p_freeaddrinfo.f)(res);
