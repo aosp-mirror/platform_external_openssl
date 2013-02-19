@@ -1,0 +1,90 @@
+diff --git a/crypto/bio/b_sock.c b/crypto/bio/b_sock.c
+index 41f958b..470b1a0 100644
+--- a/crypto/bio/b_sock.c
++++ b/crypto/bio/b_sock.c
+@@ -629,7 +629,8 @@ int BIO_get_accept_socket(char *host, int bind_mode)
+ 		struct sockaddr_in6 sa_in6;
+ #endif
+ 	} server,client;
+-	int s=INVALID_SOCKET,cs,addrlen;
++	int s=INVALID_SOCKET,cs;
++	socklen_t addrlen;
+ 	unsigned char ip[4];
+ 	unsigned short port;
+ 	char *str=NULL,*e;
+@@ -704,10 +705,10 @@ int BIO_get_accept_socket(char *host, int bind_mode)
+ 
+ 	if ((*p_getaddrinfo.f)(h,p,&hint,&res)) break;
+ 
+-	addrlen = res->ai_addrlen<=sizeof(server) ?
++	addrlen = res->ai_addrlen <= (socklen_t)sizeof(server) ?
+ 			res->ai_addrlen :
+-			sizeof(server);
+-	memcpy(&server, res->ai_addr, addrlen);
++			(socklen_t)sizeof(server);
++	memcpy(&server, res->ai_addr, (size_t)addrlen);
+ 
+ 	(*p_freeaddrinfo.f)(res);
+ 	goto again;
+@@ -719,7 +720,7 @@ int BIO_get_accept_socket(char *host, int bind_mode)
+ 	memset((char *)&server,0,sizeof(server));
+ 	server.sa_in.sin_family=AF_INET;
+ 	server.sa_in.sin_port=htons(port);
+-	addrlen = sizeof(server.sa_in);
++	addrlen = (socklen_t)sizeof(server.sa_in);
+ 
+ 	if (h == NULL || strcmp(h,"*") == 0)
+ 		server.sa_in.sin_addr.s_addr=INADDR_ANY;
+diff --git a/crypto/x509v3/v3_utl.c b/crypto/x509v3/v3_utl.c
+index e030234..87cfceb 100644
+--- a/crypto/x509v3/v3_utl.c
++++ b/crypto/x509v3/v3_utl.c
+@@ -365,7 +365,7 @@ char *hex_to_string(const unsigned char *buffer, long len)
+ 	char *tmp, *q;
+ 	const unsigned char *p;
+ 	int i;
+-	const static char hexdig[] = "0123456789ABCDEF";
++	static const char hexdig[] = "0123456789ABCDEF";
+ 	if(!buffer || !len) return NULL;
+ 	if(!(tmp = OPENSSL_malloc(len * 3 + 1))) {
+ 		X509V3err(X509V3_F_HEX_TO_STRING,ERR_R_MALLOC_FAILURE);
+diff --git a/include/openssl/ssl.h b/include/openssl/ssl.h
+index 5695aae..61b110f 100644
+--- a/include/openssl/ssl.h
++++ b/include/openssl/ssl.h
+@@ -1725,6 +1725,7 @@ int	SSL_CIPHER_get_bits(const SSL_CIPHER *c,int *alg_bits);
+ char *	SSL_CIPHER_get_version(const SSL_CIPHER *c);
+ const char *	SSL_CIPHER_get_name(const SSL_CIPHER *c);
+ unsigned long 	SSL_CIPHER_get_id(const SSL_CIPHER *c);
++const char* SSL_CIPHER_authentication_method(const SSL_CIPHER* cipher);
+ 
+ int	SSL_get_fd(const SSL *s);
+ int	SSL_get_rfd(const SSL *s);
+diff --git a/ssl/s3_both.c b/ssl/s3_both.c
+index 514ff85..1edef20 100644
+--- a/ssl/s3_both.c
++++ b/ssl/s3_both.c
+@@ -555,7 +555,7 @@ long ssl3_get_message(SSL *s, int st1, int stn, int mt, long max, int *ok)
+ #endif
+ 
+ 	/* Feed this message into MAC computation. */
+-	if (*s->init_buf->data != SSL3_MT_ENCRYPTED_EXTENSIONS)
++	if (*(unsigned char*)s->init_buf->data != SSL3_MT_ENCRYPTED_EXTENSIONS)
+ 		ssl3_finish_mac(s, (unsigned char *)s->init_buf->data, s->init_num + 4);
+ 	if (s->msg_callback)
+ 		s->msg_callback(0, s->version, SSL3_RT_HANDSHAKE, s->init_buf->data, (size_t)s->init_num + 4, s, s->msg_callback_arg);
+diff --git a/ssl/s3_clnt.c b/ssl/s3_clnt.c
+index 3b7e3b5..1d40a2e 100644
+--- a/ssl/s3_clnt.c
++++ b/ssl/s3_clnt.c
+@@ -3476,7 +3476,7 @@ int ssl3_send_channel_id(SSL *s)
+ 		}
+ 
+ 	derp = der_sig;
+-	sig = d2i_ECDSA_SIG(NULL, &derp, sig_len);
++	sig = d2i_ECDSA_SIG(NULL, (const unsigned char**)&derp, sig_len);
+ 	if (sig == NULL)
+ 		{
+ 		SSLerr(SSL_F_SSL3_SEND_CHANNEL_ID,SSL_R_D2I_ECDSA_SIG);
+diff --git a/ssl/ssl.h b/ssl/ssl.h
+index 5695aae..61b110f 100644

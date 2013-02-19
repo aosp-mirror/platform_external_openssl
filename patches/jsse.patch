@@ -1,6 +1,6 @@
---- openssl-1.0.0b.orig/ssl/ssl.h	2010-11-30 00:03:46.000000000 +0000
-+++ openssl-1.0.0b/ssl/ssl.h	2010-11-30 00:03:47.000000000 +0000
-@@ -1133,6 +1133,9 @@ struct ssl_st
+--- openssl-1.0.1e.orig/ssl/ssl.h	2013-02-11 15:26:04.000000000 +0000
++++ openssl-1.0.1e/ssl/ssl.h	2013-02-20 12:16:42.123360248 +0000
+@@ -1222,6 +1222,9 @@ struct ssl_st
  	/* This can also be in the session once a session is established */
  	SSL_SESSION *session;
  
@@ -10,7 +10,15 @@
  	/* Default generate session ID callback. */
  	GEN_SESSION_CB generate_session_id;
  
-@@ -1554,6 +1558,7 @@ const char  * SSL_get_cipher_list(const 
+@@ -1677,6 +1680,7 @@ int	SSL_CIPHER_get_bits(const SSL_CIPHER
+ char *	SSL_CIPHER_get_version(const SSL_CIPHER *c);
+ const char *	SSL_CIPHER_get_name(const SSL_CIPHER *c);
+ unsigned long 	SSL_CIPHER_get_id(const SSL_CIPHER *c);
++const char* SSL_CIPHER_authentication_method(const SSL_CIPHER* cipher);
+ 
+ int	SSL_get_fd(const SSL *s);
+ int	SSL_get_rfd(const SSL *s);
+@@ -1685,6 +1689,7 @@ const char  * SSL_get_cipher_list(const
  char *	SSL_get_shared_ciphers(const SSL *s, char *buf, int len);
  int	SSL_get_read_ahead(const SSL * s);
  int	SSL_pending(const SSL *s);
@@ -18,7 +26,7 @@
  #ifndef OPENSSL_NO_SOCK
  int	SSL_set_fd(SSL *s, int fd);
  int	SSL_set_rfd(SSL *s, int fd);
-@@ -1565,6 +1570,7 @@ BIO *	SSL_get_rbio(const SSL *s);
+@@ -1696,6 +1701,7 @@ BIO *	SSL_get_rbio(const SSL *s);
  BIO *	SSL_get_wbio(const SSL *s);
  #endif
  int	SSL_set_cipher_list(SSL *s, const char *str);
@@ -26,7 +34,7 @@
  void	SSL_set_read_ahead(SSL *s, int yes);
  int	SSL_get_verify_mode(const SSL *s);
  int	SSL_get_verify_depth(const SSL *s);
-@@ -1580,6 +1586,8 @@ int	SSL_use_PrivateKey(SSL *ssl, EVP_PKE
+@@ -1711,6 +1717,8 @@ int	SSL_use_PrivateKey(SSL *ssl, EVP_PKE
  int	SSL_use_PrivateKey_ASN1(int pk,SSL *ssl, const unsigned char *d, long len);
  int	SSL_use_certificate(SSL *ssl, X509 *x);
  int	SSL_use_certificate_ASN1(SSL *ssl, const unsigned char *d, int len);
@@ -35,7 +43,7 @@
  
  #ifndef OPENSSL_NO_STDIO
  int	SSL_use_RSAPrivateKey_file(SSL *ssl, const char *file, int type);
-@@ -1615,6 +1623,7 @@ void	SSL_copy_session_id(SSL *to,const S
+@@ -1749,6 +1757,7 @@ int SSL_SESSION_set1_id_context(SSL_SESS
  SSL_SESSION *SSL_SESSION_new(void);
  const unsigned char *SSL_SESSION_get_id(const SSL_SESSION *s,
  					unsigned int *len);
@@ -43,7 +51,7 @@
  unsigned int SSL_SESSION_get_compress_id(const SSL_SESSION *s);
  #ifndef OPENSSL_NO_FP_API
  int	SSL_SESSION_print_fp(FILE *fp,const SSL_SESSION *ses);
-@@ -1624,6 +1633,7 @@ int	SSL_SESSION_print(BIO *fp,const SSL_
+@@ -1759,6 +1768,7 @@ int	SSL_SESSION_print(BIO *fp,const SSL_
  void	SSL_SESSION_free(SSL_SESSION *ses);
  int	i2d_SSL_SESSION(SSL_SESSION *in,unsigned char **pp);
  int	SSL_set_session(SSL *to, SSL_SESSION *session);
@@ -51,7 +59,7 @@
  int	SSL_CTX_add_session(SSL_CTX *s, SSL_SESSION *c);
  int	SSL_CTX_remove_session(SSL_CTX *,SSL_SESSION *c);
  int	SSL_CTX_set_generate_session_id(SSL_CTX *, GEN_SESSION_CB);
-@@ -2066,6 +2076,7 @@ void ERR_load_SSL_strings(void);
+@@ -2250,6 +2260,7 @@ void ERR_load_SSL_strings(void);
  #define SSL_F_SSL_UNDEFINED_VOID_FUNCTION		 244
  #define SSL_F_SSL_USE_CERTIFICATE			 198
  #define SSL_F_SSL_USE_CERTIFICATE_ASN1			 199
@@ -59,17 +67,17 @@
  #define SSL_F_SSL_USE_CERTIFICATE_FILE			 200
  #define SSL_F_SSL_USE_PRIVATEKEY			 201
  #define SSL_F_SSL_USE_PRIVATEKEY_ASN1			 202
-@@ -2272,6 +2283,7 @@ void ERR_load_SSL_strings(void);
+@@ -2470,6 +2481,7 @@ void ERR_load_SSL_strings(void);
  #define SSL_R_SCSV_RECEIVED_WHEN_RENEGOTIATING		 345
  #define SSL_R_SERVERHELLO_TLSEXT			 275
  #define SSL_R_SESSION_ID_CONTEXT_UNINITIALIZED		 277
 +#define SSL_R_SESSION_MAY_NOT_BE_CREATED		 2000
  #define SSL_R_SHORT_READ				 219
+ #define SSL_R_SIGNATURE_ALGORITHMS_ERROR		 360
  #define SSL_R_SIGNATURE_FOR_NON_SIGNING_CERTIFICATE	 220
- #define SSL_R_SSL23_DOING_SESSION_ID_REUSE		 221
---- openssl-1.0.0b.orig/ssl/d1_clnt.c	2010-01-26 19:46:29.000000000 +0000
-+++ openssl-1.0.0b/ssl/d1_clnt.c	2010-11-30 00:03:47.000000000 +0000
-@@ -613,6 +613,12 @@ int dtls1_client_hello(SSL *s)
+--- openssl-1.0.1e.orig/ssl/d1_clnt.c	2013-02-11 15:26:04.000000000 +0000
++++ openssl-1.0.1e/ssl/d1_clnt.c	2013-02-20 12:15:03.662301228 +0000
+@@ -789,6 +789,12 @@ int dtls1_client_hello(SSL *s)
  #endif
  			(s->session->not_resumable))
  			{
@@ -82,9 +90,9 @@
  			if (!ssl_get_new_session(s,0))
  				goto err;
  			}
---- openssl-1.0.0b.orig/ssl/s23_clnt.c	2010-02-16 14:20:40.000000000 +0000
-+++ openssl-1.0.0b/ssl/s23_clnt.c	2010-11-30 00:03:47.000000000 +0000
-@@ -687,6 +687,13 @@ static int ssl23_get_server_hello(SSL *s
+--- openssl-1.0.1e.orig/ssl/s23_clnt.c	2013-02-11 15:26:04.000000000 +0000
++++ openssl-1.0.1e/ssl/s23_clnt.c	2013-02-20 12:15:03.662301228 +0000
+@@ -770,6 +770,13 @@ static int ssl23_get_server_hello(SSL *s
  
  	/* Since, if we are sending a ssl23 client hello, we are not
  	 * reusing a session-id */
@@ -98,8 +106,8 @@
  	if (!ssl_get_new_session(s,0))
  		goto err;
  
---- openssl-1.0.0b.orig/ssl/s3_both.c	2010-11-30 00:03:46.000000000 +0000
-+++ openssl-1.0.0b/ssl/s3_both.c	2010-11-30 00:03:47.000000000 +0000
+--- openssl-1.0.1e.orig/ssl/s3_both.c	2013-02-11 15:26:04.000000000 +0000
++++ openssl-1.0.1e/ssl/s3_both.c	2013-02-20 12:15:03.662301228 +0000
 @@ -347,8 +347,11 @@ unsigned long ssl3_output_cert_chain(SSL
  	unsigned long l=7;
  	BUF_MEM *buf;
@@ -124,9 +132,9 @@
  	l-=7;
  	p=(unsigned char *)&(buf->data[4]);
  	l2n3(l,p);
---- openssl-1.0.0b.orig/ssl/s3_clnt.c	2010-11-30 00:03:46.000000000 +0000
-+++ openssl-1.0.0b/ssl/s3_clnt.c	2010-11-30 00:03:47.000000000 +0000
-@@ -686,6 +686,12 @@ int ssl3_client_hello(SSL *s)
+--- openssl-1.0.1e.orig/ssl/s3_clnt.c	2013-02-11 15:26:04.000000000 +0000
++++ openssl-1.0.1e/ssl/s3_clnt.c	2013-02-20 12:15:03.672301339 +0000
+@@ -674,6 +674,12 @@ int ssl3_client_hello(SSL *s)
  #endif
  			(sess->not_resumable))
  			{
@@ -139,7 +147,7 @@
  			if (!ssl_get_new_session(s,0))
  				goto err;
  			}
-@@ -894,6 +900,12 @@ int ssl3_get_server_hello(SSL *s)
+@@ -925,6 +931,12 @@ int ssl3_get_server_hello(SSL *s)
  		s->hit=0;
  		if (s->session->session_id_length > 0)
  			{
@@ -152,9 +160,9 @@
  			if (!ssl_get_new_session(s,0))
  				{
  				al=SSL_AD_INTERNAL_ERROR;
---- openssl-1.0.0b.orig/ssl/s3_srvr.c	2010-11-30 00:03:46.000000000 +0000
-+++ openssl-1.0.0b/ssl/s3_srvr.c	2010-11-30 00:03:47.000000000 +0000
-@@ -902,6 +902,12 @@ int ssl3_get_client_hello(SSL *s)
+--- openssl-1.0.1e.orig/ssl/s3_srvr.c	2013-02-11 15:26:04.000000000 +0000
++++ openssl-1.0.1e/ssl/s3_srvr.c	2013-02-20 12:15:03.672301339 +0000
+@@ -1003,6 +1003,12 @@ int ssl3_get_client_hello(SSL *s)
  	 */
  	if ((s->new_session && (s->options & SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION)))
  		{
@@ -167,7 +175,7 @@
  		if (!ssl_get_new_session(s,1))
  			goto err;
  		}
-@@ -916,6 +922,12 @@ int ssl3_get_client_hello(SSL *s)
+@@ -1017,6 +1023,12 @@ int ssl3_get_client_hello(SSL *s)
  			goto err;
  		else /* i == 0 */
  			{
@@ -180,10 +188,10 @@
  			if (!ssl_get_new_session(s,1))
  				goto err;
  			}
---- openssl-1.0.0b.orig/ssl/ssl_ciph.c	2010-06-15 17:25:14.000000000 +0000
-+++ openssl-1.0.0b/ssl/ssl_ciph.c	2010-11-30 00:03:47.000000000 +0000
-@@ -1652,6 +1652,52 @@ int SSL_CIPHER_get_bits(const SSL_CIPHER
- 	return(ret);
+--- openssl-1.0.1e.orig/ssl/ssl_ciph.c	2013-02-11 15:26:04.000000000 +0000
++++ openssl-1.0.1e/ssl/ssl_ciph.c	2013-02-20 12:15:03.672301339 +0000
+@@ -1759,6 +1759,52 @@ unsigned long SSL_CIPHER_get_id(const SS
+ 	return c->id;
  	}
  
 +/* return string version of key exchange algorithm */
@@ -235,19 +243,19 @@
  SSL_COMP *ssl3_comp_find(STACK_OF(SSL_COMP) *sk, int n)
  	{
  	SSL_COMP *ctmp;
---- openssl-1.0.0b.orig/ssl/ssl_err.c	2010-11-30 00:03:46.000000000 +0000
-+++ openssl-1.0.0b/ssl/ssl_err.c	2010-11-30 00:03:47.000000000 +0000
-@@ -465,6 +465,7 @@ static ERR_STRING_DATA SSL_str_reasons[]
+--- openssl-1.0.1e.orig/ssl/ssl_err.c	2013-02-11 15:26:04.000000000 +0000
++++ openssl-1.0.1e/ssl/ssl_err.c	2013-02-20 12:15:03.672301339 +0000
+@@ -490,6 +490,7 @@ static ERR_STRING_DATA SSL_str_reasons[]
  {ERR_REASON(SSL_R_SCSV_RECEIVED_WHEN_RENEGOTIATING),"scsv received when renegotiating"},
  {ERR_REASON(SSL_R_SERVERHELLO_TLSEXT)    ,"serverhello tlsext"},
  {ERR_REASON(SSL_R_SESSION_ID_CONTEXT_UNINITIALIZED),"session id context uninitialized"},
 +{ERR_REASON(SSL_R_SESSION_MAY_NOT_BE_CREATED),"session may not be created"},
  {ERR_REASON(SSL_R_SHORT_READ)            ,"short read"},
+ {ERR_REASON(SSL_R_SIGNATURE_ALGORITHMS_ERROR),"signature algorithms error"},
  {ERR_REASON(SSL_R_SIGNATURE_FOR_NON_SIGNING_CERTIFICATE),"signature for non signing certificate"},
- {ERR_REASON(SSL_R_SSL23_DOING_SESSION_ID_REUSE),"ssl23 doing session id reuse"},
---- openssl-1.0.0b.orig/ssl/ssl_lib.c	2010-11-30 00:03:46.000000000 +0000
-+++ openssl-1.0.0b/ssl/ssl_lib.c	2010-11-30 00:03:47.000000000 +0000
-@@ -326,6 +326,7 @@ SSL *SSL_new(SSL_CTX *ctx)
+--- openssl-1.0.1e.orig/ssl/ssl_lib.c	2013-02-11 15:26:04.000000000 +0000
++++ openssl-1.0.1e/ssl/ssl_lib.c	2013-02-20 12:15:03.672301339 +0000
+@@ -329,6 +329,7 @@ SSL *SSL_new(SSL_CTX *ctx)
  	OPENSSL_assert(s->sid_ctx_length <= sizeof s->sid_ctx);
  	memcpy(&s->sid_ctx,&ctx->sid_ctx,sizeof(s->sid_ctx));
  	s->verify_callback=ctx->default_verify_callback;
@@ -255,7 +263,7 @@
  	s->generate_session_id=ctx->generate_session_id;
  
  	s->param = X509_VERIFY_PARAM_new();
-@@ -1311,6 +1312,32 @@ int SSL_set_cipher_list(SSL *s,const cha
+@@ -1335,6 +1336,32 @@ int SSL_set_cipher_list(SSL *s,const cha
  	return 1;
  	}
  
@@ -288,7 +296,7 @@
  /* works well for SSLv2, not so good for SSLv3 */
  char *SSL_get_shared_ciphers(const SSL *s,char *buf,int len)
  	{
-@@ -2551,22 +2578,45 @@ SSL_METHOD *ssl_bad_method(int ver)
+@@ -2614,22 +2641,45 @@ SSL_METHOD *ssl_bad_method(int ver)
  	return(NULL);
  	}
  
@@ -340,18 +348,18 @@
  SSL *SSL_dup(SSL *s)
  	{
  	STACK_OF(X509_NAME) *sk;
---- openssl-1.0.0b.orig/ssl/ssl_locl.h	2010-11-30 00:03:46.000000000 +0000
-+++ openssl-1.0.0b/ssl/ssl_locl.h	2010-11-30 00:03:47.000000000 +0000
-@@ -456,6 +456,7 @@
+--- openssl-1.0.1e.orig/ssl/ssl_locl.h	2013-02-11 15:26:04.000000000 +0000
++++ openssl-1.0.1e/ssl/ssl_locl.h	2013-02-20 12:15:03.672301339 +0000
+@@ -480,6 +480,7 @@
  typedef struct cert_pkey_st
  	{
  	X509 *x509;
 +	STACK_OF(X509) *cert_chain;
  	EVP_PKEY *privatekey;
- 	} CERT_PKEY;
- 
---- openssl-1.0.0b.orig/ssl/ssl_rsa.c	2009-09-12 23:09:26.000000000 +0000
-+++ openssl-1.0.0b/ssl/ssl_rsa.c	2010-11-30 00:03:47.000000000 +0000
+ 	/* Digest to use when signing */
+ 	const EVP_MD *digest;
+--- openssl-1.0.1e.orig/ssl/ssl_rsa.c	2013-02-11 15:26:04.000000000 +0000
++++ openssl-1.0.1e/ssl/ssl_rsa.c	2013-02-20 12:15:03.672301339 +0000
 @@ -697,6 +697,42 @@ int SSL_CTX_use_PrivateKey_ASN1(int type
  	}
  
@@ -395,9 +403,9 @@
  #ifndef OPENSSL_NO_STDIO
  /* Read a file that contains our certificate in "PEM" format,
   * possibly followed by a sequence of CA certificates that should be
---- openssl-1.0.0b.orig/ssl/ssl_sess.c	2010-02-01 16:49:42.000000000 +0000
-+++ openssl-1.0.0b/ssl/ssl_sess.c	2010-11-30 00:03:47.000000000 +0000
-@@ -261,6 +261,11 @@ static int def_generate_session_id(const
+--- openssl-1.0.1e.orig/ssl/ssl_sess.c	2013-02-11 15:26:04.000000000 +0000
++++ openssl-1.0.1e/ssl/ssl_sess.c	2013-02-20 12:15:03.672301339 +0000
+@@ -269,6 +269,11 @@ static int def_generate_session_id(const
  	return 0;
  }
  
@@ -409,7 +417,7 @@
  int ssl_get_new_session(SSL *s, int session)
  	{
  	/* This gets used by clients and servers. */
-@@ -269,6 +274,8 @@ int ssl_get_new_session(SSL *s, int sess
+@@ -277,6 +282,8 @@ int ssl_get_new_session(SSL *s, int sess
  	SSL_SESSION *ss=NULL;
  	GEN_SESSION_CB cb = def_generate_session_id;
  
