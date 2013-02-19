@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "P3x9kkj4",
+        "filename": "build-config.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2013-02-19T17:09:09Z",
+      "side": 1,
+      "message": "Hm, I think this is accidentally disabled.",
+      "revId": "1a908cd36beb00836ee553e825fc13e35f694234",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
