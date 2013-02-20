@@ -16,6 +16,24 @@
       "revId": "a14732ee246bec70917110819a9480b144e66412",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "P.a-0fRY",
+        "filename": "Crypto-config.mk",
+        "patchSetId": 3
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1000411
+      },
+      "writtenOn": "2013-02-20T21:33:52Z",
+      "side": 1,
+      "message": "Yep, it\u0027s part of the original in Crypto.mk :)\nI\u0027d prefer if we kept this in this patch, it makes it much easier to see what really changed (because the binary sizes match byte-by-byte). I guess it would be trivial to remove this in a future patch once this one has landed.",
+      "parentUuid": "P367EKWI",
+      "revId": "a14732ee246bec70917110819a9480b144e66412",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
