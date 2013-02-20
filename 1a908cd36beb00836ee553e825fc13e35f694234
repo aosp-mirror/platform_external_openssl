@@ -34,6 +34,24 @@
       "revId": "1a908cd36beb00836ee553e825fc13e35f694234",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "P4y2mkxQ",
+        "filename": "build-config.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1000411
+      },
+      "writtenOn": "2013-02-20T08:29:28Z",
+      "side": 1,
+      "message": "Good to know, thanks for the clarification. I was wondering about this myself.",
+      "parentUuid": "P.GQhxlI",
+      "revId": "1a908cd36beb00836ee553e825fc13e35f694234",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
