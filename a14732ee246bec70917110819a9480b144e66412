@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "P367EKWI",
+        "filename": "Crypto-config.mk",
+        "patchSetId": 3
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2013-02-20T17:39:39Z",
+      "side": 1,
+      "message": "???",
+      "revId": "a14732ee246bec70917110819a9480b144e66412",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
