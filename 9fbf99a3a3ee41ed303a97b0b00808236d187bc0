@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "QOfWzYyY",
+        "filename": "README.android",
+        "patchSetId": 4
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1003723
+      },
+      "writtenOn": "2013-02-25T17:29:58Z",
+      "side": 0,
+      "message": "this is now in external/apache-harmony so it should be found in out/target/...",
+      "revId": "9fbf99a3a3ee41ed303a97b0b00808236d187bc0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
