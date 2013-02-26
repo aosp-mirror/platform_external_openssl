@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "QOeGDobU",
+        "filename": "README.android",
+        "patchSetId": 4
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1003723
+      },
+      "writtenOn": "2013-02-26T17:06:39Z",
+      "side": 1,
+      "message": "you have a double --classpath --classpath here",
+      "revId": "ad907b856ab68b8a05cc992ca521cc87239d8734",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}

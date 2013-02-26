@@ -33,6 +33,24 @@
       "revId": "9fbf99a3a3ee41ed303a97b0b00808236d187bc0",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "QOUFqrSY",
+        "filename": "README.android",
+        "patchSetId": 4
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1003723
+      },
+      "writtenOn": "2013-02-26T17:06:39Z",
+      "side": 0,
+      "message": "out/target/common/obj/JAVA_LIBRARIES/apache-harmony-tests_intermediates/classes-full-debug.jar",
+      "parentUuid": "QOfWzYyY",
+      "revId": "9fbf99a3a3ee41ed303a97b0b00808236d187bc0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
