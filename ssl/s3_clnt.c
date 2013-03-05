@@ -3476,7 +3476,7 @@ int ssl3_send_channel_id(SSL *s)
 		}
 
 	derp = der_sig;
-	sig = d2i_ECDSA_SIG(NULL, &derp, sig_len);
+	sig = d2i_ECDSA_SIG(NULL, (const unsigned char**)&derp, sig_len);
 	if (sig == NULL)
 		{
 		SSLerr(SSL_F_SSL3_SEND_CHANNEL_ID,SSL_R_D2I_ECDSA_SIG);
