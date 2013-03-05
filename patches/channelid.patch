@@ -1,7 +1,6 @@
-diff -ur openssl/crypto/evp/evp.h openssl.channelid/crypto/evp/evp.h
---- openssl/crypto/evp/evp.h	2012-05-16 12:44:09.000000000 -0400
-+++ openssl.channelid/crypto/evp/evp.h	2012-08-28 16:19:15.195752493 -0400
-@@ -922,6 +922,7 @@
+--- openssl-1.0.1e.orig/crypto/evp/evp.h	2013-03-05 18:49:33.183296743 +0000
++++ openssl-1.0.1e/crypto/evp/evp.h	2013-03-05 18:49:33.373298798 +0000
+@@ -921,6 +921,7 @@ struct ec_key_st *EVP_PKEY_get1_EC_KEY(E
  #endif
  
  EVP_PKEY *	EVP_PKEY_new(void);
@@ -9,10 +8,9 @@ diff -ur openssl/crypto/evp/evp.h openssl.channelid/crypto/evp/evp.h
  void		EVP_PKEY_free(EVP_PKEY *pkey);
  
  EVP_PKEY *	d2i_PublicKey(int type,EVP_PKEY **a, const unsigned char **pp,
-diff -ur openssl/crypto/evp/p_lib.c openssl.channelid/crypto/evp/p_lib.c
---- openssl/crypto/evp/p_lib.c	2011-02-01 09:46:34.000000000 -0500
-+++ openssl.channelid/crypto/evp/p_lib.c	2012-08-29 16:22:27.467810070 -0400
-@@ -200,6 +200,12 @@
+--- openssl-1.0.1e.orig/crypto/evp/p_lib.c	2013-03-05 18:49:33.183296743 +0000
++++ openssl-1.0.1e/crypto/evp/p_lib.c	2013-03-05 18:49:33.373298798 +0000
+@@ -200,6 +200,12 @@ EVP_PKEY *EVP_PKEY_new(void)
  	return(ret);
  	}
  
@@ -25,23 +23,21 @@ diff -ur openssl/crypto/evp/p_lib.c openssl.channelid/crypto/evp/p_lib.c
  /* Setup a public key ASN1 method and ENGINE from a NID or a string.
   * If pkey is NULL just return 1 or 0 if the algorithm exists.
   */
-diff -ur openssl/ssl/s3_both.c openssl.channelid/ssl/s3_both.c
---- openssl/ssl/s3_both.c	2012-08-28 16:04:21.173349370 -0400
-+++ openssl.channelid/ssl/s3_both.c	2012-08-28 16:04:40.583618671 -0400
-@@ -544,7 +544,8 @@
- 		ssl3_take_mac(s);
+--- openssl-1.0.1e.orig/ssl/s3_both.c	2013-03-05 18:49:33.233297282 +0000
++++ openssl-1.0.1e/ssl/s3_both.c	2013-03-05 18:49:33.413299231 +0000
+@@ -555,7 +555,8 @@ long ssl3_get_message(SSL *s, int st1, i
  #endif
+ 
  	/* Feed this message into MAC computation. */
 -	ssl3_finish_mac(s, (unsigned char *)s->init_buf->data, s->init_num + 4);
-+	if (*s->init_buf->data != SSL3_MT_ENCRYPTED_EXTENSIONS)
++	if (*(unsigned char*)s->init_buf->data != SSL3_MT_ENCRYPTED_EXTENSIONS)
 +		ssl3_finish_mac(s, (unsigned char *)s->init_buf->data, s->init_num + 4);
  	if (s->msg_callback)
  		s->msg_callback(0, s->version, SSL3_RT_HANDSHAKE, s->init_buf->data, (size_t)s->init_num + 4, s, s->msg_callback_arg);
  	*ok=1;
-diff -ur openssl/ssl/s3_clnt.c openssl.channelid/ssl/s3_clnt.c
---- openssl/ssl/s3_clnt.c	2012-08-28 16:04:21.173349370 -0400
-+++ openssl.channelid/ssl/s3_clnt.c	2012-08-28 16:04:42.563646142 -0400
-@@ -465,13 +465,14 @@
+--- openssl-1.0.1e.orig/ssl/s3_clnt.c	2013-03-05 18:49:33.233297282 +0000
++++ openssl-1.0.1e/ssl/s3_clnt.c	2013-03-05 18:49:33.413299231 +0000
+@@ -477,13 +477,14 @@ int ssl3_connect(SSL *s)
  				SSL3_ST_CW_CHANGE_A,SSL3_ST_CW_CHANGE_B);
  			if (ret <= 0) goto end;
  
@@ -60,7 +56,7 @@ diff -ur openssl/ssl/s3_clnt.c openssl.channelid/ssl/s3_clnt.c
  #endif
  			s->init_num=0;
  
-@@ -506,6 +506,18 @@
+@@ -517,6 +518,18 @@ int ssl3_connect(SSL *s)
  		case SSL3_ST_CW_NEXT_PROTO_B:
  			ret=ssl3_send_next_proto(s);
  			if (ret <= 0) goto end;
@@ -79,7 +75,7 @@ diff -ur openssl/ssl/s3_clnt.c openssl.channelid/ssl/s3_clnt.c
  			s->state=SSL3_ST_CW_FINISHED_A;
  			break;
  #endif
-@@ -3339,7 +3351,8 @@
+@@ -3362,7 +3375,8 @@ err:
  	return(0);
  	}
  
@@ -89,7 +85,7 @@ diff -ur openssl/ssl/s3_clnt.c openssl.channelid/ssl/s3_clnt.c
  int ssl3_send_next_proto(SSL *s)
  	{
  	unsigned int len, padding_len;
-@@ -3363,7 +3376,116 @@
+@@ -3386,7 +3400,116 @@ int ssl3_send_next_proto(SSL *s)
  
  	return ssl3_do_write(s, SSL3_RT_HANDSHAKE);
  }
@@ -170,7 +166,7 @@ diff -ur openssl/ssl/s3_clnt.c openssl.channelid/ssl/s3_clnt.c
 +		}
 +
 +	derp = der_sig;
-+	sig = d2i_ECDSA_SIG(NULL, &derp, sig_len);
++	sig = d2i_ECDSA_SIG(NULL, (const unsigned char**)&derp, sig_len);
 +	if (sig == NULL)
 +		{
 +		SSLerr(SSL_F_SSL3_SEND_CHANNEL_ID,SSL_R_D2I_ECDSA_SIG);
@@ -207,10 +203,9 @@ diff -ur openssl/ssl/s3_clnt.c openssl.channelid/ssl/s3_clnt.c
  
  /* Check to see if handshake is full or resumed. Usually this is just a
   * case of checking to see if a cache hit has occurred. In the case of
-diff -ur openssl/ssl/s3_lib.c openssl.channelid/ssl/s3_lib.c
---- openssl/ssl/s3_lib.c	2012-08-28 16:04:21.173349370 -0400
-+++ openssl.channelid/ssl/s3_lib.c	2012-08-28 16:19:15.195752493 -0400
-@@ -2951,6 +2951,11 @@
+--- openssl-1.0.1e.orig/ssl/s3_lib.c	2013-03-05 18:49:33.223297173 +0000
++++ openssl-1.0.1e/ssl/s3_lib.c	2013-03-05 18:49:33.413299231 +0000
+@@ -2951,6 +2951,11 @@ int ssl3_new(SSL *s)
  #ifndef OPENSSL_NO_SRP
  	SSL_SRP_CTX_init(s);
  #endif
@@ -222,7 +217,7 @@ diff -ur openssl/ssl/s3_lib.c openssl.channelid/ssl/s3_lib.c
  	s->method->ssl_clear(s);
  	return(1);
  err:
-@@ -3074,6 +3079,10 @@
+@@ -3074,6 +3079,10 @@ void ssl3_clear(SSL *s)
  		s->next_proto_negotiated_len = 0;
  		}
  #endif
@@ -233,7 +228,7 @@ diff -ur openssl/ssl/s3_lib.c openssl.channelid/ssl/s3_lib.c
  	}
  
  #ifndef OPENSSL_NO_SRP
-@@ -3348,6 +3357,35 @@
+@@ -3348,6 +3357,35 @@ long ssl3_ctrl(SSL *s, int cmd, long lar
  		ret = 1;
  		break;
  #endif
@@ -269,7 +264,7 @@ diff -ur openssl/ssl/s3_lib.c openssl.channelid/ssl/s3_lib.c
  
  #endif /* !OPENSSL_NO_TLSEXT */
  	default:
-@@ -3569,6 +3607,12 @@
+@@ -3569,6 +3607,12 @@ long ssl3_ctx_ctrl(SSL_CTX *ctx, int cmd
  			}
  		return 1;
  		}
@@ -282,7 +277,7 @@ diff -ur openssl/ssl/s3_lib.c openssl.channelid/ssl/s3_lib.c
  
  #ifdef TLSEXT_TYPE_opaque_prf_input
  	case SSL_CTRL_SET_TLSEXT_OPAQUE_PRF_INPUT_CB_ARG:
-@@ -3637,6 +3681,18 @@
+@@ -3637,6 +3681,18 @@ long ssl3_ctx_ctrl(SSL_CTX *ctx, int cmd
  			}
  		break;
  
@@ -301,10 +296,9 @@ diff -ur openssl/ssl/s3_lib.c openssl.channelid/ssl/s3_lib.c
  	default:
  		return(0);
  		}
-diff -ur openssl/ssl/s3_srvr.c openssl.channelid/ssl/s3_srvr.c
---- openssl/ssl/s3_srvr.c	2012-08-28 16:04:21.173349370 -0400
-+++ openssl.channelid/ssl/s3_srvr.c	2012-08-28 16:04:40.593618810 -0400
-@@ -158,8 +158,11 @@
+--- openssl-1.0.1e.orig/ssl/s3_srvr.c	2013-03-05 18:49:33.233297282 +0000
++++ openssl-1.0.1e/ssl/s3_srvr.c	2013-03-05 18:49:33.413299231 +0000
+@@ -157,8 +157,11 @@
  #include <openssl/buffer.h>
  #include <openssl/rand.h>
  #include <openssl/objects.h>
@@ -316,7 +310,7 @@ diff -ur openssl/ssl/s3_srvr.c openssl.channelid/ssl/s3_srvr.c
  #include <openssl/x509.h>
  #ifndef OPENSSL_NO_DH
  #include <openssl/dh.h>
-@@ -621,15 +624,8 @@
+@@ -609,15 +612,8 @@ int ssl3_accept(SSL *s)
  				 * the client uses its key from the certificate
  				 * for key exchange.
  				 */
@@ -333,7 +327,7 @@ diff -ur openssl/ssl/s3_srvr.c openssl.channelid/ssl/s3_srvr.c
  				}
  			else if (TLS1_get_version(s) >= TLS1_2_VERSION)
  				{
-@@ -689,16 +685,28 @@
+@@ -677,16 +673,28 @@ int ssl3_accept(SSL *s)
  			ret=ssl3_get_cert_verify(s);
  			if (ret <= 0) goto end;
  
@@ -368,7 +362,7 @@ diff -ur openssl/ssl/s3_srvr.c openssl.channelid/ssl/s3_srvr.c
  
  #if !defined(OPENSSL_NO_TLSEXT) && !defined(OPENSSL_NO_NEXTPROTONEG)
  		case SSL3_ST_SR_NEXT_PROTO_A:
-@@ -706,6 +714,19 @@
+@@ -694,6 +702,19 @@ int ssl3_accept(SSL *s)
  			ret=ssl3_get_next_proto(s);
  			if (ret <= 0) goto end;
  			s->init_num = 0;
@@ -388,7 +382,7 @@ diff -ur openssl/ssl/s3_srvr.c openssl.channelid/ssl/s3_srvr.c
  			s->state=SSL3_ST_SR_FINISHED_A;
  			break;
  #endif
-@@ -777,16 +798,7 @@
+@@ -765,16 +786,7 @@ int ssl3_accept(SSL *s)
  			if (ret <= 0) goto end;
  			s->state=SSL3_ST_SW_FLUSH;
  			if (s->hit)
@@ -406,7 +400,7 @@ diff -ur openssl/ssl/s3_srvr.c openssl.channelid/ssl/s3_srvr.c
  			else
  				s->s3->tmp.next_state=SSL_ST_OK;
  			s->init_num=0;
-@@ -3679,4 +3691,140 @@
+@@ -3610,4 +3622,140 @@ int ssl3_get_next_proto(SSL *s)
  	return 1;
  	}
  # endif
@@ -547,10 +541,9 @@ diff -ur openssl/ssl/s3_srvr.c openssl.channelid/ssl/s3_srvr.c
 +	return ret;
 +	}
  #endif
-diff -ur openssl/ssl/ssl.h openssl.channelid/ssl/ssl.h
---- openssl/ssl/ssl.h	2012-08-28 16:04:21.183349508 -0400
-+++ openssl.channelid/ssl/ssl.h	2012-08-28 16:19:15.195752493 -0400
-@@ -1016,6 +1016,12 @@
+--- openssl-1.0.1e.orig/ssl/ssl.h	2013-03-05 18:49:33.233297282 +0000
++++ openssl-1.0.1e/ssl/ssl.h	2013-03-05 18:49:33.413299231 +0000
+@@ -981,6 +981,12 @@ struct ssl_ctx_st
  # endif
          /* SRTP profiles we are willing to do from RFC 5764 */
          STACK_OF(SRTP_PROTECTION_PROFILE) *srtp_profiles;  
@@ -563,7 +556,7 @@ diff -ur openssl/ssl/ssl.h openssl.channelid/ssl/ssl.h
  #endif
  	};
  
-@@ -1057,6 +1063,10 @@
+@@ -1022,6 +1028,10 @@ LHASH_OF(SSL_SESSION) *SSL_CTX_sessions(
  	SSL_CTX_ctrl(ctx,SSL_CTRL_SESS_TIMEOUTS,0,NULL)
  #define SSL_CTX_sess_cache_full(ctx) \
  	SSL_CTX_ctrl(ctx,SSL_CTRL_SESS_CACHE_FULL,0,NULL)
@@ -574,7 +567,7 @@ diff -ur openssl/ssl/ssl.h openssl.channelid/ssl/ssl.h
  
  void SSL_CTX_sess_set_new_cb(SSL_CTX *ctx, int (*new_session_cb)(struct ssl_st *ssl,SSL_SESSION *sess));
  int (*SSL_CTX_sess_get_new_cb(SSL_CTX *ctx))(struct ssl_st *ssl, SSL_SESSION *sess);
-@@ -1400,6 +1410,13 @@
+@@ -1348,6 +1358,13 @@ struct ssl_st
  	                                 */
  	unsigned int tlsext_hb_pending; /* Indicates if a HeartbeatRequest is in flight */
  	unsigned int tlsext_hb_seq;     /* HeartbeatRequest sequence number */
@@ -588,7 +581,7 @@ diff -ur openssl/ssl/ssl.h openssl.channelid/ssl/ssl.h
  #else
  #define session_ctx ctx
  #endif /* OPENSSL_NO_TLSEXT */
-@@ -1659,6 +1676,9 @@
+@@ -1605,6 +1622,9 @@ DECLARE_PEM_rw(SSL_SESSION, SSL_SESSION)
  #define SSL_CTRL_GET_TLS_EXT_HEARTBEAT_PENDING		86
  #define SSL_CTRL_SET_TLS_EXT_HEARTBEAT_NO_REQUESTS	87
  #endif
@@ -598,7 +591,7 @@ diff -ur openssl/ssl/ssl.h openssl.channelid/ssl/ssl.h
  #endif
  
  #define DTLS_CTRL_GET_TIMEOUT		73
-@@ -1706,6 +1726,25 @@
+@@ -1652,6 +1672,25 @@ DECLARE_PEM_rw(SSL_SESSION, SSL_SESSION)
  #define SSL_set_tmp_ecdh(ssl,ecdh) \
  	SSL_ctrl(ssl,SSL_CTRL_SET_TMP_ECDH,0,(char *)ecdh)
  
@@ -624,7 +617,15 @@ diff -ur openssl/ssl/ssl.h openssl.channelid/ssl/ssl.h
  #define SSL_CTX_add_extra_chain_cert(ctx,x509) \
  	SSL_CTX_ctrl(ctx,SSL_CTRL_EXTRA_CHAIN_CERT,0,(char *)x509)
  #define SSL_CTX_get_extra_chain_certs(ctx,px509) \
-@@ -2207,6 +2246,7 @@
+@@ -1686,6 +1725,7 @@ int	SSL_CIPHER_get_bits(const SSL_CIPHER
+ char *	SSL_CIPHER_get_version(const SSL_CIPHER *c);
+ const char *	SSL_CIPHER_get_name(const SSL_CIPHER *c);
+ unsigned long 	SSL_CIPHER_get_id(const SSL_CIPHER *c);
++const char* SSL_CIPHER_authentication_method(const SSL_CIPHER* cipher);
+ 
+ int	SSL_get_fd(const SSL *s);
+ int	SSL_get_rfd(const SSL *s);
+@@ -2149,6 +2189,7 @@ void ERR_load_SSL_strings(void);
  #define SSL_F_SSL3_GET_CERTIFICATE_REQUEST		 135
  #define SSL_F_SSL3_GET_CERT_STATUS			 289
  #define SSL_F_SSL3_GET_CERT_VERIFY			 136
@@ -632,7 +633,7 @@ diff -ur openssl/ssl/ssl.h openssl.channelid/ssl/ssl.h
  #define SSL_F_SSL3_GET_CLIENT_CERTIFICATE		 137
  #define SSL_F_SSL3_GET_CLIENT_HELLO			 138
  #define SSL_F_SSL3_GET_CLIENT_KEY_EXCHANGE		 139
-@@ -2226,6 +2266,7 @@
+@@ -2168,6 +2209,7 @@ void ERR_load_SSL_strings(void);
  #define SSL_F_SSL3_READ_BYTES				 148
  #define SSL_F_SSL3_READ_N				 149
  #define SSL_F_SSL3_SEND_CERTIFICATE_REQUEST		 150
@@ -640,7 +641,7 @@ diff -ur openssl/ssl/ssl.h openssl.channelid/ssl/ssl.h
  #define SSL_F_SSL3_SEND_CLIENT_CERTIFICATE		 151
  #define SSL_F_SSL3_SEND_CLIENT_KEY_EXCHANGE		 152
  #define SSL_F_SSL3_SEND_CLIENT_VERIFY			 153
-@@ -2391,12 +2432,15 @@
+@@ -2335,12 +2377,15 @@ void ERR_load_SSL_strings(void);
  #define SSL_R_BIO_NOT_SET				 128
  #define SSL_R_BLOCK_CIPHER_PAD_IS_WRONG			 129
  #define SSL_R_BN_LIB					 130
@@ -656,7 +657,7 @@ diff -ur openssl/ssl/ssl.h openssl.channelid/ssl/ssl.h
  #define SSL_R_CIPHER_CODE_WRONG_LENGTH			 137
  #define SSL_R_CIPHER_OR_HASH_UNAVAILABLE		 138
  #define SSL_R_CIPHER_TABLE_SRC_ERROR			 139
-@@ -2409,6 +2453,7 @@
+@@ -2353,6 +2398,7 @@ void ERR_load_SSL_strings(void);
  #define SSL_R_CONNECTION_ID_IS_DIFFERENT		 143
  #define SSL_R_CONNECTION_TYPE_NOT_SET			 144
  #define SSL_R_COOKIE_MISMATCH				 308
@@ -664,7 +665,7 @@ diff -ur openssl/ssl/ssl.h openssl.channelid/ssl/ssl.h
  #define SSL_R_DATA_BETWEEN_CCS_AND_FINISHED		 145
  #define SSL_R_DATA_LENGTH_TOO_LONG			 146
  #define SSL_R_DECRYPTION_FAILED				 147
-@@ -2426,9 +2471,12 @@
+@@ -2370,9 +2416,12 @@ void ERR_load_SSL_strings(void);
  #define SSL_R_ENCRYPTED_LENGTH_TOO_LONG			 150
  #define SSL_R_ERROR_GENERATING_TMP_RSA_KEY		 282
  #define SSL_R_ERROR_IN_RECEIVED_CIPHER_LIST		 151
@@ -677,7 +678,7 @@ diff -ur openssl/ssl/ssl.h openssl.channelid/ssl/ssl.h
  #define SSL_R_GOT_NEXT_PROTO_BEFORE_A_CCS		 355
  #define SSL_R_GOT_NEXT_PROTO_WITHOUT_EXTENSION		 356
  #define SSL_R_HTTPS_PROXY_REQUEST			 155
-@@ -2438,6 +2486,7 @@
+@@ -2382,6 +2431,7 @@ void ERR_load_SSL_strings(void);
  #define SSL_R_INVALID_CHALLENGE_LENGTH			 158
  #define SSL_R_INVALID_COMMAND				 280
  #define SSL_R_INVALID_COMPRESSION_ALGORITHM		 341
@@ -685,7 +686,7 @@ diff -ur openssl/ssl/ssl.h openssl.channelid/ssl/ssl.h
  #define SSL_R_INVALID_PURPOSE				 278
  #define SSL_R_INVALID_SRP_USERNAME			 357
  #define SSL_R_INVALID_STATUS_RESPONSE			 328
-@@ -2492,6 +2541,7 @@
+@@ -2436,6 +2486,7 @@ void ERR_load_SSL_strings(void);
  #define SSL_R_NO_COMPRESSION_SPECIFIED			 187
  #define SSL_R_NO_GOST_CERTIFICATE_SENT_BY_PEER		 330
  #define SSL_R_NO_METHOD_SPECIFIED			 188
@@ -693,10 +694,9 @@ diff -ur openssl/ssl/ssl.h openssl.channelid/ssl/ssl.h
  #define SSL_R_NO_PRIVATEKEY				 189
  #define SSL_R_NO_PRIVATE_KEY_ASSIGNED			 190
  #define SSL_R_NO_PROTOCOLS_AVAILABLE			 191
-diff -ur openssl/ssl/ssl3.h openssl.channelid/ssl/ssl3.h
---- openssl/ssl/ssl3.h	2012-08-28 16:04:21.183349508 -0400
-+++ openssl.channelid/ssl/ssl3.h	2012-08-28 16:04:40.593618810 -0400
-@@ -539,6 +539,17 @@
+--- openssl-1.0.1e.orig/ssl/ssl3.h	2013-03-05 18:49:33.223297173 +0000
++++ openssl-1.0.1e/ssl/ssl3.h	2013-03-05 18:49:33.413299231 +0000
+@@ -539,6 +539,17 @@ typedef struct ssl3_state_st
  	/* Set if we saw the Next Protocol Negotiation extension from our peer. */
  	int next_proto_neg_seen;
  #endif
@@ -714,8 +714,7 @@ diff -ur openssl/ssl/ssl3.h openssl.channelid/ssl/ssl3.h
  	} SSL3_STATE;
  
  #endif
-@@ -581,7 +592,9 @@
- #define SSL3_ST_CW_CHANGE_B		(0x1A1|SSL_ST_CONNECT)
+@@ -583,6 +594,8 @@ typedef struct ssl3_state_st
  #define SSL3_ST_CW_NEXT_PROTO_A		(0x200|SSL_ST_CONNECT)
  #define SSL3_ST_CW_NEXT_PROTO_B		(0x201|SSL_ST_CONNECT)
  #endif
@@ -724,7 +723,7 @@ diff -ur openssl/ssl/ssl3.h openssl.channelid/ssl/ssl3.h
  #define SSL3_ST_CW_FINISHED_A		(0x1B0|SSL_ST_CONNECT)
  #define SSL3_ST_CW_FINISHED_B		(0x1B1|SSL_ST_CONNECT)
  /* read from server */
-@@ -631,10 +644,13 @@
+@@ -632,10 +645,13 @@ typedef struct ssl3_state_st
  #define SSL3_ST_SR_CERT_VRFY_B		(0x1A1|SSL_ST_ACCEPT)
  #define SSL3_ST_SR_CHANGE_A		(0x1B0|SSL_ST_ACCEPT)
  #define SSL3_ST_SR_CHANGE_B		(0x1B1|SSL_ST_ACCEPT)
@@ -738,19 +737,17 @@ diff -ur openssl/ssl/ssl3.h openssl.channelid/ssl/ssl3.h
  #define SSL3_ST_SR_FINISHED_A		(0x1C0|SSL_ST_ACCEPT)
  #define SSL3_ST_SR_FINISHED_B		(0x1C1|SSL_ST_ACCEPT)
  /* write to client */
-@@ -658,7 +674,8 @@
- #define SSL3_MT_FINISHED			20
- #define SSL3_MT_CERTIFICATE_STATUS		22
+@@ -663,6 +679,7 @@ typedef struct ssl3_state_st
+ #ifndef OPENSSL_NO_NEXTPROTONEG
  #define SSL3_MT_NEXT_PROTO			67
  #endif
 +#define SSL3_MT_ENCRYPTED_EXTENSIONS		203
  #define DTLS1_MT_HELLO_VERIFY_REQUEST    3
  
  
-diff -ur openssl/ssl/ssl_err.c openssl.channelid/ssl/ssl_err.c
---- openssl/ssl/ssl_err.c	2012-08-28 16:04:21.183349508 -0400
-+++ openssl.channelid/ssl/ssl_err.c	2012-08-28 16:04:40.593618810 -0400
-@@ -151,6 +151,7 @@
+--- openssl-1.0.1e.orig/ssl/ssl_err.c	2013-03-05 18:49:33.243297392 +0000
++++ openssl-1.0.1e/ssl/ssl_err.c	2013-03-05 18:49:33.413299231 +0000
+@@ -151,6 +151,7 @@ static ERR_STRING_DATA SSL_str_functs[]=
  {ERR_FUNC(SSL_F_SSL3_GET_CERTIFICATE_REQUEST),	"SSL3_GET_CERTIFICATE_REQUEST"},
  {ERR_FUNC(SSL_F_SSL3_GET_CERT_STATUS),	"SSL3_GET_CERT_STATUS"},
  {ERR_FUNC(SSL_F_SSL3_GET_CERT_VERIFY),	"SSL3_GET_CERT_VERIFY"},
@@ -758,7 +755,7 @@ diff -ur openssl/ssl/ssl_err.c openssl.channelid/ssl/ssl_err.c
  {ERR_FUNC(SSL_F_SSL3_GET_CLIENT_CERTIFICATE),	"SSL3_GET_CLIENT_CERTIFICATE"},
  {ERR_FUNC(SSL_F_SSL3_GET_CLIENT_HELLO),	"SSL3_GET_CLIENT_HELLO"},
  {ERR_FUNC(SSL_F_SSL3_GET_CLIENT_KEY_EXCHANGE),	"SSL3_GET_CLIENT_KEY_EXCHANGE"},
-@@ -170,6 +171,7 @@
+@@ -170,6 +171,7 @@ static ERR_STRING_DATA SSL_str_functs[]=
  {ERR_FUNC(SSL_F_SSL3_READ_BYTES),	"SSL3_READ_BYTES"},
  {ERR_FUNC(SSL_F_SSL3_READ_N),	"SSL3_READ_N"},
  {ERR_FUNC(SSL_F_SSL3_SEND_CERTIFICATE_REQUEST),	"SSL3_SEND_CERTIFICATE_REQUEST"},
@@ -766,7 +763,7 @@ diff -ur openssl/ssl/ssl_err.c openssl.channelid/ssl/ssl_err.c
  {ERR_FUNC(SSL_F_SSL3_SEND_CLIENT_CERTIFICATE),	"SSL3_SEND_CLIENT_CERTIFICATE"},
  {ERR_FUNC(SSL_F_SSL3_SEND_CLIENT_KEY_EXCHANGE),	"SSL3_SEND_CLIENT_KEY_EXCHANGE"},
  {ERR_FUNC(SSL_F_SSL3_SEND_CLIENT_VERIFY),	"SSL3_SEND_CLIENT_VERIFY"},
-@@ -338,12 +340,15 @@
+@@ -339,12 +341,15 @@ static ERR_STRING_DATA SSL_str_reasons[]
  {ERR_REASON(SSL_R_BIO_NOT_SET)           ,"bio not set"},
  {ERR_REASON(SSL_R_BLOCK_CIPHER_PAD_IS_WRONG),"block cipher pad is wrong"},
  {ERR_REASON(SSL_R_BN_LIB)                ,"bn lib"},
@@ -782,7 +779,7 @@ diff -ur openssl/ssl/ssl_err.c openssl.channelid/ssl/ssl_err.c
  {ERR_REASON(SSL_R_CIPHER_CODE_WRONG_LENGTH),"cipher code wrong length"},
  {ERR_REASON(SSL_R_CIPHER_OR_HASH_UNAVAILABLE),"cipher or hash unavailable"},
  {ERR_REASON(SSL_R_CIPHER_TABLE_SRC_ERROR),"cipher table src error"},
-@@ -356,6 +361,7 @@
+@@ -357,6 +362,7 @@ static ERR_STRING_DATA SSL_str_reasons[]
  {ERR_REASON(SSL_R_CONNECTION_ID_IS_DIFFERENT),"connection id is different"},
  {ERR_REASON(SSL_R_CONNECTION_TYPE_NOT_SET),"connection type not set"},
  {ERR_REASON(SSL_R_COOKIE_MISMATCH)       ,"cookie mismatch"},
@@ -790,7 +787,7 @@ diff -ur openssl/ssl/ssl_err.c openssl.channelid/ssl/ssl_err.c
  {ERR_REASON(SSL_R_DATA_BETWEEN_CCS_AND_FINISHED),"data between ccs and finished"},
  {ERR_REASON(SSL_R_DATA_LENGTH_TOO_LONG)  ,"data length too long"},
  {ERR_REASON(SSL_R_DECRYPTION_FAILED)     ,"decryption failed"},
-@@ -373,9 +379,12 @@
+@@ -374,9 +380,12 @@ static ERR_STRING_DATA SSL_str_reasons[]
  {ERR_REASON(SSL_R_ENCRYPTED_LENGTH_TOO_LONG),"encrypted length too long"},
  {ERR_REASON(SSL_R_ERROR_GENERATING_TMP_RSA_KEY),"error generating tmp rsa key"},
  {ERR_REASON(SSL_R_ERROR_IN_RECEIVED_CIPHER_LIST),"error in received cipher list"},
@@ -803,7 +800,7 @@ diff -ur openssl/ssl/ssl_err.c openssl.channelid/ssl/ssl_err.c
  {ERR_REASON(SSL_R_GOT_NEXT_PROTO_BEFORE_A_CCS),"got next proto before a ccs"},
  {ERR_REASON(SSL_R_GOT_NEXT_PROTO_WITHOUT_EXTENSION),"got next proto without seeing extension"},
  {ERR_REASON(SSL_R_HTTPS_PROXY_REQUEST)   ,"https proxy request"},
-@@ -385,6 +394,7 @@
+@@ -386,6 +395,7 @@ static ERR_STRING_DATA SSL_str_reasons[]
  {ERR_REASON(SSL_R_INVALID_CHALLENGE_LENGTH),"invalid challenge length"},
  {ERR_REASON(SSL_R_INVALID_COMMAND)       ,"invalid command"},
  {ERR_REASON(SSL_R_INVALID_COMPRESSION_ALGORITHM),"invalid compression algorithm"},
@@ -811,7 +808,7 @@ diff -ur openssl/ssl/ssl_err.c openssl.channelid/ssl/ssl_err.c
  {ERR_REASON(SSL_R_INVALID_PURPOSE)       ,"invalid purpose"},
  {ERR_REASON(SSL_R_INVALID_SRP_USERNAME)  ,"invalid srp username"},
  {ERR_REASON(SSL_R_INVALID_STATUS_RESPONSE),"invalid status response"},
-@@ -439,6 +449,7 @@
+@@ -440,6 +450,7 @@ static ERR_STRING_DATA SSL_str_reasons[]
  {ERR_REASON(SSL_R_NO_COMPRESSION_SPECIFIED),"no compression specified"},
  {ERR_REASON(SSL_R_NO_GOST_CERTIFICATE_SENT_BY_PEER),"Peer haven't sent GOST certificate, required for selected ciphersuite"},
  {ERR_REASON(SSL_R_NO_METHOD_SPECIFIED)   ,"no method specified"},
@@ -819,10 +816,9 @@ diff -ur openssl/ssl/ssl_err.c openssl.channelid/ssl/ssl_err.c
  {ERR_REASON(SSL_R_NO_PRIVATEKEY)         ,"no privatekey"},
  {ERR_REASON(SSL_R_NO_PRIVATE_KEY_ASSIGNED),"no private key assigned"},
  {ERR_REASON(SSL_R_NO_PROTOCOLS_AVAILABLE),"no protocols available"},
-diff -ur openssl/ssl/ssl_lib.c openssl.channelid/ssl/ssl_lib.c
---- openssl/ssl/ssl_lib.c	2012-08-28 16:04:21.183349508 -0400
-+++ openssl.channelid/ssl/ssl_lib.c	2012-08-29 16:19:55.815717788 -0400
-@@ -562,6 +562,8 @@
+--- openssl-1.0.1e.orig/ssl/ssl_lib.c	2013-03-05 18:49:33.243297392 +0000
++++ openssl-1.0.1e/ssl/ssl_lib.c	2013-03-05 18:49:33.413299231 +0000
+@@ -579,6 +579,8 @@ void SSL_free(SSL *s)
  		sk_OCSP_RESPID_pop_free(s->tlsext_ocsp_ids, OCSP_RESPID_free);
  	if (s->tlsext_ocsp_resp)
  		OPENSSL_free(s->tlsext_ocsp_resp);
@@ -831,7 +827,7 @@ diff -ur openssl/ssl/ssl_lib.c openssl.channelid/ssl/ssl_lib.c
  #endif
  
  	if (s->client_CA != NULL)
-@@ -1946,6 +1948,11 @@
+@@ -2005,6 +2007,11 @@ void SSL_CTX_free(SSL_CTX *a)
  		ssl_buf_freelist_free(a->rbuf_freelist);
  #endif
  
@@ -843,10 +839,9 @@ diff -ur openssl/ssl/ssl_lib.c openssl.channelid/ssl/ssl_lib.c
  	OPENSSL_free(a);
  	}
  
-diff -ur openssl/ssl/ssl_locl.h openssl.channelid/ssl/ssl_locl.h
---- openssl/ssl/ssl_locl.h	2012-08-28 16:04:21.183349508 -0400
-+++ openssl.channelid/ssl/ssl_locl.h	2012-08-28 16:04:40.603618948 -0400
-@@ -369,6 +369,7 @@
+--- openssl-1.0.1e.orig/ssl/ssl_locl.h	2013-03-05 18:49:33.243297392 +0000
++++ openssl-1.0.1e/ssl/ssl_locl.h	2013-03-05 18:49:33.413299231 +0000
+@@ -378,6 +378,7 @@
   * (currently this also goes into algorithm2) */
  #define TLS1_STREAM_MAC 0x04
  
@@ -854,7 +849,7 @@ diff -ur openssl/ssl/ssl_locl.h openssl.channelid/ssl/ssl_locl.h
  
  
  /*
-@@ -996,6 +997,7 @@
+@@ -1004,6 +1005,7 @@ int ssl3_check_cert_and_algorithm(SSL *s
  int ssl3_check_finished(SSL *s);
  # ifndef OPENSSL_NO_NEXTPROTONEG
  int ssl3_send_next_proto(SSL *s);
@@ -862,7 +857,7 @@ diff -ur openssl/ssl/ssl_locl.h openssl.channelid/ssl/ssl_locl.h
  # endif
  #endif
  
-@@ -1018,6 +1020,7 @@
+@@ -1026,6 +1028,7 @@ int ssl3_get_cert_verify(SSL *s);
  #ifndef OPENSSL_NO_NEXTPROTONEG
  int ssl3_get_next_proto(SSL *s);
  #endif
@@ -870,7 +865,7 @@ diff -ur openssl/ssl/ssl_locl.h openssl.channelid/ssl/ssl_locl.h
  
  int dtls1_send_hello_request(SSL *s);
  int dtls1_send_server_hello(SSL *s);
-@@ -1114,7 +1117,9 @@
+@@ -1123,7 +1126,9 @@ int tls12_get_sigandhash(unsigned char *
  int tls12_get_sigid(const EVP_PKEY *pk);
  const EVP_MD *tls12_get_hash(unsigned char hash_alg);
  
@@ -880,10 +875,9 @@ diff -ur openssl/ssl/ssl_locl.h openssl.channelid/ssl/ssl_locl.h
  EVP_MD_CTX* ssl_replace_hash(EVP_MD_CTX **hash,const EVP_MD *md) ;
  void ssl_clear_hash_ctx(EVP_MD_CTX **hash);
  int ssl_add_serverhello_renegotiate_ext(SSL *s, unsigned char *p, int *len,
-diff -ur openssl/ssl/t1_lib.c openssl.channelid/ssl/t1_lib.c
---- openssl/ssl/t1_lib.c	2012-08-28 16:04:21.193349647 -0400
-+++ openssl.channelid/ssl/t1_lib.c	2012-08-28 16:04:40.603618948 -0400
-@@ -649,7 +649,17 @@
+--- openssl-1.0.1e.orig/ssl/t1_lib.c	2013-03-05 18:49:33.173296633 +0000
++++ openssl-1.0.1e/ssl/t1_lib.c	2013-03-05 18:49:33.413299231 +0000
+@@ -649,6 +649,16 @@ unsigned char *ssl_add_clienthello_tlsex
  		}
  #endif
  
@@ -900,8 +894,7 @@ diff -ur openssl/ssl/t1_lib.c openssl.channelid/ssl/t1_lib.c
  #ifndef OPENSSL_NO_SRTP
          if(SSL_get_srtp_profiles(s))
                  {
-                 int el;
-@@ -855,6 +865,16 @@
+@@ -859,6 +869,16 @@ unsigned char *ssl_add_serverhello_tlsex
  		}
  #endif
  
@@ -918,7 +911,7 @@ diff -ur openssl/ssl/t1_lib.c openssl.channelid/ssl/t1_lib.c
  	if ((extdatalen = ret-p-2)== 0) 
  		return p;
  
-@@ -1331,6 +1351,9 @@
+@@ -1332,6 +1352,9 @@ int ssl_parse_clienthello_tlsext(SSL *s,
  			}
  #endif
  
@@ -926,9 +919,9 @@ diff -ur openssl/ssl/t1_lib.c openssl.channelid/ssl/t1_lib.c
 +			s->s3->tlsext_channel_id_valid = 1;
 +
  		/* session ticket processed earlier */
+ #ifndef OPENSSL_NO_SRTP
  		else if (type == TLSEXT_TYPE_use_srtp)
-                         {
-@@ -1558,6 +1581,9 @@
+@@ -1562,6 +1585,9 @@ int ssl_parse_serverhello_tlsext(SSL *s,
  			s->s3->next_proto_neg_seen = 1;
  			}
  #endif
@@ -938,7 +931,7 @@ diff -ur openssl/ssl/t1_lib.c openssl.channelid/ssl/t1_lib.c
  		else if (type == TLSEXT_TYPE_renegotiate)
  			{
  			if(!ssl_parse_serverhello_renegotiate_ext(s, data, size, al))
-@@ -2580,3 +2606,37 @@
+@@ -2621,3 +2647,37 @@ tls1_heartbeat(SSL *s)
  	return ret;
  	}
  #endif
@@ -976,10 +969,9 @@ diff -ur openssl/ssl/t1_lib.c openssl.channelid/ssl/t1_lib.c
 +	return 1;
 +	}
 +#endif
-diff -ur openssl/ssl/tls1.h openssl.channelid/ssl/tls1.h
---- openssl/ssl/tls1.h	2012-08-28 16:04:21.193349647 -0400
-+++ openssl.channelid/ssl/tls1.h	2012-08-28 16:04:40.603618948 -0400
-@@ -248,6 +248,9 @@
+--- openssl-1.0.1e.orig/ssl/tls1.h	2013-03-05 18:49:33.173296633 +0000
++++ openssl-1.0.1e/ssl/tls1.h	2013-03-05 18:49:33.413299231 +0000
+@@ -248,6 +248,9 @@ extern "C" {
  #define TLSEXT_TYPE_next_proto_neg		13172
  #endif
  
