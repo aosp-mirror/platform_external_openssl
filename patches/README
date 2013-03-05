@@ -22,3 +22,7 @@ See http://tools.ietf.org/html/draft-balfanz-tls-channelid-00.
 eng_dyn_dirs.patch
 
 Fixes the case of having multiple DIR_ADD commands sent to eng_dyn
+
+fix_clang_build.patch
+
+Fixes the Clang based build.
