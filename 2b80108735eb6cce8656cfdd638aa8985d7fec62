@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "RRB4abes",
+        "filename": "Crypto.mk",
+        "patchSetId": 5
+      },
+      "lineNbr": 560,
+      "author": {
+        "id": 1000411
+      },
+      "writtenOn": "2013-03-07T23:11:15Z",
+      "side": 0,
+      "message": "for the record, external/zlib is no longer needed (since compression support is compiled out now), and has been removed from the new scripts / definitions.",
+      "revId": "2b80108735eb6cce8656cfdd638aa8985d7fec62",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
