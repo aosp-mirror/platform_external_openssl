@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "RSPoLSS4",
+        "filename": "Apps-config.mk",
+        "patchSetId": 5
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1003723
+      },
+      "writtenOn": "2013-03-08T01:34:58Z",
+      "side": 1,
+      "message": "are you saying we no longer use x86 asm on the linux host? that actually cut testing time down a lot, plus actually gave it more test coverage since we aren\u0027t otherwise running it regularly.",
+      "revId": "1cea17bea263c1cb77127df9ebcdc41b567b4747",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
