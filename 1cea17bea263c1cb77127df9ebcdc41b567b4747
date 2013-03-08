@@ -16,6 +16,24 @@
       "revId": "1cea17bea263c1cb77127df9ebcdc41b567b4747",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "RRGRkvvg",
+        "filename": "Apps-config.mk",
+        "patchSetId": 5
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1000411
+      },
+      "writtenOn": "2013-03-08T03:06:30Z",
+      "side": 1,
+      "message": "Actually, that\u0027s obsolete, the x86 asm builds just fine now, I\u0027ll update import_openssl.sh to reinstantiate the old behaviour. Sorry about that, well spotted.",
+      "parentUuid": "RSPoLSS4",
+      "revId": "1cea17bea263c1cb77127df9ebcdc41b567b4747",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
