@@ -1,0 +1,7 @@
+Code-Review+2: Elliott Hughes <enh@google.com>
+Verified+1: Brian Carlstrom <bdc@google.com>
+Submitted-by: Brian Carlstrom <bdc@google.com>
+Submitted-at: Thu, 02 May 2013 16:07:59 +0000
+Reviewed-on: https://android-review.googlesource.com/57867
+Project: platform/external/openssl
+Branch: refs/heads/master
