@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1d879d2a_3c8cc0f1",
+        "filename": "Apps.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1003723
+      },
+      "writtenOn": "2013-06-07T18:18:16Z",
+      "side": 1,
+      "message": "we don\u0027t support clang on host?",
+      "revId": "9d6b691a23aeebe0e520dab9e11a484eae4999fd",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1d879d2a_dc7c84f5",
+        "filename": "android-config.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1003723
+      },
+      "writtenOn": "2013-06-07T18:18:16Z",
+      "side": 1,
+      "message": "I guess not.",
+      "revId": "9d6b691a23aeebe0e520dab9e11a484eae4999fd",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
