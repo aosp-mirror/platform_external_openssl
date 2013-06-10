@@ -25,3 +25,6 @@ LOCAL_CFLAGS := $(filter-out -DZLIB, $(LOCAL_CFLAGS))
 
 # Debug
 # LOCAL_CFLAGS += -DCIPHER_DEBUG
+
+# Add clang here when it works on host
+# LOCAL_CLANG := true
