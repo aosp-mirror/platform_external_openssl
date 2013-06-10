@@ -15,7 +15,6 @@ ifneq (,$(TARGET_BUILD_APPS))
 LOCAL_SDK_VERSION := 9
 endif
 
-LOCAL_CLANG := true
 LOCAL_SRC_FILES += $(target_src_files)
 LOCAL_CFLAGS += $(target_c_flags)
 LOCAL_C_INCLUDES += $(target_c_includes)
