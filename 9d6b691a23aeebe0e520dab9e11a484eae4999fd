@@ -1,0 +1,9 @@
+Verified+1: Kenny Root <kroot@android.com>
+Code-Review+2: Brian Carlstrom <bdc@google.com>
+Code-Review+1: Stephen Hines <srhines@google.com>
+Code-Review+1: Geremy Condra <gcondra@google.com>
+Submitted-by: Kenny Root <kroot@android.com>
+Submitted-at: Mon, 10 Jun 2013 16:18:45 +0000
+Reviewed-on: https://android-review.googlesource.com/60155
+Project: platform/external/openssl
+Branch: refs/heads/master
