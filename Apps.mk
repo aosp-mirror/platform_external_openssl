@@ -11,6 +11,7 @@ include $(LOCAL_PATH)/Apps-config.mk
 
 include $(CLEAR_VARS)
 LOCAL_MODULE:= openssl
+LOCAL_CLANG := true
 LOCAL_MODULE_TAGS := optional
 LOCAL_SRC_FILES := $(target_src_files)
 LOCAL_SHARED_LIBRARIES := libssl libcrypto
