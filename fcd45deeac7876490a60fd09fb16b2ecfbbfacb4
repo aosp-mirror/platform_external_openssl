@@ -1,0 +1,8 @@
+Verified+1: Kenny Root <kroot@android.com>
+Code-Review+2: Brian Carlstrom <bdc@google.com>
+Code-Review+1: Ying Wang <wangying@android.com>
+Submitted-by: Kenny Root <kroot@android.com>
+Submitted-at: Tue, 11 Jun 2013 00:03:50 +0000
+Reviewed-on: https://android-review.googlesource.com/60382
+Project: platform/external/openssl
+Branch: refs/heads/master
