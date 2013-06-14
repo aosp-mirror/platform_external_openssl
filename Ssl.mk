@@ -15,9 +15,7 @@ include $(LOCAL_PATH)/android-config.mk
 # in the NDK yet. This can be removed when a clang version that is fast enough
 # in the NDK.
 ifeq (,$(TARGET_BUILD_APPS))
-ifeq (,$(WITHOUT_CLANG))
 LOCAL_CLANG := true
-endif
 else
 LOCAL_SDK_VERSION := 9
 endif
@@ -40,9 +38,7 @@ include $(LOCAL_PATH)/android-config.mk
 # in the NDK yet. This can be removed when a clang version that is fast enough
 # in the NDK.
 ifeq (,$(TARGET_BUILD_APPS))
-ifeq (,$(WITHOUT_CLANG))
 LOCAL_CLANG := true
-endif
 else
 LOCAL_SDK_VERSION := 9
 endif
