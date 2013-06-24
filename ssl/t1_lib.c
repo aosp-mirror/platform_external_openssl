@@ -897,6 +897,13 @@ int ssl_parse_clienthello_tlsext(SSL *s, unsigned char **p, unsigned char *d, in
 
 	s->servername_done = 0;
 	s->tlsext_status_type = -1;
+
+	/* Reset TLS 1.2 digest functions to defaults because they don't carry
+	 * over to a renegotiation. */
+	s->s3->digest_rsa = NULL;
+	s->s3->digest_dsa = NULL;
+	s->s3->digest_ecdsa = NULL;
+
 #ifndef OPENSSL_NO_NEXTPROTONEG
 	s->s3->next_proto_neg_seen = 0;
 #endif
@@ -1194,11 +1201,7 @@ int ssl_parse_clienthello_tlsext(SSL *s, unsigned char **p, unsigned char *d, in
 				*al = SSL_AD_DECODE_ERROR;
 				return 0;
 				}
-			if (!tls1_process_sigalgs(s, data, dsize))
-				{
-				*al = SSL_AD_DECODE_ERROR;
-				return 0;
-				}
+			tls1_process_sigalgs(s, data, dsize);
 			}
 		else if (type == TLSEXT_TYPE_status_request &&
 		         s->version != DTLS1_VERSION && s->ctx->tlsext_status_cb)
@@ -2350,18 +2353,6 @@ static int tls12_find_id(int nid, tls12_lookup *table, size_t tlen)
 		}
 	return -1;
 	}
-#if 0
-static int tls12_find_nid(int id, tls12_lookup *table, size_t tlen)
-	{
-	size_t i;
-	for (i = 0; i < tlen; i++)
-		{
-		if (table[i].id == id)
-			return table[i].nid;
-		}
-	return -1;
-	}
-#endif
 
 int tls12_get_sigandhash(unsigned char *p, const EVP_PKEY *pk, const EVP_MD *md)
 	{
@@ -2380,6 +2371,8 @@ int tls12_get_sigandhash(unsigned char *p, const EVP_PKEY *pk, const EVP_MD *md)
 	return 1;
 	}
 
+/* tls12_get_sigid returns the TLS 1.2 SignatureAlgorithm value corresponding
+ * to the given public key, or -1 if not known. */
 int tls12_get_sigid(const EVP_PKEY *pk)
 	{
 	return tls12_find_id(pk->type, tls12_sig,
@@ -2399,47 +2392,49 @@ const EVP_MD *tls12_get_hash(unsigned char hash_alg)
 		return EVP_md5();
 #endif
 #ifndef OPENSSL_NO_SHA
-		case TLSEXT_hash_sha1:
+	case TLSEXT_hash_sha1:
 		return EVP_sha1();
 #endif
 #ifndef OPENSSL_NO_SHA256
-		case TLSEXT_hash_sha224:
+	case TLSEXT_hash_sha224:
 		return EVP_sha224();
 
-		case TLSEXT_hash_sha256:
+	case TLSEXT_hash_sha256:
 		return EVP_sha256();
 #endif
 #ifndef OPENSSL_NO_SHA512
-		case TLSEXT_hash_sha384:
+	case TLSEXT_hash_sha384:
 		return EVP_sha384();
 
-		case TLSEXT_hash_sha512:
+	case TLSEXT_hash_sha512:
 		return EVP_sha512();
 #endif
-		default:
+	default:
 		return NULL;
 
 		}
 	}
 
-/* Set preferred digest for each key type */
-
-int tls1_process_sigalgs(SSL *s, const unsigned char *data, int dsize)
+/* tls1_process_sigalgs processes a signature_algorithms extension and sets the
+ * digest functions accordingly for each key type.
+ *
+ * See RFC 5246, section 7.4.1.4.1.
+ *
+ * data: points to the content of the extension, not including type and length
+ *     headers.
+ * dsize: the number of bytes of |data|. Must be even.
+ */
+void tls1_process_sigalgs(SSL *s, const unsigned char *data, int dsize)
 	{
-	int i, idx;
-	const EVP_MD *md;
-	CERT *c = s->cert;
+	int i;
+	const EVP_MD *md, **digest_ptr;
 	/* Extension ignored for TLS versions below 1.2 */
 	if (TLS1_get_version(s) < TLS1_2_VERSION)
-		return 1;
-	/* Should never happen */
-	if (!c)
-		return 0;
+		return;
 
-	c->pkeys[SSL_PKEY_DSA_SIGN].digest = NULL;
-	c->pkeys[SSL_PKEY_RSA_SIGN].digest = NULL;
-	c->pkeys[SSL_PKEY_RSA_ENC].digest = NULL;
-	c->pkeys[SSL_PKEY_ECC].digest = NULL;
+	s->s3->digest_rsa = NULL;
+	s->s3->digest_dsa = NULL;
+	s->s3->digest_ecdsa = NULL;
 
 	for (i = 0; i < dsize; i += 2)
 		{
@@ -2449,56 +2444,31 @@ int tls1_process_sigalgs(SSL *s, const unsigned char *data, int dsize)
 			{
 #ifndef OPENSSL_NO_RSA
 			case TLSEXT_signature_rsa:
-			idx = SSL_PKEY_RSA_SIGN;
+			digest_ptr = &s->s3->digest_rsa;
 			break;
 #endif
 #ifndef OPENSSL_NO_DSA
 			case TLSEXT_signature_dsa:
-			idx = SSL_PKEY_DSA_SIGN;
+			digest_ptr = &s->s3->digest_dsa;
 			break;
 #endif
 #ifndef OPENSSL_NO_ECDSA
 			case TLSEXT_signature_ecdsa:
-			idx = SSL_PKEY_ECC;
+			digest_ptr = &s->s3->digest_ecdsa;
 			break;
 #endif
 			default:
 			continue;
 			}
 
-		if (c->pkeys[idx].digest == NULL)
+		if (*digest_ptr == NULL)
 			{
 			md = tls12_get_hash(hash_alg);
 			if (md)
-				{
-				c->pkeys[idx].digest = md;
-				if (idx == SSL_PKEY_RSA_SIGN)
-					c->pkeys[SSL_PKEY_RSA_ENC].digest = md;
-				}
+				*digest_ptr = md;
 			}
 
 		}
-
-
-	/* Set any remaining keys to default values. NOTE: if alg is not
-	 * supported it stays as NULL.
-	 */
-#ifndef OPENSSL_NO_DSA
-	if (!c->pkeys[SSL_PKEY_DSA_SIGN].digest)
-		c->pkeys[SSL_PKEY_DSA_SIGN].digest = EVP_sha1();
-#endif
-#ifndef OPENSSL_NO_RSA
-	if (!c->pkeys[SSL_PKEY_RSA_SIGN].digest)
-		{
-		c->pkeys[SSL_PKEY_RSA_SIGN].digest = EVP_sha1();
-		c->pkeys[SSL_PKEY_RSA_ENC].digest = EVP_sha1();
-		}
-#endif
-#ifndef OPENSSL_NO_ECDSA
-	if (!c->pkeys[SSL_PKEY_ECC].digest)
-		c->pkeys[SSL_PKEY_ECC].digest = EVP_sha1();
-#endif
-	return 1;
 	}
 
 #endif
