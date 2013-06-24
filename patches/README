@@ -26,3 +26,8 @@ Fixes the case of having multiple DIR_ADD commands sent to eng_dyn
 fix_clang_build.patch
 
 Fixes the Clang based build.
+
+tls12_digests.patch
+
+Fixes a bug with handling TLS 1.2 and digest functions for DSA and ECDSA
+keys.

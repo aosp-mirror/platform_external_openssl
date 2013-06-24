@@ -550,6 +550,16 @@ typedef struct ssl3_state_st
 	 *     verified Channel ID from the client: a P256 point, (x,y), where
 	 *     each are big-endian values. */
 	unsigned char tlsext_channel_id[64];
+
+	/* These point to the digest function to use for signatures made with
+	 * each type of public key. A NULL value indicates that the default
+	 * digest should be used, which is SHA1 as of TLS 1.2.
+	 *
+	 * (These should be in the tmp member, but we have to put them here to
+	 * ensure binary compatibility with earlier OpenSSL 1.0.* releases.) */
+	const EVP_MD *digest_rsa;
+	const EVP_MD *digest_dsa;
+	const EVP_MD *digest_ecdsa;
 	} SSL3_STATE;
 
 #endif
@@ -699,4 +709,3 @@ typedef struct ssl3_state_st
 }
 #endif
 #endif
-

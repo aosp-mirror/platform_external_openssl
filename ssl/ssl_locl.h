@@ -483,8 +483,6 @@ typedef struct cert_pkey_st
 	X509 *x509;
 	STACK_OF(X509) *cert_chain;
 	EVP_PKEY *privatekey;
-	/* Digest to use when signing */
-	const EVP_MD *digest;
 	} CERT_PKEY;
 
 typedef struct cert_st
@@ -1140,7 +1138,7 @@ int ssl_add_clienthello_renegotiate_ext(SSL *s, unsigned char *p, int *len,
 int ssl_parse_clienthello_renegotiate_ext(SSL *s, unsigned char *d, int len,
 					  int *al);
 long ssl_get_algorithm2(SSL *s);
-int tls1_process_sigalgs(SSL *s, const unsigned char *data, int dsize);
+void tls1_process_sigalgs(SSL *s, const unsigned char *data, int dsize);
 int tls12_get_req_sig_algs(SSL *s, unsigned char *p);
 
 int ssl_add_clienthello_use_srtp_ext(SSL *s, unsigned char *p, int *len, int maxlen);
