@@ -26,3 +26,14 @@ Fixes the case of having multiple DIR_ADD commands sent to eng_dyn
 fix_clang_build.patch
 
 Fixes the Clang based build.
+
+tls12_digests.patch
+
+Fixes a bug with handling TLS 1.2 and digest functions for DSA and ECDSA
+keys.
+
+alpn.patch
+
+This change adds support for ALPN in OpenSSL. ALPN is the IETF
+blessed version of NPN and we'll be supporting both ALPN and NPN for
+some time yet.
