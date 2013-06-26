@@ -2014,12 +2014,13 @@ int ssl3_get_certificate_request(SSL *s)
 			SSLerr(SSL_F_SSL3_GET_CERTIFICATE_REQUEST,SSL_R_DATA_LENGTH_TOO_LONG);
 			goto err;
 			}
-		if ((llen & 1) || !tls1_process_sigalgs(s, p, llen))
+		if (llen & 1)
 			{
 			ssl3_send_alert(s,SSL3_AL_FATAL,SSL_AD_DECODE_ERROR);
 			SSLerr(SSL_F_SSL3_GET_CERTIFICATE_REQUEST,SSL_R_SIGNATURE_ALGORITHMS_ERROR);
 			goto err;
 			}
+		tls1_process_sigalgs(s, p, llen);
 		p += llen;
 		}
 
@@ -3041,7 +3042,28 @@ int ssl3_send_client_verify(SSL *s)
 			{
 			long hdatalen = 0;
 			void *hdata;
-			const EVP_MD *md = s->cert->key->digest;
+			const EVP_MD *md;
+			switch (ssl_cert_type(NULL, pkey))
+				{
+			case SSL_PKEY_RSA_ENC:
+				md = s->s3->digest_rsa;
+				break;
+			case SSL_PKEY_DSA_SIGN:
+				md = s->s3->digest_dsa;
+				break;
+			case SSL_PKEY_ECC:
+				md = s->s3->digest_ecdsa;
+				break;
+			default:
+				md = NULL;
+				}
+			if (!md)
+				/* Unlike with the SignatureAlgorithm extension (sent by clients),
+				 * there are no default algorithms for the CertificateRequest message
+				 * (sent by servers). However, now that we've sent a certificate
+				 * for which we don't really know what hash to use for signing, the
+				 * best we can do is try a default algorithm. */
+				md = EVP_sha1();
 			hdatalen = BIO_get_mem_data(s->s3->handshake_buffer,
 								&hdata);
 			if (hdatalen <= 0 || !tls12_get_sigandhash(p, pkey, md))
