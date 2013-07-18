@@ -283,3 +283,40 @@ void *ECDSA_get_ex_data(EC_KEY *d, int idx)
 		return NULL;
 	return(CRYPTO_get_ex_data(&ecdsa->ex_data,idx));
 }
+
+ECDSA_METHOD *ECDSA_METHOD_new()
+{
+    ECDSA_METHOD* method = OPENSSL_malloc(sizeof(ECDSA_METHOD));
+    memset(method, 0, sizeof(ECDSA_METHOD));
+    return method;
+}
+
+void ECDSA_METHOD_destroy(ECDSA_METHOD *meth)
+{
+    OPENSSL_free(meth);
+}
+
+void ECDSA_meth_set_name(ECDSA_METHOD *meth, const char *name)
+{
+    meth->name = name;
+}
+
+void ECDSA_meth_set_sign_setup(ECDSA_METHOD* meth,
+        int (*sign_setup)(EC_KEY *eckey, BN_CTX *ctx, BIGNUM **kinv, BIGNUM **r))
+{
+    meth->ecdsa_sign_setup = sign_setup;
+}
+
+void ECDSA_meth_set_do_sign(ECDSA_METHOD* meth,
+        ECDSA_SIG *(*do_sign)(const unsigned char *dgst, int dgst_len, const BIGNUM *inv,
+                const BIGNUM *rp, EC_KEY *eckey))
+{
+    meth->ecdsa_do_sign = do_sign;
+}
+
+void ECDSA_meth_set_do_verify(ECDSA_METHOD* meth,
+        int (*do_verify)(const unsigned char *dgst, int dgst_len, const ECDSA_SIG *sig,
+                EC_KEY *eckey))
+{
+    meth->ecdsa_do_verify = do_verify;
+}
