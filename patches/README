@@ -37,3 +37,8 @@ alpn.patch
 This change adds support for ALPN in OpenSSL. ALPN is the IETF
 blessed version of NPN and we'll be supporting both ALPN and NPN for
 some time yet.
+
+ssleay_prng_is_initialized.patch
+
+Adds RAND_SSLeay_is_initialized method for checking whether the SSLeay PRNG
+is initialized.

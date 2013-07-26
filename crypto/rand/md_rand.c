@@ -163,6 +163,7 @@ static int ssleay_rand_bytes(unsigned char *buf, int num, int pseudo);
 static int ssleay_rand_nopseudo_bytes(unsigned char *buf, int num);
 static int ssleay_rand_pseudo_bytes(unsigned char *buf, int num);
 static int ssleay_rand_status(void);
+static int ssleay_rand_is_initialized(void);
 
 RAND_METHOD rand_ssleay_meth={
 	ssleay_rand_seed,
@@ -176,6 +177,11 @@ RAND_METHOD rand_ssleay_meth={
 RAND_METHOD *RAND_SSLeay(void)
 	{
 	return(&rand_ssleay_meth);
+	}
+
+int RAND_SSLeay_is_initialized(void)
+	{
+	return ssleay_rand_is_initialized();
 	}
 
 static void ssleay_rand_cleanup(void)
@@ -588,5 +594,47 @@ static int ssleay_rand_status(void)
 		CRYPTO_w_unlock(CRYPTO_LOCK_RAND);
 		}
 	
+	return ret;
+	}
+
+static int ssleay_rand_is_initialized(void)
+	{
+	CRYPTO_THREADID cur;
+	int ret;
+	int do_not_lock;
+
+	CRYPTO_THREADID_current(&cur);
+	/* check if we already have the lock
+	 * (could happen if a RAND_poll() implementation calls RAND_status()) */
+	if (crypto_lock_rand)
+		{
+		CRYPTO_r_lock(CRYPTO_LOCK_RAND2);
+		do_not_lock = !CRYPTO_THREADID_cmp(&locking_threadid, &cur);
+		CRYPTO_r_unlock(CRYPTO_LOCK_RAND2);
+		}
+	else
+		do_not_lock = 0;
+
+	if (!do_not_lock)
+		{
+		CRYPTO_w_lock(CRYPTO_LOCK_RAND);
+
+		/* prevent ssleay_rand_bytes() from trying to obtain the lock again */
+		CRYPTO_w_lock(CRYPTO_LOCK_RAND2);
+		CRYPTO_THREADID_cpy(&locking_threadid, &cur);
+		CRYPTO_w_unlock(CRYPTO_LOCK_RAND2);
+		crypto_lock_rand = 1;
+		}
+
+	ret = initialized;
+
+	if (!do_not_lock)
+		{
+		/* before unlocking, we must clear 'crypto_lock_rand' */
+		crypto_lock_rand = 0;
+
+		CRYPTO_w_unlock(CRYPTO_LOCK_RAND);
+		}
+
 	return ret;
 	}

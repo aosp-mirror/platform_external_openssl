@@ -1,0 +1,91 @@
+diff -ur openssl-1.0.1e.orig/crypto/rand/md_rand.c openssl-1.0.1e/crypto/rand/md_rand.c
+--- openssl-1.0.1e.orig/crypto/rand/md_rand.c	2013-02-11 07:26:04.000000000 -0800
++++ openssl-1.0.1e/crypto/rand/md_rand.c	2013-07-26 11:21:29.666729254 -0700
+@@ -163,6 +163,7 @@
+ static int ssleay_rand_nopseudo_bytes(unsigned char *buf, int num);
+ static int ssleay_rand_pseudo_bytes(unsigned char *buf, int num);
+ static int ssleay_rand_status(void);
++static int ssleay_rand_is_initialized(void);
+ 
+ RAND_METHOD rand_ssleay_meth={
+ 	ssleay_rand_seed,
+@@ -178,6 +179,11 @@
+ 	return(&rand_ssleay_meth);
+ 	}
+ 
++int RAND_SSLeay_is_initialized(void)
++	{
++	return ssleay_rand_is_initialized();
++	}
++
+ static void ssleay_rand_cleanup(void)
+ 	{
+ 	OPENSSL_cleanse(state,sizeof(state));
+@@ -590,3 +596,45 @@
+ 	
+ 	return ret;
+ 	}
++
++static int ssleay_rand_is_initialized(void)
++	{
++	CRYPTO_THREADID cur;
++	int ret;
++	int do_not_lock;
++
++	CRYPTO_THREADID_current(&cur);
++	/* check if we already have the lock
++	 * (could happen if a RAND_poll() implementation calls RAND_status()) */
++	if (crypto_lock_rand)
++		{
++		CRYPTO_r_lock(CRYPTO_LOCK_RAND2);
++		do_not_lock = !CRYPTO_THREADID_cmp(&locking_threadid, &cur);
++		CRYPTO_r_unlock(CRYPTO_LOCK_RAND2);
++		}
++	else
++		do_not_lock = 0;
++
++	if (!do_not_lock)
++		{
++		CRYPTO_w_lock(CRYPTO_LOCK_RAND);
++
++		/* prevent ssleay_rand_bytes() from trying to obtain the lock again */
++		CRYPTO_w_lock(CRYPTO_LOCK_RAND2);
++		CRYPTO_THREADID_cpy(&locking_threadid, &cur);
++		CRYPTO_w_unlock(CRYPTO_LOCK_RAND2);
++		crypto_lock_rand = 1;
++		}
++
++	ret = initialized;
++
++	if (!do_not_lock)
++		{
++		/* before unlocking, we must clear 'crypto_lock_rand' */
++		crypto_lock_rand = 0;
++
++		CRYPTO_w_unlock(CRYPTO_LOCK_RAND);
++		}
++
++	return ret;
++	}
+diff -ur openssl-1.0.1e.orig/crypto/rand/rand.h openssl-1.0.1e/crypto/rand/rand.h
+--- openssl-1.0.1e.orig/crypto/rand/rand.h	2013-02-11 07:26:04.000000000 -0800
++++ openssl-1.0.1e/crypto/rand/rand.h	2013-07-26 11:21:23.406688199 -0700
+@@ -98,6 +98,7 @@
+ int RAND_set_rand_engine(ENGINE *engine);
+ #endif
+ RAND_METHOD *RAND_SSLeay(void);
++int RAND_SSLeay_is_initialized(void);
+ void RAND_cleanup(void );
+ int  RAND_bytes(unsigned char *buf,int num);
+ int  RAND_pseudo_bytes(unsigned char *buf,int num);
+diff -ur openssl-1.0.1e.orig/include/openssl/rand.h openssl-1.0.1e/include/openssl/rand.h
+--- openssl-1.0.1e.orig/include/openssl/rand.h	2013-02-11 07:26:04.000000000 -0800
++++ openssl-1.0.1e/include/openssl/rand.h	2013-07-26 11:21:23.406688199 -0700
+@@ -98,6 +98,7 @@
+ int RAND_set_rand_engine(ENGINE *engine);
+ #endif
+ RAND_METHOD *RAND_SSLeay(void);
++int RAND_SSLeay_is_initialized(void);
+ void RAND_cleanup(void );
+ int  RAND_bytes(unsigned char *buf,int num);
+ int  RAND_pseudo_bytes(unsigned char *buf,int num);

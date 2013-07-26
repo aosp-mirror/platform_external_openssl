@@ -98,6 +98,7 @@ const RAND_METHOD *RAND_get_rand_method(void);
 int RAND_set_rand_engine(ENGINE *engine);
 #endif
 RAND_METHOD *RAND_SSLeay(void);
+int RAND_SSLeay_is_initialized(void);
 void RAND_cleanup(void );
 int  RAND_bytes(unsigned char *buf,int num);
 int  RAND_pseudo_bytes(unsigned char *buf,int num);
