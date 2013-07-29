@@ -87,7 +87,7 @@ function main() {
     declare -r patch=$1
     shift || usage "No patch file specified."
     [ -d $OPENSSL_DIR ] || usage "$OPENSSL_DIR not found, did you mean to use generate?"
-    [ -d $OPENSSL_DIR_ORIG_ORIG ] || usage "$OPENSSL_DIR_ORIG not found, did you mean to use generate?"
+    [ -d $OPENSSL_DIR_ORIG ] || usage "$OPENSSL_DIR_ORIG not found, did you mean to use generate?"
     regenerate $patch
   elif [ "$command" = "generate" ]; then
     declare -r patch=$1
