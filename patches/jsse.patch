@@ -352,7 +352,7 @@
  
 --- openssl-1.0.0b.orig/ssl/ssl_rsa.c	2009-09-12 23:09:26.000000000 +0000
 +++ openssl-1.0.0b/ssl/ssl_rsa.c	2010-11-30 00:03:47.000000000 +0000
-@@ -697,6 +697,42 @@ int SSL_CTX_use_PrivateKey_ASN1(int type
+@@ -697,6 +697,44 @@ int SSL_CTX_use_PrivateKey_ASN1(int type
  	}
  
  
@@ -373,6 +373,8 @@
 +		SSLerr(SSL_F_SSL_USE_CERTIFICATE_CHAIN,SSL_R_NO_CERTIFICATE_ASSIGNED);
 +		return(0);
 +		}
++	if (ssl->cert->key->cert_chain != NULL)
++		sk_X509_pop_free(ssl->cert->key->cert_chain, X509_free);
 +	ssl->cert->key->cert_chain = cert_chain;
 +	return(1);
 +	}
