@@ -714,6 +714,8 @@ int SSL_use_certificate_chain(SSL *ssl, STACK_OF(X509) *cert_chain)
 		SSLerr(SSL_F_SSL_USE_CERTIFICATE_CHAIN,SSL_R_NO_CERTIFICATE_ASSIGNED);
 		return(0);
 		}
+	if (ssl->cert->key->cert_chain != NULL)
+		sk_X509_pop_free(ssl->cert->key->cert_chain, X509_free);
 	ssl->cert->key->cert_chain = cert_chain;
 	return(1);
 	}
