@@ -35,6 +35,7 @@ common_src_files := \
   apps/asn1pars.c \
   apps/ca.c \
   apps/ciphers.c \
+  apps/cms.c \
   apps/crl.c \
   apps/crl2p7.c \
   apps/dgst.c \

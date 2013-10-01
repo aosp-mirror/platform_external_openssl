@@ -14,9 +14,6 @@
 #ifndef OPENSSL_NO_CAST
 # define OPENSSL_NO_CAST
 #endif
-#ifndef OPENSSL_NO_CMS
-# define OPENSSL_NO_CMS
-#endif
 #ifndef OPENSSL_NO_DTLS1
 # define OPENSSL_NO_DTLS1
 #endif
@@ -100,9 +97,6 @@
 # endif
 # if defined(OPENSSL_NO_CAST) && !defined(NO_CAST)
 #  define NO_CAST
-# endif
-# if defined(OPENSSL_NO_CMS) && !defined(NO_CMS)
-#  define NO_CMS
 # endif
 # if defined(OPENSSL_NO_DTLS1) && !defined(NO_DTLS1)
 #  define NO_DTLS1
