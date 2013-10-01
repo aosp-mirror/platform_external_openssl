@@ -171,6 +171,19 @@ common_src_files := \
   crypto/cmac/cm_ameth.c \
   crypto/cmac/cm_pmeth.c \
   crypto/cmac/cmac.c \
+  crypto/cms/cms_asn1.c \
+  crypto/cms/cms_att.c \
+  crypto/cms/cms_cd.c \
+  crypto/cms/cms_dd.c \
+  crypto/cms/cms_enc.c \
+  crypto/cms/cms_env.c \
+  crypto/cms/cms_err.c \
+  crypto/cms/cms_ess.c \
+  crypto/cms/cms_io.c \
+  crypto/cms/cms_lib.c \
+  crypto/cms/cms_pwri.c \
+  crypto/cms/cms_sd.c \
+  crypto/cms/cms_smime.c \
   crypto/comp/c_rle.c \
   crypto/comp/c_zlib.c \
   crypto/comp/comp_err.c \
