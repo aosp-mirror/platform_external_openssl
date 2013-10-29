@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ea7bc23_5f147b53",
+        "filename": "ssl/ssl_sess.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 972,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2013-10-29T16:02:55Z",
+      "side": 1,
+      "message": "I suppose there is no STACK_OF(SSL_SESSION) ...",
+      "revId": "d3b44c57bd36ab7129e38085de5a8306a5f2c521",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fe62ccbe_2f6eb42d",
+        "filename": "ssl/ssl_sess.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 998,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2013-10-29T16:02:55Z",
+      "side": 1,
+      "message": "ws",
+      "revId": "d3b44c57bd36ab7129e38085de5a8306a5f2c521",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1e5ec0fd_cd81bfbf",
+        "filename": "ssl/ssl_sess.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1023,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2013-10-29T16:02:55Z",
+      "side": 1,
+      "message": "This should move up to the top of the function.",
+      "revId": "d3b44c57bd36ab7129e38085de5a8306a5f2c521",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
