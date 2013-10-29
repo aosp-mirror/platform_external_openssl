@@ -546,12 +546,12 @@ function generatepatch() {
   declare -r patch=$1
 
   # Cleanup stray files before generating patch
-  find $BOUNCYCASTLE_DIR -type f -name "*.orig" -print0 | xargs -0 rm -f
-  find $BOUNCYCASTLE_DIR -type f -name "*~" -print0 | xargs -0 rm -f
+  find $OPENSSL_DIR -type f -name "*.orig" -print0 | xargs -0 rm -f
+  find $OPENSSL_DIR -type f -name "*~" -print0 | xargs -0 rm -f
 
-  declare -r variable_name=OPENSSL_PATCHES_`basename $patch .patch | sed s/-/_/`_SOURCES
-  # http://tldp.org/LDP/abs/html/ivr.html
-  eval declare -r sources=\$$variable_name
+  # Find the files the patch touches and only keep those in the output patch
+  declare -r sources=`patch -p1 --dry-run -d $OPENSSL_DIR < $patch  | awk '/^patching file / { print $3 }'`
+
   rm -f $patch
   touch $patch
   for i in $sources; do
