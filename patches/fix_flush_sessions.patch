@@ -1,0 +1,78 @@
+diff --git a/ssl/ssl_sess.c b/ssl/ssl_sess.c
+index 920b763..4f028a0 100644
+--- a/ssl/ssl_sess.c
++++ b/ssl/ssl_sess.c
+@@ -969,6 +969,7 @@ typedef struct timeout_param_st
+ 	{
+ 	SSL_CTX *ctx;
+ 	long time;
++	_STACK *expired_list;
+ 	LHASH_OF(SSL_SESSION) *cache;
+ 	} TIMEOUT_PARAM;
+ 
+@@ -976,34 +977,57 @@ static void timeout_doall_arg(SSL_SESSION *s, TIMEOUT_PARAM *p)
+ 	{
+ 	if ((p->time == 0) || (p->time > (s->time+s->timeout))) /* timeout */
+ 		{
+-		/* The reason we don't call SSL_CTX_remove_session() is to
+-		 * save on locking overhead */
+-		(void)lh_SSL_SESSION_delete(p->cache,s);
+-		SSL_SESSION_list_remove(p->ctx,s);
+-		s->not_resumable=1;
+-		if (p->ctx->remove_session_cb != NULL)
+-			p->ctx->remove_session_cb(p->ctx,s);
+-		SSL_SESSION_free(s);
++		/* Don't delete the session here because this modifies the
++		 * hash table being iterated on. Simply record it in the
++		 * expired_list stack instead. */
++		sk_push(p->expired_list, s);
+ 		}
+ 	}
+ 
++static void delete_expired_ssl_session(SSL_SESSION *s, TIMEOUT_PARAM *p)
++	{
++	/* The reason we don't call SSL_CTX_remove_session() is to
++	 * save on locking overhead */
++	(void)lh_SSL_SESSION_delete(p->cache,s);
++	SSL_SESSION_list_remove(p->ctx,s);
++	s->not_resumable=1;
++	if (p->ctx->remove_session_cb != NULL)
++		p->ctx->remove_session_cb(p->ctx,s);
++	SSL_SESSION_free(s);
++	}
++
+ static IMPLEMENT_LHASH_DOALL_ARG_FN(timeout, SSL_SESSION, TIMEOUT_PARAM)
+ 
+ void SSL_CTX_flush_sessions(SSL_CTX *s, long t)
+ 	{
+ 	unsigned long i;
++	int n;
+ 	TIMEOUT_PARAM tp;
+ 
+ 	tp.ctx=s;
+ 	tp.cache=s->sessions;
+ 	if (tp.cache == NULL) return;
+ 	tp.time=t;
++	tp.expired_list = sk_new_null();
++	if (!tp.expired_list) return;
++
+ 	CRYPTO_w_lock(CRYPTO_LOCK_SSL_CTX);
++
++	/* First, collect all expired sessions in 'expired_list' */
+ 	i=CHECKED_LHASH_OF(SSL_SESSION, tp.cache)->down_load;
+ 	CHECKED_LHASH_OF(SSL_SESSION, tp.cache)->down_load=0;
+ 	lh_SSL_SESSION_doall_arg(tp.cache, LHASH_DOALL_ARG_FN(timeout),
+ 				 TIMEOUT_PARAM, &tp);
+ 	CHECKED_LHASH_OF(SSL_SESSION, tp.cache)->down_load=i;
++
++	/* Second, delete all expired sessions. */
++	for (n = 0; n < sk_num(tp.expired_list); ++n)
++		{
++		SSL_SESSION *session = sk_value(tp.expired_list, n);
++		delete_expired_ssl_session(session, &tp);
++		}
++
++	sk_free(tp.expired_list);
+ 	CRYPTO_w_unlock(CRYPTO_LOCK_SSL_CTX);
+ 	}
+ 
