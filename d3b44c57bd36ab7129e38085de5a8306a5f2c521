@@ -89,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "de8ee8b0_e4686e24",
+        "filename": "ssl/ssl_sess.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1017,
+      "author": {
+        "id": 1000411
+      },
+      "writtenOn": "2013-10-29T16:51:27Z",
+      "side": 1,
+      "message": "Yes, I think it\u0027s safe now and I\u0027ve removed it. However I don\u0027t trust the implementation of the linear hash function to really be correct. Have you seen the comments in doall_util_fn() ? Clearly the authors had no clue why they were having problems :-/",
+      "parentUuid": "1ed08087_317bb22c",
+      "revId": "d3b44c57bd36ab7129e38085de5a8306a5f2c521",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1e5ec0fd_cd81bfbf",
         "filename": "ssl/ssl_sess.c",
         "patchSetId": 1
