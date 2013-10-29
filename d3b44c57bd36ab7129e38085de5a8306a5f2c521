@@ -72,6 +72,23 @@
     },
     {
       "key": {
+        "uuid": "1ed08087_317bb22c",
+        "filename": "ssl/ssl_sess.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1017,
+      "author": {
+        "id": 1031048
+      },
+      "writtenOn": "2013-10-29T16:43:34Z",
+      "side": 1,
+      "message": "I\u0027m not very familiar with openssl code, but can we get rid of this down_load fiddling now that entries are deleted outside the loop? It looks like that\u0027s only to make deleting entries inside a doall callback work.\n\nhttps://www.openssl.org/docs/crypto/lhash.html\n\nThough if this is the cause, that documentation seems off. Perhaps the problem is this comparison in lh_delete:\n\n\tif ((lh-\u003enum_nodes \u003e MIN_NODES) \u0026\u0026\n\t\t(lh-\u003edown_load \u003e\u003d (lh-\u003enum_items*LH_LOAD_MULT/lh-\u003enum_nodes)))\n\t\tcontract(lh);\n\nIf num_items is less than 1/256th (LH_LOAD_MULT \u003d 256) of num_nodes, then the division could round to 0 and still contract. And if, say, we have a fairly full session cache, stop using the browser for a while, and then call SSL_CTX_flush_sessions with most of those sessions expired, I could imagine the load getting off enough for that to happen. Or perhaps we just never end up deleting sessions through other codepaths, so the table has no chance to contract.\n\n(Short of contractions, it seems the doall_util_fn should be fine with the callback deleting things? It does read a-\u003enext before calling.)",
+      "revId": "d3b44c57bd36ab7129e38085de5a8306a5f2c521",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1e5ec0fd_cd81bfbf",
         "filename": "ssl/ssl_sess.c",
         "patchSetId": 1
