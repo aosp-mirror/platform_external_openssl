@@ -225,9 +225,6 @@ void _CONF_free_data(CONF *conf)
 	{
 	if (conf == NULL || conf->data == NULL) return;
 
-	lh_CONF_VALUE_down_load(conf->data)=0; /* evil thing to make
-				  * sure the 'OPENSSL_free()' works as
-				  * expected */
 	lh_CONF_VALUE_doall_arg(conf->data,
 				LHASH_DOALL_ARG_FN(value_free_hash),
 				LHASH_OF(CONF_VALUE), conf->data);
