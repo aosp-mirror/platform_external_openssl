@@ -163,6 +163,7 @@ typedef struct lhash_st
 	unsigned long num_hash_comps;
 
 	int error;
+	int iteration_state;
 	} _LHASH;	/* Do not use _LHASH directly, use LHASH_OF
 			 * and friends */
 
