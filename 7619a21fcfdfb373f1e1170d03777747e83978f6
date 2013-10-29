@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1e5ec0fd_3017eebe",
+        "filename": "import_openssl.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 552,
+      "author": {
+        "id": 1003723
+      },
+      "writtenOn": "2013-10-29T17:25:09Z",
+      "side": 1,
+      "message": "long term this should probably go. it doesn\u0027t deal with the case when a new file needs to be touched to deal with a patch still. but better than before.",
+      "revId": "7619a21fcfdfb373f1e1170d03777747e83978f6",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
