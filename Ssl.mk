@@ -1,4 +1,4 @@
-local_c_flags :=
+local_c_flags := -Wno-unused-parameter -Wno-missing-field-initializers
 
 local_c_includes := $(log_c_includes)
 
@@ -69,6 +69,7 @@ include $(BUILD_HOST_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 include $(LOCAL_PATH)/android-config.mk
 LOCAL_SRC_FILES:= ssl/ssltest.c
+LOCAL_CFLAGS += $(host_c_flags)
 LOCAL_C_INCLUDES += $(host_c_includes)
 LOCAL_SHARED_LIBRARIES := libssl libcrypto $(log_shared_libraries)
 LOCAL_MODULE:= ssltest
