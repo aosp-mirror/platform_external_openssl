@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ee71194_0875cb5b",
+        "filename": "crypto/lhash/lhash.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1019036
+      },
+      "writtenOn": "2013-11-04T16:06:49Z",
+      "side": 1,
+      "message": "s/macros/macro/",
+      "revId": "315ef2af6efe7303fd977c9c15c50bc6a83ee3ef",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ee71194_c87ec33f",
+        "filename": "crypto/lhash/lhash.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1019036
+      },
+      "writtenOn": "2013-11-04T16:06:49Z",
+      "side": 1,
+      "message": "I don\u0027t understand this.\n\n\"exact division\", to me, is undefined when b does not divide a.\n\n\"integer division\" (for positive numbers) is means rounding down.\n\nSo, if a//b is defined then it\u0027s equal to a/b, no?",
+      "revId": "315ef2af6efe7303fd977c9c15c50bc6a83ee3ef",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ef1194f_a6105265",
+        "filename": "crypto/lhash/lhash.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 1019036
+      },
+      "writtenOn": "2013-11-04T16:06:49Z",
+      "side": 1,
+      "message": "Clean up these comments? (Maybe by deleting them.)",
+      "revId": "315ef2af6efe7303fd977c9c15c50bc6a83ee3ef",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
