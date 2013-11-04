@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1e2401a3_b92abb8f",
+        "filename": "crypto/lhash/lhash.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1000411
+      },
+      "writtenOn": "2013-11-04T16:54:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ee71194_0875cb5b",
+      "revId": "315ef2af6efe7303fd977c9c15c50bc6a83ee3ef",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9ee71194_c87ec33f",
         "filename": "crypto/lhash/lhash.c",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "3e446556_8ff675ac",
+        "filename": "crypto/lhash/lhash.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1000411
+      },
+      "writtenOn": "2013-11-04T16:54:30Z",
+      "side": 1,
+      "message": "It means the division operation over real numbers (i.e. the strictest mathematical interpretation). The result of (a // b) is a real number, which is not always expressible as an int or a double. But the difference with an integer is bounded, expressed as epsilon. I\u0027ve updated this comment to make this clearer.",
+      "parentUuid": "9ee71194_c87ec33f",
+      "revId": "315ef2af6efe7303fd977c9c15c50bc6a83ee3ef",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5ef1194f_a6105265",
         "filename": "crypto/lhash/lhash.c",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2013-11-04T16:06:49Z",
       "side": 1,
       "message": "Clean up these comments? (Maybe by deleting them.)",
+      "revId": "315ef2af6efe7303fd977c9c15c50bc6a83ee3ef",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3e446556_afa7f99f",
+        "filename": "crypto/lhash/lhash.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 1000411
+      },
+      "writtenOn": "2013-11-04T16:54:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ef1194f_a6105265",
       "revId": "315ef2af6efe7303fd977c9c15c50bc6a83ee3ef",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
