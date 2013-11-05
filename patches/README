@@ -37,3 +37,8 @@ alpn.patch
 This change adds support for ALPN in OpenSSL. ALPN is the IETF
 blessed version of NPN and we'll be supporting both ALPN and NPN for
 some time yet.
+
+cbc_record_splitting.patch
+
+BEAST attack client-side mitigation. Removes 0/n record splitting, adds 1/n-1
+record splitting. Record splitting is disabled by default.
