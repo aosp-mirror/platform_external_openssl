@@ -1,4 +1,4 @@
-local_c_flags := -Wno-missing-field-initializers -Wno-unused-parameter -Wno-sometimes-uninitialized
+local_c_flags := -Wno-missing-field-initializers -Wno-unused-parameter
 
 local_c_includes := $(log_c_includes)
 

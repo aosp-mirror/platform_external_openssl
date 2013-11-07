@@ -3,7 +3,7 @@
 LOCAL_PATH:= $(call my-dir)
 
 local_c_includes :=
-local_c_flags := -Wno-missing-field-initializers -Wno-unused-parameter -Wno-sometimes-uninitialized
+local_c_flags := -Wno-missing-field-initializers -Wno-unused-parameter
 
 local_additional_dependencies := $(LOCAL_PATH)/android-config.mk $(LOCAL_PATH)/Apps.mk
 
