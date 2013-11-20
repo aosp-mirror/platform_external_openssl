@@ -108,7 +108,7 @@ const RAND_METHOD *RAND_get_rand_method(void)
 			funct_ref = e;
 		else
 #endif
-			default_RAND_meth = RAND_SSLeay();
+			default_RAND_meth = RAND_Raw();
 		}
 	return default_RAND_meth;
 	}

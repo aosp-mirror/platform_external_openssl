@@ -441,6 +441,7 @@ common_src_files := \
   crypto/rand/rand_unix.c \
   crypto/rand/rand_win.c \
   crypto/rand/randfile.c \
+  crypto/rand/raw_rand.c \
   crypto/rc2/rc2_cbc.c \
   crypto/rc2/rc2_ecb.c \
   crypto/rc2/rc2_skey.c \
