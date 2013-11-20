@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9e08f1da_906b8134",
+        "filename": "crypto/rand/raw_rand.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2013-11-20T07:35:18Z",
+      "side": 1,
+      "message": "Separate locks for random/psuedorandom?",
+      "revId": "136cf62fc2dbd9861ad8f91abe063bdf9e69f888",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9e08f1da_b06e8543",
+        "filename": "crypto/rand/raw_rand.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2013-11-20T07:35:18Z",
+      "side": 1,
+      "message": "Check that this function should return 0/1 or num_bytes",
+      "revId": "136cf62fc2dbd9861ad8f91abe063bdf9e69f888",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fe71ed53_24dff67e",
+        "filename": "crypto/rand/raw_rand.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2013-11-20T07:35:18Z",
+      "side": 1,
+      "message": "This needs to be moved to a pthread_once or equivalent apparently. Also check return value.",
+      "revId": "136cf62fc2dbd9861ad8f91abe063bdf9e69f888",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
