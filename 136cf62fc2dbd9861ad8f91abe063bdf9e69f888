@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "fe71ed53_6fcab736",
+        "filename": "crypto/rand/raw_rand.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1018773
+      },
+      "writtenOn": "2013-11-20T19:20:30Z",
+      "side": 1,
+      "message": "Please document:\n1. what this RAND implementation does (in particular, why /dev/random is used rather than just /dev/urandom, and how RAND_bytes and RAND_pseudo_bytes differ),\n2. how seeding works in the face of buffering (seeding must starting having effect from the very next byte read from RAND),\n2. how thread-safety is ensured.",
+      "revId": "136cf62fc2dbd9861ad8f91abe063bdf9e69f888",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fe71ed53_cf616b99",
+        "filename": "crypto/rand/raw_rand.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1018773
+      },
+      "writtenOn": "2013-11-20T19:20:30Z",
+      "side": 1,
+      "message": "Why 1024, rather than, say, 8 or 16? In fact, why buffer at all?",
+      "revId": "136cf62fc2dbd9861ad8f91abe063bdf9e69f888",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9e08f1da_906b8134",
         "filename": "crypto/rand/raw_rand.c",
         "patchSetId": 3
