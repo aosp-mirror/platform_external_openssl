@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "5ed03988_20eeb030",
+        "filename": "crypto/rand/raw_rand.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1018773
+      },
+      "writtenOn": "2013-11-26T01:16:00Z",
+      "side": 1,
+      "message": "How does using no buffering (or, perhaps, 8-16 bytes of buffering) affect the current performance test results? CSRNG is not expected to be lighting-fast. So, if an app\u0027s once in a while invocation of SecureRandom.nextBytes() takes less than 10ms we\u0027re probably fine. My suspicion is that the only place where using no buffering may realistically matter is in RSA (and DSA?) key generation where OpenSSL invokes RAND_bytes many times in a tight loop. Do you have some numbers?",
+      "parentUuid": "5ed03988_9af70ba9",
+      "revId": "136cf62fc2dbd9861ad8f91abe063bdf9e69f888",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9e08f1da_906b8134",
         "filename": "crypto/rand/raw_rand.c",
         "patchSetId": 3
