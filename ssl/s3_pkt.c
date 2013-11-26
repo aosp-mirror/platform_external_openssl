@@ -603,7 +603,7 @@ int ssl3_write_bytes(SSL *s, int type, const void *buf_, int len)
 		{
 		/* max contains the maximum number of bytes that we can put
 		 * into a record. */
-		int max = s->max_send_fragment;
+		unsigned max = s->max_send_fragment;
 		/* fragment is true if do_ssl3_write should send the first byte
 		 * in its own record in order to randomise a CBC IV. */
 		int fragment = 0;
