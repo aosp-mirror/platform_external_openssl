@@ -1,7 +1,7 @@
-From 09a7b35e88a23f3ea006c03d3cee175f82d980db Mon Sep 17 00:00:00 2001
+From 6d65fc2d2bd6d6f4a5de364ff2cf7ec2da8f5037 Mon Sep 17 00:00:00 2001
 From: Adam Langley <agl@chromium.org>
 Date: Thu, 31 Oct 2013 13:22:54 -0400
-Subject: [PATCH 50/51] CBC record splitting.
+Subject: [PATCH 50/53] CBC record splitting.
 
 This patch removes support for empty records (which is almost
 universally disabled via SSL_OP_ALL) and adds optional support for 1/n-1
@@ -223,7 +223,7 @@ index 191b86b..6358e1b 100644
  	SSLerr(SSL_F_SSL3_SETUP_KEY_BLOCK,ERR_R_MALLOC_FAILURE);
  	return(0);
 diff --git a/ssl/s3_pkt.c b/ssl/s3_pkt.c
-index 04b474d..70af882 100644
+index 04b474d..d690493 100644
 --- a/ssl/s3_pkt.c
 +++ b/ssl/s3_pkt.c
 @@ -118,7 +118,7 @@
@@ -243,7 +243,7 @@ index 04b474d..70af882 100644
 -			nw=s->max_send_fragment;
 +		/* max contains the maximum number of bytes that we can put
 +		 * into a record. */
-+		int max = s->max_send_fragment;
++		unsigned max = s->max_send_fragment;
 +		/* fragment is true if do_ssl3_write should send the first byte
 +		 * in its own record in order to randomise a CBC IV. */
 +		int fragment = 0;
