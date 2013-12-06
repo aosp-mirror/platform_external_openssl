@@ -225,9 +225,12 @@
 /* Should we define BN_DIV2W here? */
 
 /* Only one for the following should be defined */
-#undef SIXTY_FOUR_BIT_LONG
 #undef SIXTY_FOUR_BIT
+#if defined(__LP64__)
+#define SIXTY_FOUR_BIT_LONG
+#else
 #define THIRTY_TWO_BIT
+#endif
 #endif
 
 #if defined(HEADER_RC4_LOCL_H) && !defined(CONFIG_HEADER_RC4_LOCL_H)
