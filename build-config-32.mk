@@ -31,4 +31,5 @@ openssl_cflags := \
   -DOPENSSL_NO_STATIC_ENGINE \
   -DOPENSSL_NO_STORE \
   -DOPENSSL_NO_WHIRLPOOL \
+  -I$(LOCAL_PATH)/config/generic-32/include \
 
