@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "83e41a52_555d6cd6",
+        "filename": "include/openssl/opensslconf.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1003723
+      },
+      "writtenOn": "2013-12-09T08:36:32Z",
+      "side": 1,
+      "message": "note... generated file.",
+      "revId": "8106d8066647b4135411570d2043614c657eb8c2",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "83e41a52_355a68e0",
+        "filename": "include/openssl/opensslconf.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 1003723
+      },
+      "writtenOn": "2013-12-09T08:36:32Z",
+      "side": 1,
+      "message": "this file is created by import_openssl.sh running ./Configure so  patching the file like this won\u0027t work as the changes will be clobbered when import_openssl.sh is run.\n\npresumably we can change import_openssl.sh to run ./Configure twice to produce two opensslconf.h files in two different output directories, one 32-bit, one 64-bit, and then have the makefile select right one based on existing architecture defines in the makefiles.",
+      "revId": "8106d8066647b4135411570d2043614c657eb8c2",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
