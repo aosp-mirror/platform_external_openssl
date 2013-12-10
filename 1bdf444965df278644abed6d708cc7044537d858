@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "83e41a52_5418c58e",
+        "filename": "Android.mk",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1003224
+      },
+      "writtenOn": "2013-12-10T20:46:16Z",
+      "side": 1,
+      "message": "if there isn\u0027t anything already available, we should probably add something to the build system to signify \"any 64-bit target\". otherwise we\u0027re going to be filtering lists everywhere.",
+      "revId": "1bdf444965df278644abed6d708cc7044537d858",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "83809a7a_9565147a",
+        "filename": "import_openssl.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 1003224
+      },
+      "writtenOn": "2013-12-10T20:46:16Z",
+      "side": 1,
+      "message": "ws",
+      "revId": "1bdf444965df278644abed6d708cc7044537d858",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
