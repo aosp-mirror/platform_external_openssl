@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "83e41a52_5427259a",
+        "filename": "Android.mk",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1003981
+      },
+      "writtenOn": "2013-12-10T20:56:36Z",
+      "side": 1,
+      "message": "If necessary we can add a global variable TARGET_IS_64_BIT and define it in build/core/combo/TARGET_linux-aarch64.mk and build/core/combo/TARGET_linux-x86_64.mk.",
+      "parentUuid": "83e41a52_5418c58e",
+      "revId": "1bdf444965df278644abed6d708cc7044537d858",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "83e41a52_74498979",
         "filename": "crypto/opensslconf.h",
         "patchSetId": 2
