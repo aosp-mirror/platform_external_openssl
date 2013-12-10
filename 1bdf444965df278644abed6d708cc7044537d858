@@ -19,6 +19,40 @@
     },
     {
       "key": {
+        "uuid": "83e41a52_74498979",
+        "filename": "crypto/opensslconf.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2013-12-10T20:49:59Z",
+      "side": 1,
+      "message": "these should be \"opensslconf-64.h\" instead of brackets",
+      "revId": "1bdf444965df278644abed6d708cc7044537d858",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "83e41a52_f47919ad",
+        "filename": "crypto/opensslconf.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2013-12-10T20:49:59Z",
+      "side": 1,
+      "message": "#include \"opensslconf-32.h\"",
+      "revId": "1bdf444965df278644abed6d708cc7044537d858",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "43eea235_3eb9a0ff",
         "filename": "import_openssl.sh",
         "patchSetId": 2
