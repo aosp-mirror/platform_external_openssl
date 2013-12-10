@@ -13,14 +13,9 @@ include $(LOCAL_PATH)/android-config.mk
 
 LOCAL_SHARED_LIBRARIES := $(log_shared_libraries)
 
-# If we're building an unbundled build, don't try to use clang since it's not
-# in the NDK yet. This can be removed when a clang version that is fast enough
-# in the NDK.
-ifeq (,$(TARGET_BUILD_APPS))
-LOCAL_CLANG := true
-else
+# The static library should be used in only unbundled apps
+# and we don't have clang in unbundled build yet.
 LOCAL_SDK_VERSION := 9
-endif
 
 LOCAL_SRC_FILES += $(target_src_files)
 LOCAL_CFLAGS += $(target_c_flags)
