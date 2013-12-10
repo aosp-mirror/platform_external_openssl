@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "43eea235_3eb9a0ff",
+        "filename": "import_openssl.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2013-12-10T20:47:24Z",
+      "side": 1,
+      "message": "this also needs:\n  cp -f crypto/opensslconf-$2.h include/openssl/opensslconf-$2.h",
+      "revId": "1bdf444965df278644abed6d708cc7044537d858",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "83809a7a_9565147a",
         "filename": "import_openssl.sh",
         "patchSetId": 2
