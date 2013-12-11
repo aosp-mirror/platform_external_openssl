@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "08f84737_dda8cb75",
+        "filename": "Android.mk",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1037003
+      },
+      "writtenOn": "2013-12-11T13:24:33Z",
+      "side": 1,
+      "message": "I added this variable in patch https://android-review.googlesource.com/72002",
+      "parentUuid": "83e41a52_5427259a",
+      "revId": "1bdf444965df278644abed6d708cc7044537d858",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "83e41a52_74498979",
         "filename": "crypto/opensslconf.h",
         "patchSetId": 2
