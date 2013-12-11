@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "e31f9643_c4b7debd",
+        "filename": "Android.mk",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1037003
+      },
+      "writtenOn": "2013-12-11T13:07:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "08f84737_3d39eff0",
+      "revId": "1bdf444965df278644abed6d708cc7044537d858",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "83e41a52_74498979",
         "filename": "crypto/opensslconf.h",
         "patchSetId": 2
@@ -88,6 +106,42 @@
     },
     {
       "key": {
+        "uuid": "08f84737_5d9ddb50",
+        "filename": "crypto/opensslconf.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1037003
+      },
+      "writtenOn": "2013-12-11T13:07:34Z",
+      "side": 1,
+      "message": "Not needed in new patch",
+      "parentUuid": "83e41a52_74498979",
+      "revId": "1bdf444965df278644abed6d708cc7044537d858",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "08f84737_9dcb635a",
+        "filename": "crypto/opensslconf.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1037003
+      },
+      "writtenOn": "2013-12-11T13:07:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a8101b3f_da46856b",
+      "revId": "1bdf444965df278644abed6d708cc7044537d858",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "83e41a52_f47919ad",
         "filename": "crypto/opensslconf.h",
         "patchSetId": 2
@@ -99,6 +153,24 @@
       "writtenOn": "2013-12-10T20:49:59Z",
       "side": 1,
       "message": "#include \"opensslconf-32.h\"",
+      "revId": "1bdf444965df278644abed6d708cc7044537d858",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e31f9643_64c9ca3e",
+        "filename": "crypto/opensslconf.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1037003
+      },
+      "writtenOn": "2013-12-11T13:07:34Z",
+      "side": 1,
+      "message": "Not needed in new patch",
+      "parentUuid": "83e41a52_f47919ad",
       "revId": "1bdf444965df278644abed6d708cc7044537d858",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
@@ -122,6 +194,24 @@
     },
     {
       "key": {
+        "uuid": "e31f9643_44ccce4f",
+        "filename": "import_openssl.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1037003
+      },
+      "writtenOn": "2013-12-11T13:07:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "43eea235_3eb9a0ff",
+      "revId": "1bdf444965df278644abed6d708cc7044537d858",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "83809a7a_9565147a",
         "filename": "import_openssl.sh",
         "patchSetId": 2
@@ -133,6 +223,24 @@
       "writtenOn": "2013-12-10T20:46:16Z",
       "side": 1,
       "message": "ws",
+      "revId": "1bdf444965df278644abed6d708cc7044537d858",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "08f84737_7d989762",
+        "filename": "import_openssl.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 1037003
+      },
+      "writtenOn": "2013-12-11T13:07:34Z",
+      "side": 1,
+      "message": "Not needed in new patch",
+      "parentUuid": "83809a7a_9565147a",
       "revId": "1bdf444965df278644abed6d708cc7044537d858",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
