@@ -37,6 +37,23 @@
     },
     {
       "key": {
+        "uuid": "08f84737_3d39eff0",
+        "filename": "Android.mk",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000411
+      },
+      "writtenOn": "2013-12-11T10:24:24Z",
+      "side": 1,
+      "message": "Why a double $ here? Secondary expansion doesn\u0027t seem necessary here.",
+      "revId": "1bdf444965df278644abed6d708cc7044537d858",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "83e41a52_74498979",
         "filename": "crypto/opensslconf.h",
         "patchSetId": 2
@@ -48,6 +65,23 @@
       "writtenOn": "2013-12-10T20:49:59Z",
       "side": 1,
       "message": "these should be \"opensslconf-64.h\" instead of brackets",
+      "revId": "1bdf444965df278644abed6d708cc7044537d858",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a8101b3f_da46856b",
+        "filename": "crypto/opensslconf.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1000411
+      },
+      "writtenOn": "2013-12-11T10:24:24Z",
+      "side": 1,
+      "message": "Why is this necessary? We used to instead place the headers under different top-level directories (e.g. config/generic-32/include/ config/generic-64/include/) and adjust the include path in the Android.mk instead.\n\nIt seems a better solution to me, and will allow more fine-tuning of the config file in the future if needed without auto-generating more stuff.",
       "revId": "1bdf444965df278644abed6d708cc7044537d858",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
