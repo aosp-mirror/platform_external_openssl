@@ -90,6 +90,24 @@
     },
     {
       "key": {
+        "uuid": "e8a77388_a429429f",
+        "filename": "Android.mk",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1037003
+      },
+      "writtenOn": "2013-12-12T08:57:10Z",
+      "side": 1,
+      "message": "Used TARGET_IS_64_BIT in patch set 4",
+      "parentUuid": "08f84737_dda8cb75",
+      "revId": "1bdf444965df278644abed6d708cc7044537d858",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "83e41a52_74498979",
         "filename": "crypto/opensslconf.h",
         "patchSetId": 2
