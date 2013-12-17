@@ -13,7 +13,11 @@ include $(LOCAL_PATH)/android-config.mk
 
 # The static library should be used in only unbundled apps
 # and we don't have clang in unbundled build yet.
+ifeq ($(TARGET_ARCH),aarch64)
+$(info TODOAArch64: $(LOCAL_PATH)/Android.mk : Use NDK once it is available for AArch64)
+else
 LOCAL_SDK_VERSION := 9
+endif
 
 LOCAL_SRC_FILES += $(target_src_files)
 LOCAL_CFLAGS += $(target_c_flags)

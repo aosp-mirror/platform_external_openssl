@@ -261,7 +261,7 @@ print_defines_in_mk() {
 function generate_config_mk() {
   declare -r output="$1"
   declare -r prefix="$2"
-  declare -r all_archs="arm x86 x86_64 mips"
+  declare -r all_archs="arm aarch64 x86 x86_64 mips"
 
   echo "Generating $(basename $output)"
   (
