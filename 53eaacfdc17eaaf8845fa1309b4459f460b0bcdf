@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "884ef754_b1b140cb",
+        "filename": "Android.mk",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1037003
+      },
+      "writtenOn": "2013-12-19T15:34:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a832dbd0_8ab08be7",
+      "revId": "53eaacfdc17eaaf8845fa1309b4459f460b0bcdf",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "884ef754_115e8cd3",
         "filename": "import_openssl.sh",
         "patchSetId": 5
@@ -30,6 +48,24 @@
       "writtenOn": "2013-12-19T15:05:11Z",
       "side": 1,
       "message": "nit: trailing whitespace.",
+      "revId": "53eaacfdc17eaaf8845fa1309b4459f460b0bcdf",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8438f32_2bff9983",
+        "filename": "import_openssl.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 1037003
+      },
+      "writtenOn": "2013-12-19T15:34:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "884ef754_115e8cd3",
       "revId": "53eaacfdc17eaaf8845fa1309b4459f460b0bcdf",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
