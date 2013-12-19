@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a832dbd0_8ab08be7",
+        "filename": "Android.mk",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000411
+      },
+      "writtenOn": "2013-12-19T15:05:11Z",
+      "side": 1,
+      "message": "nit: Still a $$ instead of $ here :-)",
+      "revId": "53eaacfdc17eaaf8845fa1309b4459f460b0bcdf",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "884ef754_115e8cd3",
+        "filename": "import_openssl.sh",
+        "patchSetId": 5
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 1000411
+      },
+      "writtenOn": "2013-12-19T15:05:11Z",
+      "side": 1,
+      "message": "nit: trailing whitespace.",
+      "revId": "53eaacfdc17eaaf8845fa1309b4459f460b0bcdf",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
