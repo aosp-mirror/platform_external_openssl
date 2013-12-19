@@ -661,8 +661,10 @@ x86_64_src_files := \
 x86_64_exclude_files := \
   crypto/aes/aes_cbc.c \
   crypto/aes/aes_core.c \
+  crypto/bn/bn_asm.c \
   crypto/mem_clr.c \
   crypto/rc4/rc4_enc.c \
+  crypto/rc4/rc4_skey.c \
 
 mips_c_flags := \
   -DAES_ASM \
