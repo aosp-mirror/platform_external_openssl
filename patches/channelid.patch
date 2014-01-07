@@ -697,9 +697,9 @@
 --- openssl-1.0.1e.orig/ssl/ssl3.h	2013-03-05 18:49:33.223297173 +0000
 +++ openssl-1.0.1e/ssl/ssl3.h	2013-03-05 18:49:33.413299231 +0000
 @@ -539,6 +539,17 @@ typedef struct ssl3_state_st
- 	/* Set if we saw the Next Protocol Negotiation extension from our peer. */
- 	int next_proto_neg_seen;
- #endif
+	 char is_probably_safari;
+ #endif /* !OPENSSL_NO_EC */
+ #endif /* !OPENSSL_NO_TLSEXT */
 +
 +	/* In a client, this means that the server supported Channel ID and that
 +	 * a Channel ID was sent. In a server it means that we echoed support
