@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ad974d5d_82193a94",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1014443
+      },
+      "writtenOn": "2014-01-08T09:03:33Z",
+      "side": 1,
+      "message": "I had to look at the patches to understand the comment. Reword ?",
+      "revId": "a550722ec120192245e354139d9bf75d729f2ebf",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
