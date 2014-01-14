@@ -27,6 +27,9 @@
 set -e
 trap  "echo WARNING: Exiting on non-zero subprocess exit code" ERR;
 
+# Make sure we're in the right directory.
+cd $(dirname $0)
+
 # Ensure consistent sorting order / tool output.
 export LANG=C
 export LC_ALL=C
@@ -60,7 +63,7 @@ function main() {
     die "openssl.version not found"
   fi
 
-  source openssl.version
+  source ./openssl.version
   if [ "$OPENSSL_VERSION" == "" ]; then
     die "Invalid openssl.version; see README.android for more information"
   fi
@@ -72,7 +75,7 @@ function main() {
     die "openssl.config not found"
   fi
 
-  source openssl.config
+  source ./openssl.config
   if [ "$CONFIGURE_ARGS" == "" -o "$UNNEEDED_SOURCES" == "" -o "$NEEDED_SOURCES" == "" ]; then
     die "Invalid openssl.config; see README.android for more information"
   fi
