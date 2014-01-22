@@ -91,11 +91,11 @@ arm_src_files :=
 
 arm_exclude_files :=
 
-aarch64_c_flags :=
+arm64_c_flags :=
 
-aarch64_src_files :=
+arm64_src_files :=
 
-aarch64_exclude_files :=
+arm64_exclude_files :=
 
 x86_c_flags :=
 
