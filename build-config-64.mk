@@ -1,6 +1,6 @@
 # Auto-generated - DO NOT EDIT!
 # To regenerate, edit openssl.config, then run:
-#     ./import_openssl.sh import /path/to/openssl-1.0.1e.tar.gz
+#     ./import_openssl.sh import /path/to/openssl-1.0.1f.tar.gz
 #
 openssl_cflags := \
   -DOPENSSL_THREADS \
