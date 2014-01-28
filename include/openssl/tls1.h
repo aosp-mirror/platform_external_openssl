@@ -254,6 +254,10 @@ extern "C" {
 /* This is not an IANA defined extension number */
 #define TLSEXT_TYPE_channel_id			30031
 
+/* See https://tools.ietf.org/html/draft-agl-tls-padding-02
+ * Number not yet IANA assigned. */
+#define TLSEXT_TYPE_padding			35655
+
 /* NameType value from RFC 3546 */
 #define TLSEXT_NAMETYPE_host_name 0
 /* status request value from RFC 3546 */

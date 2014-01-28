@@ -487,7 +487,10 @@ static int ssl23_client_hello(SSL *s)
 			{
 			/* create Client Hello in SSL 3.0/TLS 1.0 format */
 
-			/* do the record header (5 bytes) and handshake message header (4 bytes) last */
+			/* do the record header (5 bytes) and handshake message
+			 * header (4 bytes) last. Note: the code to add the
+			 * padding extension in t1_lib.c depends on the size of
+			 * this prefix. */
 			d = p = &(buf[9]);
 			
 			*(p++) = version_major;
