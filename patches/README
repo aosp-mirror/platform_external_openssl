@@ -47,3 +47,9 @@ paddingext.patch
 
 ClientHello padding extension which is added, when needed, to work around bugs
 in F5 terminators.
+
+dsa_nonce.patch
+
+Adds an option to mix in hash of message and private key into (EC)DSA nonces to
+make (EC)DSA more resilient to weaknesses in RNGs used for nonces. The feature
+is disabled by default.
