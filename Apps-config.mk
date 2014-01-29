@@ -126,7 +126,11 @@ target_src_files  := $(common_src_files) $($(target_arch)_src_files)
 target_src_files  := $(filter-out $($(target_arch)_exclude_files), $(target_src_files))
 
 ifeq ($(HOST_OS)-$(HOST_ARCH),linux-x86)
+ifneq ($(BUILD_HOST_64bit),)
+host_arch := x86_64
+else
 host_arch := x86
+endif
 else
 host_arch := unknown_arch
 endif
