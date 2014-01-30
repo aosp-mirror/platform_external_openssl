@@ -16,7 +16,7 @@ include $(LOCAL_PATH)/android-config.mk
 ifeq ($(TARGET_ARCH),arm64)
 $(info TODOArm64: $(LOCAL_PATH)/Android.mk : Use NDK once it is available for Arm64)
 else
-LOCAL_SDK_VERSION := 9
+LOCAL_SDK_VERSION := 19
 endif
 
 LOCAL_SRC_FILES += $(target_src_files)
@@ -39,7 +39,7 @@ include $(LOCAL_PATH)/android-config.mk
 ifeq (,$(TARGET_BUILD_APPS))
 LOCAL_CLANG := true
 else
-LOCAL_SDK_VERSION := 9
+LOCAL_SDK_VERSION := 19
 endif
 
 LOCAL_SRC_FILES += $(target_src_files)
