@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "52811216_e6261bc8",
+        "filename": "Crypto.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1003723
+      },
+      "writtenOn": "2014-01-30T18:59:23Z",
+      "side": 1,
+      "message": "yeah, we didn\u0027t know about this trick at the time. certainly that is an improvement but seems like for a different change.",
+      "parentUuid": "12731a25_8b79f19e",
+      "revId": "d633fb4198cc620f7332536011298b939e49ea66",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "12731a25_eb70a5ae",
         "filename": "Crypto.mk",
         "patchSetId": 1
