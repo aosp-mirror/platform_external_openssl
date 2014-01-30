@@ -2,6 +2,74 @@
   "comments": [
     {
       "key": {
+        "uuid": "12731a25_8b79f19e",
+        "filename": "Crypto.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1003981
+      },
+      "writtenOn": "2014-01-30T18:36:00Z",
+      "side": 1,
+      "message": "Why not build libcrypto from libcrypto_static as a whole static library, instead of compiling every source file once more?\nAlso then we don\u0027t need to include the above 2 .mk files again here.",
+      "revId": "d633fb4198cc620f7332536011298b939e49ea66",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "12731a25_eb70a5ae",
+        "filename": "Crypto.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1003981
+      },
+      "writtenOn": "2014-01-30T18:36:00Z",
+      "side": 1,
+      "message": "Same here.",
+      "revId": "d633fb4198cc620f7332536011298b939e49ea66",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f26f6639_8a156f5e",
+        "filename": "Ssl.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1003981
+      },
+      "writtenOn": "2014-01-30T18:36:00Z",
+      "side": 1,
+      "message": "the same here.",
+      "revId": "d633fb4198cc620f7332536011298b939e49ea66",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "32d9fe6f_ee28df9c",
+        "filename": "Ssl.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1003981
+      },
+      "writtenOn": "2014-01-30T18:36:00Z",
+      "side": 1,
+      "message": "the same here.",
+      "revId": "d633fb4198cc620f7332536011298b939e49ea66",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "92870a29_f59c03a1",
         "filename": "android-config.mk",
         "patchSetId": 1
