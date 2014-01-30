@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "92870a29_f59c03a1",
+        "filename": "android-config.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1002751
+      },
+      "writtenOn": "2014-01-30T08:32:34Z",
+      "side": 1,
+      "message": "build-config-32.mk and build-config-64.mk are identical, do you expect them to diverge?  If not, I can delete one and not have to duplicate this",
+      "revId": "d633fb4198cc620f7332536011298b939e49ea66",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
