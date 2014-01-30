@@ -16,6 +16,24 @@
       "revId": "d633fb4198cc620f7332536011298b939e49ea66",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "92870a29_35f93b69",
+        "filename": "android-config.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1003723
+      },
+      "writtenOn": "2014-01-30T17:31:07Z",
+      "side": 1,
+      "message": "the files are machine generated during import_openssl.sh. currently the OpenSSL Configure script happens to generate the same output for 32 and 64, but it may not always be this way.",
+      "parentUuid": "92870a29_f59c03a1",
+      "revId": "d633fb4198cc620f7332536011298b939e49ea66",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
