@@ -139,6 +139,10 @@ case $HOST_OS in
 esac
 
 # The list of supported Android target architectures.
+
+# NOTE: x86_64 is not ready yet, while the toolchain is in
+# prebuilts/ it doesn't have a sysroot which means it requires
+# a platform build to get Bionic and stuff.
 ANDROID_ARCHS="arm x86 mips"
 
 BUILD_TYPES=
@@ -147,9 +151,8 @@ for ARCH in $ANDROID_ARCHS; do
 done
 ANDROID_BUILD_TYPES=$BUILD_TYPES
 
-# NOTE: The $HOST_OS-x86_64 is currently broken because the single
-#       <openssl/opensslconf.h> header is tailored for 32-bits.
 HOST_BUILD_TYPES="$HOST_OS-x86 $HOST_OS-generic32 $HOST_OS-generic64"
+HOST_BUILD_TYPES="$HOST_BUILD_TYPES $HOST_OS-x86_64"
 
 BUILD_TYPES="$ANDROID_BUILD_TYPES $HOST_BUILD_TYPES"
 
@@ -314,6 +317,9 @@ get_build_arch_target () {
     x86)
       echo "i686-linux-android"
       ;;
+    x86_64)
+      echo "x86_64-linux-android"
+      ;;
     mips)
       echo "mipsel-linux-android"
       ;;
@@ -329,6 +335,13 @@ CLANG_VERSION=3.1
 get_prebuilt_gcc_dir_for_arch () {
   local arch=$1
   local target=$(get_build_arch_target $arch)
+  # Adjust $arch for x86_64 because the prebuilts are actually
+  # under prebuilts/gcc/<host>/x86/
+  case $arch in
+    x86_64)
+        arch=x86
+        ;;
+  esac
   echo "$ANDROID_BUILD_TOP/prebuilts/gcc/$ANDROID_HOST_TAG/$arch/$target-$GCC_VERSION"
 }
 
@@ -623,6 +636,6 @@ case $? in
     dump "Error, try doing the following to inspect the issues:"
     dump "   $PROGNAME --build-dir=/tmp/mybuild"
     dump "   make -C /tmp/mybuild V=1"
-    dump ""
+    dump " "
     ;;
 esac
