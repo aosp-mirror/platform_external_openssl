@@ -7,6 +7,11 @@
 # This script performs minor but required patching for the Android build.
 #
 
+# Intentionally excluded http://b/7079965
+ifneq (,$(filter -DZLIB, $(openssl_cflags)))
+$(error ZLIB should not be enabled in openssl configuration)
+endif
+
 LOCAL_CFLAGS += $(openssl_cflags)
 
 LOCAL_CFLAGS := $(filter-out -DTERMIO, $(LOCAL_CFLAGS))
@@ -21,9 +26,6 @@ LOCAL_CFLAGS += \
   -DENGINESDIR="\"/system/lib/ssl/engines\""
 
 LOCAL_CFLAGS += -Wno-missing-field-initializers -Wno-unused-parameter
-
-# Intentionally excluded http://b/7079965
-LOCAL_CFLAGS := $(filter-out -DZLIB, $(LOCAL_CFLAGS))
 
 # Debug
 # LOCAL_CFLAGS += -DCIPHER_DEBUG
