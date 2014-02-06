@@ -7,11 +7,8 @@ LOCAL_PATH := $(call my-dir)
 # These makefiles are here instead of being Android.mk files in the
 # respective crypto, ssl, and apps directories so
 # that import_openssl.sh import won't remove them.
-ifeq ($(strip $(TARGET_IS_64_BIT)),true)
-  include $(LOCAL_PATH)/build-config-64.mk
-else
-  include $(LOCAL_PATH)/build-config-32.mk
-endif
+include $(LOCAL_PATH)/build-config-64.mk
+include $(LOCAL_PATH)/build-config-32.mk
 include $(LOCAL_PATH)/Crypto.mk
 include $(LOCAL_PATH)/Ssl.mk
 include $(LOCAL_PATH)/Apps.mk
