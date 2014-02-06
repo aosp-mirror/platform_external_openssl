@@ -8,19 +8,16 @@
 #
 
 # Intentionally excluded http://b/7079965
-ifneq (,$(filter -DZLIB, $(openssl_cflags_32) $(openssl_cflags_64)))
+ifneq (,$(filter -DZLIB, $(openssl_cflags)))
 $(error ZLIB should not be enabled in openssl configuration)
 endif
 
-LOCAL_CFLAGS_32 += $(openssl_cflags_32)
-LOCAL_CFLAGS_64 += $(openssl_cflags_32)
+LOCAL_CFLAGS += $(openssl_cflags)
 
-LOCAL_CFLAGS_32 := $(filter-out -DTERMIO, $(LOCAL_CFLAGS_32))
-LOCAL_CFLAGS_64 := $(filter-out -DTERMIO, $(LOCAL_CFLAGS_64))
+LOCAL_CFLAGS := $(filter-out -DTERMIO, $(LOCAL_CFLAGS))
 
 ifeq ($(HOST_OS),windows)
-LOCAL_CFLAGS_32 := $(filter-out -DDSO_DLFCN -DHAVE_DLFCN_H,$(LOCAL_CFLAGS_32))
-LOCAL_CFLAGS_64 := $(filter-out -DDSO_DLFCN -DHAVE_DLFCN_H,$(LOCAL_CFLAGS_64))
+LOCAL_CFLAGS := $(filter-out -DDSO_DLFCN -DHAVE_DLFCN_H,$(LOCAL_CFLAGS))
 endif
 
 # Directories
