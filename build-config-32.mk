@@ -2,7 +2,7 @@
 # To regenerate, edit openssl.config, then run:
 #     ./import_openssl.sh import /path/to/openssl-1.0.1f.tar.gz
 #
-openssl_cflags_32 := \
+openssl_cflags := \
   -DOPENSSL_THREADS \
   -D_REENTRANT \
   -DDSO_DLFCN \
