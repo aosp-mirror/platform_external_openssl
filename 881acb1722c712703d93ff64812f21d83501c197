@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0f3a11a9_2f179866",
+        "filename": "android-config.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1010118
+      },
+      "writtenOn": "2014-02-24T16:24:31Z",
+      "side": 1,
+      "message": "64?",
+      "range": {
+        "startLine": 16,
+        "startChar": 21,
+        "endLine": 16,
+        "endChar": 38
+      },
+      "revId": "881acb1722c712703d93ff64812f21d83501c197",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ef1f7d43_a4ae6263",
+        "filename": "import_openssl.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1010118
+      },
+      "writtenOn": "2014-02-24T16:24:31Z",
+      "side": 1,
+      "message": "not clear why this didn\u0027t set the flag.",
+      "range": {
+        "startLine": 206,
+        "startChar": 10,
+        "endLine": 206,
+        "endChar": 27
+      },
+      "revId": "881acb1722c712703d93ff64812f21d83501c197",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0f3a11a9_0f02dc24",
+        "filename": "import_openssl.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 1010118
+      },
+      "writtenOn": "2014-02-24T16:24:31Z",
+      "side": 1,
+      "message": "ws",
+      "range": {
+        "startLine": 330,
+        "startChar": 87,
+        "endLine": 330,
+        "endChar": 88
+      },
+      "revId": "881acb1722c712703d93ff64812f21d83501c197",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
