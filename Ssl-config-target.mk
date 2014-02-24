@@ -10,11 +10,14 @@
 #    LOCAL_SRC_FILES_$(TARGET_2ND_ARCH)
 #    LOCAL_CFLAGS_$(TARGET_ARCH)
 #    LOCAL_CFLAGS_$(TARGET_2ND_ARCH)
-#
+#    LOCAL_ADDITIONAL_DEPENDENCIES
+
 
 LOCAL_ADDITIONAL_DEPENDENCIES += $(LOCAL_PATH)/Ssl-config-target.mk
 
 common_cflags :=
+
+local_cflags :=
 
 common_src_files := \
   ssl/bio_ssl.c \
@@ -101,23 +104,17 @@ mips_exclude_files :=
 LOCAL_CFLAGS += $(common_cflags)
 LOCAL_C_INCLUDES += $(common_c_includes)
 
-
 LOCAL_SRC_FILES_arm += $(filter-out $(arm_exclude_files),$(common_src_files) $(arm_src_files))
 LOCAL_CFLAGS_arm += $(arm_cflags)
-
 
 LOCAL_SRC_FILES_arm64 += $(filter-out $(arm64_exclude_files),$(common_src_files) $(arm64_src_files))
 LOCAL_CFLAGS_arm64 += $(arm64_cflags)
 
-
 LOCAL_SRC_FILES_x86 += $(filter-out $(x86_exclude_files),$(common_src_files) $(x86_src_files))
 LOCAL_CFLAGS_x86 += $(x86_cflags)
-
 
 LOCAL_SRC_FILES_x86_64 += $(filter-out $(x86_64_exclude_files),$(common_src_files) $(x86_64_src_files))
 LOCAL_CFLAGS_x86_64 += $(x86_64_cflags)
 
-
 LOCAL_SRC_FILES_mips += $(filter-out $(mips_exclude_files),$(common_src_files) $(mips_src_files))
 LOCAL_CFLAGS_mips += $(mips_cflags)
-

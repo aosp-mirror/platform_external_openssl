@@ -322,6 +322,7 @@ LOCAL_ADDITIONAL_DEPENDENCIES += \$(LOCAL_PATH)/$(basename $output)
 
     common_defines=$(var_sorted_value OPENSSL_${prefix}_DEFINES)
     print_defines_in_mk common_cflags $common_defines
+    print_defines_in_mk local_cflags $local_defines
 
     common_sources=$(var_sorted_value OPENSSL_${prefix}_SOURCES)
     print_vardef_in_mk common_src_files $common_sources

@@ -10,11 +10,14 @@
 #    LOCAL_SRC_FILES_$(TARGET_2ND_ARCH)
 #    LOCAL_CFLAGS_$(TARGET_ARCH)
 #    LOCAL_CFLAGS_$(TARGET_2ND_ARCH)
-#
+#    LOCAL_ADDITIONAL_DEPENDENCIES
+
 
 LOCAL_ADDITIONAL_DEPENDENCIES += $(LOCAL_PATH)/Ssl-config-host.mk
 
 common_cflags :=
+
+local_cflags :=
 
 common_src_files := \
   ssl/bio_ssl.c \
@@ -105,10 +108,14 @@ else
 host_arch := x86
 endif
 else
-host_arch := unknown_arch
+ifeq ($(HOST_OS)-$(HOST_ARCH),linux-x86_64)
+host_arch := x86_64
+else
+$(warning Unknown host architecture $(HOST_OS)-$(HOST_ARCH))
+host_arch := unknown
+endif
 endif
 
 LOCAL_CFLAGS     += $(common_cflags) $($(host_arch)_cflags) $(local_cflags)
 LOCAL_C_INCLUDES += $(common_c_includes) $(local_c_includes)
 LOCAL_SRC_FILES  += $(filter-out $($(host_arch)_exclude_files), $(common_src_files) $($(host_arch)_src_files))
-

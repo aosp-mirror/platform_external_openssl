@@ -10,12 +10,15 @@
 #    LOCAL_SRC_FILES_$(TARGET_2ND_ARCH)
 #    LOCAL_CFLAGS_$(TARGET_ARCH)
 #    LOCAL_CFLAGS_$(TARGET_2ND_ARCH)
-#
+#    LOCAL_ADDITIONAL_DEPENDENCIES
+
 
 LOCAL_ADDITIONAL_DEPENDENCIES += $(LOCAL_PATH)/Apps-config-host.mk
 
 common_cflags := \
   -DMONOLITH \
+
+local_cflags :=
 
 common_src_files := \
   apps/app_rand.c \
@@ -122,4 +125,3 @@ endif
 LOCAL_CFLAGS     += $(common_cflags) $($(host_arch)_cflags) $(local_cflags)
 LOCAL_C_INCLUDES += $(common_c_includes) $(local_c_includes)
 LOCAL_SRC_FILES  += $(filter-out $($(host_arch)_exclude_files), $(common_src_files) $($(host_arch)_src_files))
-
