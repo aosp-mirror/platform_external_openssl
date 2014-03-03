@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9c63a1f1_12963230",
+        "filename": "Apps-config-host.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1002751
+      },
+      "writtenOn": "2014-03-03T20:20:07Z",
+      "side": 1,
+      "message": "local_cflags isn\u0027t set anywhere in this project, just remove it from this line (and the same in the other *-config*.mk files)",
+      "revId": "67382f0c63ed44c4f921b7ca1c26c05e963cd974",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
