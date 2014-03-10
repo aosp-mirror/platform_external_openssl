@@ -132,7 +132,12 @@ else
 host_arch := x86
 endif
 else
-host_arch := unknown_arch
+ifeq ($(HOST_OS)-$(HOST_ARCH),linux-x86_64)
+host_arch := x86_64
+else
+$(warning Unknown host architecture $(HOST_OS)-$(HOST_ARCH))
+host_arch := unknown
+endif
 endif
 
 host_c_flags    := $(common_c_flags) $($(host_arch)_c_flags) $(local_c_flags)
