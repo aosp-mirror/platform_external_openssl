@@ -2,31 +2,20 @@
 # To regenerate, edit openssl.config, then run:
 #     ./import_openssl.sh import /path/to/openssl-1.0.1f.tar.gz
 #
-# Before including this file, the local Android.mk must define the following
-# variables:
+# This script will append to the following variables:
 #
-#    local_c_flags
-#    local_c_includes
-#    local_additional_dependencies
-#
-# This script will define the following variables:
-#
-#    target_c_flags
-#    target_c_includes
-#    target_src_files
-#
-#    host_c_flags
-#    host_c_includes
-#    host_src_files
-#
-
-# Ensure these are empty.
-unknown_arch_c_flags :=
-unknown_arch_src_files :=
-unknown_arch_exclude_files :=
+#    LOCAL_CFLAGS
+#    LOCAL_C_INCLUDES
+#    LOCAL_SRC_FILES_$(TARGET_ARCH)
+#    LOCAL_SRC_FILES_$(TARGET_2ND_ARCH)
+#    LOCAL_CFLAGS_$(TARGET_ARCH)
+#    LOCAL_CFLAGS_$(TARGET_2ND_ARCH)
+#    LOCAL_ADDITIONAL_DEPENDENCIES
 
 
-common_c_flags := \
+LOCAL_ADDITIONAL_DEPENDENCIES += $(LOCAL_PATH)/Crypto-config-host.mk
+
+common_cflags := \
   -DNO_WINDOWS_BRAINDEATH \
 
 common_src_files := \
@@ -546,15 +535,15 @@ common_src_files := \
   crypto/x509v3/v3err.c \
 
 common_c_includes := \
-  . \
-  crypto \
-  crypto/asn1 \
-  crypto/evp \
-  crypto/modes \
-  include \
-  include/openssl \
+  external/openssl/. \
+  external/openssl/crypto \
+  external/openssl/crypto/asn1 \
+  external/openssl/crypto/evp \
+  external/openssl/crypto/modes \
+  external/openssl/include \
+  external/openssl/include/openssl \
 
-arm_c_flags := \
+arm_cflags := \
   -DAES_ASM \
   -DGHASH_ASM \
   -DOPENSSL_BN_ASM_GF2m \
@@ -575,14 +564,14 @@ arm_src_files := \
 arm_exclude_files := \
   crypto/aes/aes_core.c \
 
-arm64_c_flags := \
+arm64_cflags := \
   -DOPENSSL_NO_ASM \
 
 arm64_src_files :=
 
 arm64_exclude_files :=
 
-x86_c_flags := \
+x86_cflags := \
   -DAES_ASM \
   -DDES_PTR \
   -DDES_RISC1 \
@@ -624,7 +613,7 @@ x86_exclude_files := \
   crypto/des/fcrypt_b.c \
   crypto/mem_clr.c \
 
-x86_64_c_flags := \
+x86_64_cflags := \
   -DAES_ASM \
   -DDES_PTR \
   -DDES_RISC1 \
@@ -666,7 +655,7 @@ x86_64_exclude_files := \
   crypto/rc4/rc4_enc.c \
   crypto/rc4/rc4_skey.c \
 
-mips_c_flags := \
+mips_cflags := \
   -DAES_ASM \
   -DOPENSSL_BN_ASM_MONT \
   -DSHA1_ASM \
@@ -683,15 +672,6 @@ mips_exclude_files := \
   crypto/aes/aes_core.c \
   crypto/bn/bn_asm.c \
 
-target_arch := $(TARGET_ARCH)
-ifeq ($(target_arch)-$(TARGET_HAS_BIGENDIAN),mips-true)
-target_arch := unknown_arch
-endif
-
-target_c_flags    := $(common_c_flags) $($(target_arch)_c_flags) $(local_c_flags)
-target_c_includes := $(addprefix external/openssl/,$(common_c_includes)) $(local_c_includes)
-target_src_files  := $(common_src_files) $($(target_arch)_src_files)
-target_src_files  := $(filter-out $($(target_arch)_exclude_files), $(target_src_files))
 
 ifeq ($(HOST_OS)-$(HOST_ARCH),linux-x86)
 ifneq ($(BUILD_HOST_64bit),)
@@ -708,10 +688,6 @@ host_arch := unknown
 endif
 endif
 
-host_c_flags    := $(common_c_flags) $($(host_arch)_c_flags) $(local_c_flags)
-host_c_includes := $(addprefix external/openssl/,$(common_c_includes)) $(local_c_includes)
-host_src_files  := $(common_src_files) $($(host_arch)_src_files)
-host_src_files  := $(filter-out $($(host_arch)_exclude_files), $(host_src_files))
-
-local_additional_dependencies += $(LOCAL_PATH)/Crypto-config.mk
-
+LOCAL_CFLAGS     += $(common_cflags) $($(host_arch)_cflags)
+LOCAL_C_INCLUDES += $(common_c_includes) $(local_c_includes)
+LOCAL_SRC_FILES  += $(filter-out $($(host_arch)_exclude_files), $(common_src_files) $($(host_arch)_src_files))
