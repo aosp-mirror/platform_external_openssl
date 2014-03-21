@@ -12,6 +12,10 @@ LOCAL_MODULE:= libcrypto_static
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/android-config.mk $(LOCAL_PATH)/Crypto.mk
 include $(LOCAL_PATH)/Crypto-config-target.mk
 include $(LOCAL_PATH)/android-config.mk
+
+# Replace cflags with static-specific cflags so we dont build in libdl deps
+LOCAL_CFLAGS_32 := $(openssl_cflags_static_32)
+LOCAL_CFLAGS_64 := $(openssl_cflags_static_64)
 include $(BUILD_STATIC_LIBRARY)
 
 #######################################
