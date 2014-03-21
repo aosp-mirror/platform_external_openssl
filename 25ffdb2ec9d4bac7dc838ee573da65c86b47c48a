@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "5cee8935_ab7a94cb",
+        "filename": "android-config.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1003981
+      },
+      "writtenOn": "2014-03-21T23:36:42Z",
+      "side": 1,
+      "message": "Also I don\u0027t see the definition of openssl_cflags_static_32. build-config-static-32.mk defines just openssl_cflags_32",
+      "revId": "25ffdb2ec9d4bac7dc838ee573da65c86b47c48a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1cf0910e_404810ed",
         "filename": "build-config-static-32.mk",
         "patchSetId": 1
