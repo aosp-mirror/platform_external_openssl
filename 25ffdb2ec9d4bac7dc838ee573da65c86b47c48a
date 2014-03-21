@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1cf0910e_404810ed",
+        "filename": "build-config-static-32.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2014-03-21T21:56:42Z",
+      "side": 1,
+      "message": "You probably want NO_ENGINE as well. They rely on dlopen, dlsym",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 31,
+        "endChar": 30
+      },
+      "revId": "25ffdb2ec9d4bac7dc838ee573da65c86b47c48a",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
