@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5cbcc931_52a112b8",
+        "filename": "import_openssl.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1012391
+      },
+      "writtenOn": "2014-03-24T20:42:21Z",
+      "side": 1,
+      "message": "the ${!varname} syntax was added around bash 2.2, which i\u0027m pretty sure is ancient as far as android is concerned.  However I didn\u0027t find any other examples of it\u0027s usage so let me know if it needs to be changed.",
+      "range": {
+        "startLine": 193,
+        "startChar": 33,
+        "endLine": 193,
+        "endChar": 52
+      },
+      "revId": "9c04d6182e175e5823160d5ce8857d17d601bc62",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7cb7cd4c_0468e679",
+        "filename": "import_openssl.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1012391
+      },
+      "writtenOn": "2014-03-24T20:42:21Z",
+      "side": 1,
+      "message": "Not sure of this pattern usage in android, but returning function results in variables is *a* bash-ism.",
+      "revId": "9c04d6182e175e5823160d5ce8857d17d601bc62",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
