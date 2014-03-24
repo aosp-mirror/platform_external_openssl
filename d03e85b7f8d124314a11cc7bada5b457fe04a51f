@@ -22,6 +22,30 @@
       "revId": "d03e85b7f8d124314a11cc7bada5b457fe04a51f",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7cb7cd4c_79107bd8",
+        "filename": "import_openssl.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1012391
+      },
+      "writtenOn": "2014-03-24T19:16:46Z",
+      "side": 1,
+      "message": "Yes; At the same time I\u0027d also like feedback if the basic approach of this is good :)",
+      "parentUuid": "1cf0910e_63527651",
+      "range": {
+        "startLine": 202,
+        "startChar": 0,
+        "endLine": 202,
+        "endChar": 39
+      },
+      "revId": "d03e85b7f8d124314a11cc7bada5b457fe04a51f",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
