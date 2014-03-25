@@ -39,6 +39,23 @@
       "revId": "9c04d6182e175e5823160d5ce8857d17d601bc62",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5cd5a977_ca9383ce",
+        "filename": "import_openssl.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 1012391
+      },
+      "writtenOn": "2014-03-25T03:09:14Z",
+      "side": 1,
+      "message": "these calls are redundant now.",
+      "revId": "9c04d6182e175e5823160d5ce8857d17d601bc62",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
