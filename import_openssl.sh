@@ -33,6 +33,7 @@ cd $(dirname $0)
 # Ensure consistent sorting order / tool output.
 export LANG=C
 export LC_ALL=C
+PERL="perl -C"
 
 function die() {
   declare -r message=$1
@@ -127,7 +128,7 @@ function default_asm_file () {
 function gen_asm_arm () {
   local OUT
   OUT=$(default_asm_file "$@")
-  perl "$1" > "$OUT"
+  $PERL "$1" > "$OUT"
 }
 
 function gen_asm_mips () {
@@ -136,19 +137,19 @@ function gen_asm_mips () {
   # The perl scripts expect to run the target compiler as $CC to determine
   # the endianess of the target. Setting CC to true is a hack that forces the scripts
   # to generate little endian output
-  CC=true perl "$1" o32 > "$OUT"
+  CC=true $PERL "$1" o32 > "$OUT"
 }
 
 function gen_asm_x86 () {
   local OUT
   OUT=$(default_asm_file "$@")
-  perl "$1" elf -fPIC > "$OUT"
+  $PERL "$1" elf -fPIC > "$OUT"
 }
 
 function gen_asm_x86_64 () {
   local OUT
   OUT=$(default_asm_file "$@")
-  perl "$1" elf "$OUT" > "$OUT"
+  $PERL "$1" elf "$OUT" > "$OUT"
 }
 
 
