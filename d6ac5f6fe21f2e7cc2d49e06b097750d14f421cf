@@ -1,0 +1,7 @@
+Code-Review+2: Brian Carlstrom <bdc@google.com>
+Verified+1: Brian Carlstrom <bdc@google.com>
+Submitted-by: Kenny Root <kroot@android.com>
+Submitted-at: Fri, 28 Mar 2014 23:30:23 +0000
+Reviewed-on: https://android-review.googlesource.com/89371
+Project: platform/external/openssl
+Branch: refs/heads/master
