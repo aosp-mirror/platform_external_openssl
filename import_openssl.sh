@@ -33,6 +33,7 @@ cd $(dirname $0)
 # Ensure consistent sorting order / tool output.
 export LANG=C
 export LC_ALL=C
+PERL_EXE="perl -C0"
 
 function die() {
   declare -r message=$1
@@ -127,7 +128,7 @@ function default_asm_file () {
 function gen_asm_arm () {
   local OUT
   OUT=$(default_asm_file "$@")
-  perl "$1" > "$OUT"
+  $PERL_EXE "$1" > "$OUT"
 }
 
 function gen_asm_mips () {
@@ -136,19 +137,19 @@ function gen_asm_mips () {
   # The perl scripts expect to run the target compiler as $CC to determine
   # the endianess of the target. Setting CC to true is a hack that forces the scripts
   # to generate little endian output
-  CC=true perl "$1" o32 > "$OUT"
+  CC=true $PERL_EXE "$1" o32 > "$OUT"
 }
 
 function gen_asm_x86 () {
   local OUT
   OUT=$(default_asm_file "$@")
-  perl "$1" elf -fPIC > "$OUT"
+  $PERL_EXE "$1" elf -fPIC > "$OUT"
 }
 
 function gen_asm_x86_64 () {
   local OUT
   OUT=$(default_asm_file "$@")
-  perl "$1" elf "$OUT" > "$OUT"
+  $PERL_EXE "$1" elf "$OUT" > "$OUT"
 }
 
 
@@ -557,7 +558,7 @@ function generate() {
 # $1: Directory.
 # Out: list of files in $1 that are encoded as ISO-8859.
 function find_iso8859_files() {
-  find $1 -type f -print0 | xargs -0 file | fgrep "ISO-8859" | cut -d: -f1
+  find $1 -type f -print0 | xargs -0 file --mime-encoding | grep -i "iso-8859" | cut -d: -f1
 }
 
 # Convert all ISO-8859 files in a given subdirectory to UTF-8
