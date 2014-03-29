@@ -192,9 +192,9 @@ function generate_build_config_headers() {
   fi
 
   if [ $1 == "trusty" ] ; then
-    ./Configure $CONFIGURE_ARGS_TRUSTY
+    PERL=/usr/bin/perl ./Configure $CONFIGURE_ARGS_TRUSTY
   else
-    ./Configure $CONFIGURE_ARGS ${!configure_args_bits} ${!configure_args_stat}
+    PERL=/usr/bin/perl ./Configure $CONFIGURE_ARGS ${!configure_args_bits} ${!configure_args_stat}
   fi
 
   rm -f apps/CA.pl.bak crypto/opensslconf.h.bak
