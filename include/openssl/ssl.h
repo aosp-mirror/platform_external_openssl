@@ -1315,6 +1315,7 @@ struct ssl_st
 #endif	/* OPENSSL_NO_KRB5 */
 
 #ifndef OPENSSL_NO_PSK
+	char *psk_identity_hint;
 	unsigned int (*psk_client_callback)(SSL *ssl, const char *hint, char *identity,
 		unsigned int max_identity_len, unsigned char *psk,
 		unsigned int max_psk_len);
