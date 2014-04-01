@@ -475,7 +475,7 @@ int ssl3_accept(SSL *s)
 			/* PSK: send ServerKeyExchange if PSK identity
 			 * hint if provided */
 #ifndef OPENSSL_NO_PSK
-			    || ((alg_k & SSL_kPSK) && s->ctx->psk_identity_hint)
+			    || ((alg_k & SSL_kPSK) && s->psk_identity_hint)
 #endif
 #ifndef OPENSSL_NO_SRP
 			    /* SRP: send ServerKeyExchange */
@@ -1827,7 +1827,7 @@ int ssl3_send_server_key_exchange(SSL *s)
 			if (type & SSL_kPSK)
 				{
 				/* reserve size for record length and PSK identity hint*/
-				n+=2+strlen(s->ctx->psk_identity_hint);
+				n+=2+strlen(s->psk_identity_hint);
 				}
 			else
 #endif /* !OPENSSL_NO_PSK */
@@ -1935,9 +1935,9 @@ int ssl3_send_server_key_exchange(SSL *s)
 		if (type & SSL_kPSK)
 			{
 			/* copy PSK identity hint */
-			s2n(strlen(s->ctx->psk_identity_hint), p); 
-			strncpy((char *)p, s->ctx->psk_identity_hint, strlen(s->ctx->psk_identity_hint));
-			p+=strlen(s->ctx->psk_identity_hint);
+			s2n(strlen(s->psk_identity_hint), p);
+			strncpy((char *)p, s->psk_identity_hint, strlen(s->psk_identity_hint));
+			p+=strlen(s->psk_identity_hint);
 			}
 #endif
 
@@ -2763,17 +2763,6 @@ int ssl3_get_client_key_exchange(SSL *s)
 				OPENSSL_free(s->session->psk_identity);
 			s->session->psk_identity = BUF_strdup((char *)p);
 			if (s->session->psk_identity == NULL)
-				{
-				SSLerr(SSL_F_SSL3_GET_CLIENT_KEY_EXCHANGE,
-					ERR_R_MALLOC_FAILURE);
-				goto psk_err;
-				}
-
-			if (s->session->psk_identity_hint != NULL)
-				OPENSSL_free(s->session->psk_identity_hint);
-			s->session->psk_identity_hint = BUF_strdup(s->ctx->psk_identity_hint);
-			if (s->ctx->psk_identity_hint != NULL &&
-				s->session->psk_identity_hint == NULL)
 				{
 				SSLerr(SSL_F_SSL3_GET_CLIENT_KEY_EXCHANGE,
 					ERR_R_MALLOC_FAILURE);
