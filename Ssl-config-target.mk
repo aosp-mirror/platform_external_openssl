@@ -65,9 +65,9 @@ common_src_files := \
   ssl/tls_srp.c \
 
 common_c_includes := \
-  external/openssl/. \
-  external/openssl/crypto \
-  external/openssl/include \
+  openssl/. \
+  openssl/crypto \
+  openssl/include \
 
 arm_clang_asflags :=
 

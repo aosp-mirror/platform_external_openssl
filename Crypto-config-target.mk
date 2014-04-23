@@ -534,13 +534,13 @@ common_src_files := \
   crypto/x509v3/v3err.c \
 
 common_c_includes := \
-  external/openssl/. \
-  external/openssl/crypto \
-  external/openssl/crypto/asn1 \
-  external/openssl/crypto/evp \
-  external/openssl/crypto/modes \
-  external/openssl/include \
-  external/openssl/include/openssl \
+  openssl/. \
+  openssl/crypto \
+  openssl/crypto/asn1 \
+  openssl/crypto/evp \
+  openssl/crypto/modes \
+  openssl/include \
+  openssl/include/openssl \
 
 arm_clang_asflags := \
   -no-integrated-as \
