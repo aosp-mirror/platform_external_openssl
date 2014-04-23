@@ -33,6 +33,11 @@ LOCAL_SDK_VERSION := 9
 endif
 LOCAL_LDFLAGS += -ldl
 
+ifeq ($(HOST_OS), darwin)
+LOCAL_ASFLAGS += -no-integrated-as
+LOCAL_CFLAGS += -no-integrated-as
+endif
+
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE:= libcrypto
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/android-config.mk $(LOCAL_PATH)/Crypto.mk
