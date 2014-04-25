@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c5e29f1a_ac530316",
+        "filename": "rules.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1003981
+      },
+      "writtenOn": "2014-04-25T22:02:51Z",
+      "side": 1,
+      "message": "What the purpose for this file? I don\u0027t see it\u0027s included by any Android.mk. Also the the Android platform build system doesn\u0027t have  $(GET_LOCAL_DIR).",
+      "revId": "9be609ccd58e88f6ecb32211ee88ec0111e27ecc",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "850ee7b3_4a0fd34e",
+        "filename": "rules.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1003981
+      },
+      "writtenOn": "2014-04-25T22:02:51Z",
+      "side": 1,
+      "message": "You can\u0027t change global variables like \tTARGET_ARCH or \tTARGET_2ND_ARCH.",
+      "revId": "9be609ccd58e88f6ecb32211ee88ec0111e27ecc",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
