@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "6538135d_61ebb618",
+        "filename": "rules.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1038973
+      },
+      "writtenOn": "2014-04-25T22:17:50Z",
+      "side": 1,
+      "message": "This file builds openssl for a different project. Nothing Android related there. Hence no Android.mk",
+      "parentUuid": "c5e29f1a_ac530316",
+      "revId": "9be609ccd58e88f6ecb32211ee88ec0111e27ecc",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "850ee7b3_4a0fd34e",
         "filename": "rules.mk",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2014-04-25T22:02:51Z",
       "side": 1,
       "message": "You can\u0027t change global variables like \tTARGET_ARCH or \tTARGET_2ND_ARCH.",
+      "revId": "9be609ccd58e88f6ecb32211ee88ec0111e27ecc",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c5fb7fcc_84582633",
+        "filename": "rules.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1038973
+      },
+      "writtenOn": "2014-04-25T22:17:50Z",
+      "side": 1,
+      "message": "These variables are global in the build-system of the other project. They don\u0027t pollute namespace of the Android build system.",
+      "parentUuid": "850ee7b3_4a0fd34e",
       "revId": "9be609ccd58e88f6ecb32211ee88ec0111e27ecc",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
