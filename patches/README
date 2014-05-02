@@ -48,3 +48,7 @@ dsa_nonce.patch
 Adds an option to mix in hash of message and private key into (EC)DSA nonces to
 make (EC)DSA more resilient to weaknesses in RNGs used for nonces. The feature
 is disabled by default.
+
+ecdhe_psk.patch
+
+Adds support for ECDHE Pre-Shared Key (PSK) TLS cipher suites.
