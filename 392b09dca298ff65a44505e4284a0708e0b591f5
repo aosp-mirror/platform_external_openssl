@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8a2fd4b4_d6174460",
+        "filename": "patches/README",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1003723
+      },
+      "writtenOn": "2014-05-05T19:05:01Z",
+      "side": 1,
+      "message": "is this work being coordinated with upstream?",
+      "range": {
+        "startLine": 56,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 18
+      },
+      "revId": "392b09dca298ff65a44505e4284a0708e0b591f5",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
