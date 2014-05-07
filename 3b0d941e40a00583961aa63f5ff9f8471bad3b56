@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8a58b470_3a6016dd",
+        "filename": "include/openssl/ocsp.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2014-05-07T21:00:32Z",
+      "side": 1,
+      "message": "Insert this before:\n\n  #ifdef OPENSSL_SYS_WIN32\n  /* Under Win32 these are defined in wincrypt.h */",
+      "range": {
+        "startLine": 92,
+        "startChar": 0,
+        "endLine": 92,
+        "endChar": 0
+      },
+      "revId": "3b0d941e40a00583961aa63f5ff9f8471bad3b56",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
