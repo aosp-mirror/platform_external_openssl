@@ -90,6 +90,10 @@ extern "C" {
 #define OCSP_RESPID_KEY			0x400
 #define OCSP_NOTIME			0x800
 
+#undef OCSP_REQUEST
+#undef X509_NAME
+#undef OCSP_RESPONSE
+
 /*   CertID ::= SEQUENCE {
  *       hashAlgorithm            AlgorithmIdentifier,
  *       issuerNameHash     OCTET STRING, -- Hash of Issuer's DN
