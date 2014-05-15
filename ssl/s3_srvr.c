@@ -481,7 +481,7 @@ int ssl3_accept(SSL *s)
 			 *   - the key exchange is kEECDH.
 			 */
 #ifndef OPENSSL_NO_PSK
-			    || ((alg_a & SSL_aPSK) && ((alg_k & SSL_kEECDH) || s->ctx->psk_identity_hint))
+			    || ((alg_a & SSL_aPSK) && ((alg_k & SSL_kEECDH) || s->session->psk_identity_hint))
 #endif
 #ifndef OPENSSL_NO_SRP
 			    /* SRP: send ServerKeyExchange */
@@ -1595,6 +1595,10 @@ int ssl3_send_server_key_exchange(SSL *s)
 	int curve_id = 0;
 	BN_CTX *bn_ctx = NULL; 
 #endif
+#ifndef OPENSSL_NO_PSK
+	const char* psk_identity_hint;
+	size_t psk_identity_hint_len;
+#endif
 	EVP_PKEY *pkey;
 	const EVP_MD *md = NULL;
 	unsigned char *p,*d;
@@ -1623,9 +1627,12 @@ int ssl3_send_server_key_exchange(SSL *s)
 		if (alg_a & SSL_aPSK)
 			{
 			/* size for PSK identity hint */
-			n+=2;
-			if (s->ctx->psk_identity_hint)
-				n+=strlen(s->ctx->psk_identity_hint);
+			psk_identity_hint = s->session->psk_identity_hint;
+			if (psk_identity_hint)
+				psk_identity_hint_len = strlen(psk_identity_hint);
+			else
+				psk_identity_hint_len = 0;
+			n+=2+psk_identity_hint_len;
 			}
 #endif /* !OPENSSL_NO_PSK */
 #ifndef OPENSSL_NO_RSA
@@ -1918,20 +1925,12 @@ int ssl3_send_server_key_exchange(SSL *s)
 #ifndef OPENSSL_NO_PSK
 		if (alg_a & SSL_aPSK)
 			{
-			if (s->ctx->psk_identity_hint)
+			/* copy PSK identity hint (if provided) */
+			s2n(psk_identity_hint_len, p);
+			if (psk_identity_hint_len > 0)
 				{
-				/* copy PSK identity hint */
-				s2n(strlen(s->ctx->psk_identity_hint), p);
-				strncpy((char *)p, s->ctx->psk_identity_hint, strlen(s->ctx->psk_identity_hint));
-				p+=strlen(s->ctx->psk_identity_hint);
-				}
-			else
-				{
-				/* No identity hint is provided. */
-				*p = 0;
-				p += 1;
-				*p = 0;
-				p += 1;
+				memcpy(p, psk_identity_hint, psk_identity_hint_len);
+				p+=psk_identity_hint_len;
 				}
 			}
 #endif /* OPENSSL_NO_PSK */
@@ -2275,17 +2274,6 @@ int ssl3_get_client_key_exchange(SSL *s)
 		s->session->psk_identity = BUF_strdup(tmp_id);
 		OPENSSL_cleanse(tmp_id, PSK_MAX_IDENTITY_LEN+1);
 		if (s->session->psk_identity == NULL)
-			{
-			SSLerr(SSL_F_SSL3_GET_CLIENT_KEY_EXCHANGE,
-				ERR_R_MALLOC_FAILURE);
-			goto psk_err;
-			}
-
-		if (s->session->psk_identity_hint != NULL)
-			OPENSSL_free(s->session->psk_identity_hint);
-		s->session->psk_identity_hint = BUF_strdup(s->ctx->psk_identity_hint);
-		if (s->ctx->psk_identity_hint != NULL &&
-			s->session->psk_identity_hint == NULL)
 			{
 			SSLerr(SSL_F_SSL3_GET_CLIENT_KEY_EXCHANGE,
 				ERR_R_MALLOC_FAILURE);
