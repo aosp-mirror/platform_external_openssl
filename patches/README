@@ -52,3 +52,8 @@ is disabled by default.
 ecdhe_psk.patch
 
 Adds support for ECDHE Pre-Shared Key (PSK) TLS cipher suites.
+
+tls_psk_hint.patch
+
+Fixes issues with TLS-PSK identity hint implementation where
+per-connection/session and per-context hints were being mixed up.
