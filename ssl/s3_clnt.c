@@ -1381,9 +1381,11 @@ int ssl3_get_key_exchange(SSL *s)
 		if (s->s3->tmp.new_cipher->algorithm_auth & SSL_aPSK)
 			{
 			s->session->sess_cert=ssl_sess_cert_new();
-			if (s->ctx->psk_identity_hint)
-				OPENSSL_free(s->ctx->psk_identity_hint);
-			s->ctx->psk_identity_hint = NULL;
+			if (s->session->psk_identity_hint)
+				{
+				OPENSSL_free(s->session->psk_identity_hint);
+				s->session->psk_identity_hint = NULL;
+				}
 			}
 #endif
 		s->s3->tmp.reuse_message=1;
@@ -1433,7 +1435,11 @@ int ssl3_get_key_exchange(SSL *s)
 		al=SSL_AD_HANDSHAKE_FAILURE;
 		n2s(p,i);
 		param_len=i+2;
-		s->ctx->psk_identity_hint = NULL;
+		if (s->session->psk_identity_hint)
+			{
+			OPENSSL_free(s->session->psk_identity_hint);
+			s->session->psk_identity_hint = NULL;
+			}
 		if (i != 0)
 			{
 			/* Store PSK identity hint for later use, hint is used
@@ -1459,10 +1465,8 @@ int ssl3_get_key_exchange(SSL *s)
 			 * NULL-terminated string. */
 			memcpy(tmp_id_hint, p, i);
 			memset(tmp_id_hint+i, 0, PSK_MAX_IDENTITY_LEN+1-i);
-			if (s->ctx->psk_identity_hint != NULL)
-				OPENSSL_free(s->ctx->psk_identity_hint);
-			s->ctx->psk_identity_hint = BUF_strdup(tmp_id_hint);
-			if (s->ctx->psk_identity_hint == NULL)
+			s->session->psk_identity_hint = BUF_strdup(tmp_id_hint);
+			if (s->session->psk_identity_hint == NULL)
 				{
 				SSLerr(SSL_F_SSL3_GET_KEY_EXCHANGE, ERR_R_MALLOC_FAILURE);
 				goto f_err;
@@ -2345,7 +2349,7 @@ int ssl3_send_client_key_exchange(SSL *s)
 				goto err;
 				}
 
-			psk_len = s->psk_client_callback(s, s->ctx->psk_identity_hint,
+			psk_len = s->psk_client_callback(s, s->session->psk_identity_hint,
 				identity, PSK_MAX_IDENTITY_LEN, psk, sizeof(psk));
 			if (psk_len > PSK_MAX_PSK_LEN)
 				{
@@ -2379,21 +2383,6 @@ int ssl3_send_client_key_exchange(SSL *s)
 				s2n(n, p);
 				memcpy(p, identity, n);
 				n += 2;
-				}
-
-			if (s->session->psk_identity_hint != NULL)
-				OPENSSL_free(s->session->psk_identity_hint);
-			s->session->psk_identity_hint = NULL;
-			if (s->ctx->psk_identity_hint)
-				{
-				s->session->psk_identity_hint = BUF_strdup(s->ctx->psk_identity_hint);
-				if (s->ctx->psk_identity_hint != NULL &&
-					s->session->psk_identity_hint == NULL)
-					{
-					SSLerr(SSL_F_SSL3_SEND_CLIENT_KEY_EXCHANGE,
-						ERR_R_MALLOC_FAILURE);
-					goto psk_err;
-					}
 				}
 
 			if (s->session->psk_identity != NULL)
