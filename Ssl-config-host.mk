@@ -99,19 +99,11 @@ mips_src_files :=
 mips_exclude_files :=
 
 
-ifeq ($(HOST_OS)-$(HOST_ARCH),linux-x86)
-ifneq ($(BUILD_HOST_64bit),)
-host_arch := x86_64
-else
-host_arch := x86
-endif
-else
-ifeq ($(HOST_OS)-$(HOST_ARCH),linux-x86_64)
-host_arch := x86_64
+ifeq ($(HOST_OS),linux)
+host_arch := $(HOST_ARCH)
 else
 $(warning Unknown host architecture $(HOST_OS)-$(HOST_ARCH))
 host_arch := unknown
-endif
 endif
 
 LOCAL_CFLAGS     += $(common_cflags) $($(host_arch)_cflags)
