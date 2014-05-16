@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6a4e2058_6e9a7d91",
+        "filename": "Apps-config-host.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1003723
+      },
+      "writtenOn": "2014-05-16T08:04:46Z",
+      "side": 1,
+      "message": "$(warning Unknown host OS $(HOST_OS))\n\nhere and elsewhere\n\nof course it should also be fixed to not warn that darwin is unknown...",
+      "range": {
+        "startLine": 110,
+        "startChar": 0,
+        "endLine": 111,
+        "endChar": 1
+      },
+      "revId": "d108560ae4ab728f2f3796ba342534b57b8f42cb",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
