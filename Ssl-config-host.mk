@@ -99,13 +99,15 @@ mips_src_files :=
 mips_exclude_files :=
 
 
+LOCAL_CFLAGS += $(common_cflags)
+LOCAL_C_INCLUDES += $(common_c_includes) $(local_c_includes)
+
 ifeq ($(HOST_OS),linux)
-host_arch := $(HOST_ARCH)
+LOCAL_CFLAGS_x86 += $(x86_cflags)
+LOCAL_SRC_FILES_x86 += $(filter-out $(x86_exclude_files), $(common_src_files) $(x86_src_files))
+LOCAL_CFLAGS_x86_64 += $(x86_64_cflags)
+LOCAL_SRC_FILES_x86_64 += $(filter-out $(x86_64_exclude_files), $(common_src_files) $(x86_64_src_files))
 else
 $(warning Unknown host OS $(HOST_OS))
-host_arch := unknown
+LOCAL_SRC_FILES += $(common_src_files)
 endif
-
-LOCAL_CFLAGS     += $(common_cflags) $($(host_arch)_cflags)
-LOCAL_C_INCLUDES += $(common_c_includes) $(local_c_includes)
-LOCAL_SRC_FILES  += $(filter-out $($(host_arch)_exclude_files), $(common_src_files) $($(host_arch)_src_files))
