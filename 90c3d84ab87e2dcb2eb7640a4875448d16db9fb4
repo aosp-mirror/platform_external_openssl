@@ -1,0 +1,8 @@
+Verified+1: Ying Wang <wangying@android.com>
+Code-Review+1: Ian Rogers <irogers@google.com>
+Code-Review+2: Brian Carlstrom <bdc@google.com>
+Submitted-by: Ying Wang <wangying@android.com>
+Submitted-at: Fri, 23 May 2014 18:32:32 +0000
+Reviewed-on: https://android-review.googlesource.com/95275
+Project: platform/external/openssl
+Branch: refs/heads/master
