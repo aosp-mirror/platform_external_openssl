@@ -432,12 +432,16 @@ function import() {
 
   # Generate arm asm
   gen_asm_arm crypto/aes/asm/aes-armv4.pl
+  gen_asm_arm crypto/aes/asm/bsaes-armv7.pl
   gen_asm_arm crypto/bn/asm/armv4-gf2m.pl
   gen_asm_arm crypto/bn/asm/armv4-mont.pl
   gen_asm_arm crypto/modes/asm/ghash-armv4.pl
   gen_asm_arm crypto/sha/asm/sha1-armv4-large.pl
   gen_asm_arm crypto/sha/asm/sha256-armv4.pl
   gen_asm_arm crypto/sha/asm/sha512-armv4.pl
+
+  # Generate arm64 asm
+  gen_asm_arm crypto/aes/asm/aesv8-armx.pl
 
   # Generate mips asm
   gen_asm_mips crypto/aes/asm/aes-mips.pl

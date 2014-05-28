@@ -545,6 +545,7 @@ common_c_includes := \
 
 arm_cflags := \
   -DAES_ASM \
+  -DBSAES_ASM \
   -DGHASH_ASM \
   -DOPENSSL_BN_ASM_GF2m \
   -DOPENSSL_BN_ASM_MONT \
@@ -554,6 +555,7 @@ arm_cflags := \
 
 arm_src_files := \
   crypto/aes/asm/aes-armv4.S \
+  crypto/aes/asm/bsaes-armv7.S \
   crypto/bn/asm/armv4-gf2m.S \
   crypto/bn/asm/armv4-mont.S \
   crypto/modes/asm/ghash-armv4.S \
@@ -567,7 +569,8 @@ arm_exclude_files := \
 arm64_cflags := \
   -DOPENSSL_NO_ASM \
 
-arm64_src_files :=
+arm64_src_files := \
+  crypto/aes/asm/aesv8-armx.S \
 
 arm64_exclude_files :=
 
