@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bfc13c54_f4a33823",
+        "filename": "openssl.config",
+        "patchSetId": 1
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2014-05-28T19:28:56Z",
+      "side": 1,
+      "message": "It doesn\u0027t matter, but this is the order the Configure script outputs them.",
+      "parentUuid": "9f10f896_6cf66ffa",
+      "revId": "c34190ed12e47436253524e764732bbb7990dcae",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f10f896_ec09bf4b",
         "filename": "openssl.config",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2014-05-28T18:44:27Z",
       "side": 1,
       "message": "is OPENSSL_BN_ASM_PART_WORDS supposed to be missing here?",
+      "revId": "c34190ed12e47436253524e764732bbb7990dcae",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffc73462_b90c5b5d",
+        "filename": "openssl.config",
+        "patchSetId": 1
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2014-05-28T19:28:56Z",
+      "side": 1,
+      "message": "Yes, it\u0027s only defined when bn-586.o is compiled in.",
+      "parentUuid": "9f10f896_ec09bf4b",
       "revId": "c34190ed12e47436253524e764732bbb7990dcae",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
