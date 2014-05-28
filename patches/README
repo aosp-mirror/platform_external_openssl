@@ -57,3 +57,8 @@ tls_psk_hint.patch
 
 Fixes issues with TLS-PSK identity hint implementation where
 per-connection/session and per-context hints were being mixed up.
+
+psk_client_callback_128_byte_id_bug.patch
+
+Fixes the issue where it was impossible to return a 128 byte long PSK identity
+(the maximum supported length) from psk_client_callback.
