@@ -143,7 +143,7 @@ function gen_asm_mips () {
 function gen_asm_x86 () {
   local OUT
   OUT=$(default_asm_file "$@")
-  $PERL_EXE "$1" elf -fPIC > "$OUT"
+  $PERL_EXE "$1" elf -fPIC $(print_values_with_prefix -D $OPENSSL_CRYPTO_DEFINES_x86) > "$OUT"
 }
 
 function gen_asm_x86_64 () {
@@ -186,12 +186,12 @@ function generate_build_config_headers() {
   local configure_args_bits=CONFIGURE_ARGS_$1
   local configure_args_stat=''
   local outname=$1
-  if [ $2 -eq "1" ] ; then
+  if [[ $2 == 1 ]] ; then
       configure_args_stat=CONFIGURE_ARGS_STATIC
       outname="static-$1"
   fi
 
-  if [ $1 == "trusty" ] ; then
+  if [[ $1 == trusty ]] ; then
     PERL=/usr/bin/perl ./Configure $CONFIGURE_ARGS_TRUSTY
   else
     PERL=/usr/bin/perl ./Configure $CONFIGURE_ARGS ${!configure_args_bits} ${!configure_args_stat}
@@ -282,6 +282,17 @@ var_value() {
 # Out: variable value (if space-separated list, sorted with no duplicates)
 var_sorted_value() {
   uniq_sort $(var_value $1)
+}
+
+# Print the values in a list with a prefix
+# $1: prefix to use
+# $2+: values of list
+print_values_with_prefix() {
+  declare -r prefix=$1
+  shift
+  for src; do
+    echo -n " $prefix$src "
+  done
 }
 
 # Print the definition of a given variable in a GNU Make build file.

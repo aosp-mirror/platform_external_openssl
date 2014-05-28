@@ -582,9 +582,11 @@ x86_cflags := \
   -DOPENSSL_BN_ASM_MONT \
   -DOPENSSL_BN_ASM_PART_WORDS \
   -DOPENSSL_CPUID_OBJ \
+  -DOPENSSL_IA32_SSE2 \
   -DSHA1_ASM \
   -DSHA256_ASM \
   -DSHA512_ASM \
+  -DVPAES_ASM \
 
 x86_src_files := \
   crypto/aes/asm/aes-586.S \
@@ -615,6 +617,7 @@ x86_exclude_files := \
 
 x86_64_cflags := \
   -DAES_ASM \
+  -DBSAES_ASM \
   -DDES_PTR \
   -DDES_RISC1 \
   -DDES_UNROLL \
@@ -622,10 +625,12 @@ x86_64_cflags := \
   -DMD5_ASM \
   -DOPENSSL_BN_ASM_GF2m \
   -DOPENSSL_BN_ASM_MONT \
+  -DOPENSSL_BN_ASM_MONT5 \
   -DOPENSSL_CPUID_OBJ \
   -DSHA1_ASM \
   -DSHA256_ASM \
   -DSHA512_ASM \
+  -DVPAES_ASM \
 
 x86_64_src_files := \
   crypto/aes/asm/aes-x86_64.S \
