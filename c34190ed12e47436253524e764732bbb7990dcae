@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f10f896_6cf66ffa",
+        "filename": "openssl.config",
+        "patchSetId": 1
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 1003224
+      },
+      "writtenOn": "2014-05-28T18:44:27Z",
+      "side": 1,
+      "message": "are these supposed to be sorted?",
+      "revId": "c34190ed12e47436253524e764732bbb7990dcae",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f10f896_ec09bf4b",
+        "filename": "openssl.config",
+        "patchSetId": 1
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 1003224
+      },
+      "writtenOn": "2014-05-28T18:44:27Z",
+      "side": 1,
+      "message": "is OPENSSL_BN_ASM_PART_WORDS supposed to be missing here?",
+      "revId": "c34190ed12e47436253524e764732bbb7990dcae",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
