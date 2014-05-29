@@ -1,0 +1,8 @@
+Verified+1: Kenny Root <kroot@android.com>
+Code-Review+2: Elliott Hughes <enh@google.com>
+Code-Review+1: Alexey Volkov <alexey.v.volkov@intel.com>
+Submitted-by: Kenny Root <kroot@android.com>
+Submitted-at: Thu, 29 May 2014 19:25:30 +0000
+Reviewed-on: https://android-review.googlesource.com/96039
+Project: platform/external/openssl
+Branch: refs/heads/master
