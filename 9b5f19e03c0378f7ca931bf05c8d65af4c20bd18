@@ -1,0 +1,7 @@
+Code-Review+2: Kenny Root <kroot@android.com>
+Verified+1: Alex Klyubin <klyubin@google.com>
+Submitted-by: Alex Klyubin <klyubin@google.com>
+Submitted-at: Thu, 29 May 2014 19:59:57 +0000
+Reviewed-on: https://android-review.googlesource.com/96120
+Project: platform/external/openssl
+Branch: refs/heads/master
