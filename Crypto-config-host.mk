@@ -549,6 +549,7 @@ arm_cflags := \
   -DGHASH_ASM \
   -DOPENSSL_BN_ASM_GF2m \
   -DOPENSSL_BN_ASM_MONT \
+  -DOPENSSL_CPUID_OBJ \
   -DSHA1_ASM \
   -DSHA256_ASM \
   -DSHA512_ASM \
@@ -556,6 +557,8 @@ arm_cflags := \
 arm_src_files := \
   crypto/aes/asm/aes-armv4.S \
   crypto/aes/asm/bsaes-armv7.S \
+  crypto/armcap.c \
+  crypto/armv4cpuid.S \
   crypto/bn/asm/armv4-gf2m.S \
   crypto/bn/asm/armv4-mont.S \
   crypto/modes/asm/ghash-armv4.S \
@@ -565,6 +568,7 @@ arm_src_files := \
 
 arm_exclude_files := \
   crypto/aes/aes_core.c \
+  crypto/mem_clr.c \
 
 arm64_cflags := \
   -DOPENSSL_NO_ASM \
