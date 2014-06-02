@@ -5,21 +5,21 @@
  * This package is an SSL implementation written
  * by Eric Young (eay@cryptsoft.com).
  * The implementation was written so as to conform with Netscapes SSL.
- * 
+ *
  * This library is free for commercial and non-commercial use as long as
  * the following conditions are aheared to.  The following conditions
  * apply to all code found in this distribution, be it the RC4, RSA,
  * lhash, DES, etc., code; not just the SSL code.  The SSL documentation
  * included with this distribution is covered by the same copyright terms
  * except that the holder is Tim Hudson (tjh@cryptsoft.com).
- * 
+ *
  * Copyright remains Eric Young's, and as such any Copyright notices in
  * the code are not to be removed.
  * If this package is used in a product, Eric Young should be given attribution
  * as the author of the parts of the library used.
  * This can be in the form of a textual message at program startup or
  * in documentation (online or textual) provided with the package.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -37,7 +37,7 @@
  * 4. If you include any Windows specific code (or a derivative thereof) from 
  *    the apps directory (application code) you must include an acknowledgement:
  *    "This product includes software written by Tim Hudson (tjh@cryptsoft.com)"
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY ERIC YOUNG ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -49,7 +49,7 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- * 
+ *
  * The licence and distribution terms for any publically available version or
  * derivative of this code cannot be changed.  i.e. this code cannot simply be
  * copied and put under another distribution licence
@@ -75,6 +75,27 @@
 static ENGINE *funct_ref =NULL;
 #endif
 static const RAND_METHOD *default_RAND_meth = NULL;
+
+#define OPENSSL_HW_ASST 1
+
+#if OPENSSL_HW_ASST
+#include <tegra_se_secure.h>
+
+#define HW_RNG_ALG	0x50000000
+#define AES256_KEY_SIZE	32
+#define AES_BLOCK_SIZE	16
+
+uint8_t entropy_pool[AES256_KEY_SIZE];
+uint8_t rand_bytes_buf[AES_BLOCK_SIZE];
+uint64_t counter;
+int rand_bytes_pos;
+
+static const uint32_t ENTROPY_POOL_SIZE = sizeof(entropy_pool); // 32bytes
+int hw_rng_operation(uint8_t *hwrng_buf, uint32_t len);
+int aes_crypto_operation(uint8_t *out_buf, uint8_t *in_buf, uint32_t in_len, uint8_t *key);
+
+int initialize_cprng();
+#endif //OPENSSL_HW_ASST
 
 int RAND_set_rand_method(const RAND_METHOD *meth)
 	{
@@ -159,10 +180,14 @@ void RAND_add(const void *buf, int num, double entropy)
 
 int RAND_bytes(unsigned char *buf, int num)
 	{
+#if OPENSSL_HW_ASST
+	return rand_bytes_hw_alt(buf, num);
+#else
 	const RAND_METHOD *meth = RAND_get_rand_method();
 	if (meth && meth->bytes)
 		return meth->bytes(buf,num);
 	return(-1);
+#endif
 	}
 
 int RAND_pseudo_bytes(unsigned char *buf, int num)
@@ -184,7 +209,7 @@ int RAND_status(void)
 #ifdef OPENSSL_FIPS
 
 /* FIPS DRBG initialisation code. This sets up the DRBG for use by the
- * rest of OpenSSL. 
+ * rest of OpenSSL.
  */
 
 /* Entropy gatherer: use standard OpenSSL PRNG to seed (this will gather
@@ -276,14 +301,14 @@ int RAND_init_fips(void)
 		return 0;
 		}
 #endif
-		
+
 	dctx = FIPS_get_default_drbg();
         if (FIPS_drbg_init(dctx, fips_drbg_type, fips_drbg_flags) <= 0)
 		{
 		RANDerr(RAND_F_RAND_INIT_FIPS, RAND_R_ERROR_INITIALISING_DRBG);
 		return 0;
 		}
-		
+
         FIPS_drbg_set_callbacks(dctx,
 				drbg_get_entropy, drbg_free_entropy, 20,
 				drbg_get_entropy, drbg_free_entropy);
@@ -304,3 +329,95 @@ int RAND_init_fips(void)
 	}
 
 #endif
+
+#if OPENSSL_HW_ASST
+int initialize_cprng(void)
+{
+	uint8_t hwrng_buf[AES256_KEY_SIZE];
+	int result;
+
+	// generate HW RNG here
+	result = hw_rng_operation(hwrng_buf, AES256_KEY_SIZE);
+
+	memcpy(entropy_pool, hwrng_buf, ENTROPY_POOL_SIZE);
+	counter = 0;
+	rand_bytes_pos = sizeof(rand_bytes_buf);
+}
+
+int rand_bytes_hw_alt(uint8_t *buf, size_t buflen)
+{
+	uint8_t counter_buf[AES_BLOCK_SIZE];
+	int result = -1;
+
+	while (buflen > 0) {
+		if (rand_bytes_pos == sizeof(rand_bytes_buf)) {
+			++counter;
+			memset(counter_buf, 0, sizeof(counter_buf));
+			memcpy(counter_buf, &counter, sizeof(counter));
+
+			// do aes encrypt
+			result = aes_crypto_operation(rand_bytes_buf, counter_buf,
+					AES_BLOCK_SIZE, entropy_pool);
+			rand_bytes_pos = 0;
+		}
+
+		while (rand_bytes_pos < sizeof(rand_bytes_buf) && buflen-- > 0) {
+			*buf++ = rand_bytes_buf[rand_bytes_pos++];
+		}
+	}
+
+	return result;
+}
+
+void add_entropy(uint8_t *entropy_buf, size_t entropy_buf_len)
+{
+
+	uint32_t i = 0;
+	uint8_t new_pool[ENTROPY_POOL_SIZE];
+	const uint32_t new_pool_size = sizeof(new_pool);
+
+	RAND_bytes(new_pool, new_pool_size);
+	memcpy(entropy_pool, new_pool, new_pool_size);
+	for (i = 0; ((i < ENTROPY_POOL_SIZE) && (i < entropy_buf_len)); i++) {
+		entropy_pool[i] ^= entropy_buf[i];
+	}
+}
+
+int hw_rng_operation(uint8_t *hwrng_buf, uint32_t len)
+{
+
+	int result;
+	te_securedriver_input_params_t param = {0};
+
+	param.outbuf_ptr = hwrng_buf;
+	param.out_len = len;
+	param.algo_type = HW_RNG_ALG;
+
+	result = te_securedriver_do_operation(&param);
+	if (result) {
+		printf("%s: RNG failure: 0x%x\n", __func__, result);
+	}
+
+	return result;
+}
+
+int aes_crypto_operation(uint8_t *out_buf, uint8_t *in_buf, uint32_t in_len, uint8_t *key)
+{
+	EVP_CIPHER_CTX ctx;
+	unsigned char iv[EVP_MAX_IV_LENGTH];
+	uint32_t out_len = in_len;
+
+	memset(iv, 0, sizeof(EVP_CIPHER_CTX));
+
+	EVP_CIPHER_CTX_init(&ctx);
+	EVP_EncryptInit_ex(&ctx, EVP_aes_128_cbc(), NULL, key, iv);
+
+	/* Encrypt session data */
+	EVP_EncryptUpdate(&ctx, out_buf, &out_len, in_buf, in_len);
+	EVP_EncryptFinal(&ctx, out_buf, &out_len);
+
+	return 0;
+}
+
+#endif //OPENSSL_HW_ASST
+
