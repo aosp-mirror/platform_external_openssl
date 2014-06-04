@@ -53,6 +53,12 @@ ecdhe_psk.patch
 
 Adds support for ECDHE Pre-Shared Key (PSK) TLS cipher suites.
 
+ecdhe_psk_part2.patch
+
+Removes ECHDE-PSK cipher suites with SHA-2 because they cannot be used with
+SSLv3 (and there's no way to express that in OpenSSL's configuration). Adds
+SHA-1 based ECDHE-PSK AES-CBC cipher suites instead.
+
 tls_psk_hint.patch
 
 Fixes issues with TLS-PSK identity hint implementation where
