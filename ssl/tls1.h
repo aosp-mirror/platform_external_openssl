@@ -259,6 +259,7 @@ extern "C" {
 
 /* This is not an IANA defined extension number */
 #define TLSEXT_TYPE_channel_id			30031
+#define TLSEXT_TYPE_channel_id_new		30032
 
 /* NameType value from RFC 3546 */
 #define TLSEXT_NAMETYPE_host_name 0
@@ -531,10 +532,6 @@ SSL_CTX_callback_ctrl(ssl,SSL_CTRL_SET_TLSEXT_TICKET_KEY_CB,(void (*)(void))cb)
 #define TLS1_CK_ECDH_RSA_WITH_AES_128_GCM_SHA256        0x0300C031
 #define TLS1_CK_ECDH_RSA_WITH_AES_256_GCM_SHA384        0x0300C032
 
-/* ECDHE PSK ciphersuites from RFC 5489 */
-#define TLS1_CK_ECDHE_PSK_WITH_AES_128_CBC_SHA256    0x0300C037
-#define TLS1_CK_ECDHE_PSK_WITH_AES_256_CBC_SHA384    0x0300C038
-
 /* XXX
  * Inconsistency alert:
  * The OpenSSL names of ciphers with ephemeral DH here include the string
@@ -685,10 +682,6 @@ SSL_CTX_callback_ctrl(ssl,SSL_CTRL_SET_TLSEXT_TICKET_KEY_CB,(void (*)(void))cb)
 #define TLS1_TXT_ECDHE_RSA_WITH_AES_256_GCM_SHA384      "ECDHE-RSA-AES256-GCM-SHA384"
 #define TLS1_TXT_ECDH_RSA_WITH_AES_128_GCM_SHA256       "ECDH-RSA-AES128-GCM-SHA256"
 #define TLS1_TXT_ECDH_RSA_WITH_AES_256_GCM_SHA384       "ECDH-RSA-AES256-GCM-SHA384"
-
-/* ECDHE PSK ciphersuites from RFC 5489 */
-#define TLS1_TXT_ECDHE_PSK_WITH_AES_128_CBC_SHA256  "ECDHE-PSK-WITH-AES-128-CBC-SHA256"
-#define TLS1_TXT_ECDHE_PSK_WITH_AES_256_CBC_SHA384  "ECDHE-PSK-WITH-AES-256-CBC-SHA384"
 
 #define TLS_CT_RSA_SIGN			1
 #define TLS_CT_DSS_SIGN			2

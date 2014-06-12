@@ -427,18 +427,6 @@ int ssl_get_new_session(SSL *s, int session)
 			}
 #endif
 #endif
-#ifndef OPENSSL_NO_PSK
-		if (s->psk_identity_hint)
-			{
-			ss->psk_identity_hint = BUF_strdup(s->psk_identity_hint);
-			if (ss->psk_identity_hint == NULL)
-				{
-				SSLerr(SSL_F_SSL_GET_NEW_SESSION, ERR_R_MALLOC_FAILURE);
-				SSL_SESSION_free(ss);
-				return 0;
-				}
-			}
-#endif
 		}
 	else
 		{
@@ -1142,6 +1130,17 @@ void SSL_CTX_set_client_cert_cb(SSL_CTX *ctx,
 int (*SSL_CTX_get_client_cert_cb(SSL_CTX *ctx))(SSL * ssl, X509 ** x509 , EVP_PKEY **pkey)
 	{
 	return ctx->client_cert_cb;
+	}
+
+void SSL_CTX_set_channel_id_cb(SSL_CTX *ctx,
+	void (*cb)(SSL *ssl, EVP_PKEY **pkey))
+	{
+	ctx->channel_id_cb=cb;
+	}
+
+void (*SSL_CTX_get_channel_id_cb(SSL_CTX *ctx))(SSL * ssl, EVP_PKEY **pkey)
+	{
+	return ctx->channel_id_cb;
 	}
 
 #ifndef OPENSSL_NO_ENGINE
