@@ -388,13 +388,6 @@ SSL *SSL_new(SSL_CTX *ctx)
 	CRYPTO_new_ex_data(CRYPTO_EX_INDEX_SSL, s, &s->ex_data);
 
 #ifndef OPENSSL_NO_PSK
-	s->psk_identity_hint = NULL;
-	if (ctx->psk_identity_hint)
-		{
-		s->psk_identity_hint = BUF_strdup(ctx->psk_identity_hint);
-		if (s->psk_identity_hint == NULL)
-			goto err;
-		}
 	s->psk_client_callback=ctx->psk_client_callback;
 	s->psk_server_callback=ctx->psk_server_callback;
 #endif
@@ -601,11 +594,6 @@ void SSL_free(SSL *s)
 		EVP_PKEY_free(s->tlsext_channel_id_private);
 	if (s->alpn_client_proto_list)
 		OPENSSL_free(s->alpn_client_proto_list);
-#endif
-
-#ifndef OPENSSL_NO_PSK
-	if (s->psk_identity_hint)
-		OPENSSL_free(s->psk_identity_hint);
 #endif
 
 	if (s->client_CA != NULL)
@@ -1403,6 +1391,10 @@ char *SSL_get_shared_ciphers(const SSL *s,char *buf,int len)
 
 	p=buf;
 	sk=s->session->ciphers;
+
+	if (sk_SSL_CIPHER_num(sk) == 0)
+		return NULL;
+
 	for (i=0; i<sk_SSL_CIPHER_num(sk); i++)
 		{
 		int n;
@@ -1452,7 +1444,7 @@ int ssl_cipher_list_to_bytes(SSL *s,STACK_OF(SSL_CIPHER) *sk,unsigned char *p,
 #endif /* OPENSSL_NO_KRB5 */
 #ifndef OPENSSL_NO_PSK
 		/* with PSK there must be client callback set */
-		if ((c->algorithm_auth & SSL_aPSK) &&
+		if (((c->algorithm_mkey & SSL_kPSK) || (c->algorithm_auth & SSL_aPSK)) &&
 		    s->psk_client_callback == NULL)
 			continue;
 #endif /* OPENSSL_NO_PSK */
@@ -2671,6 +2663,10 @@ int SSL_get_error(const SSL *s,int i)
 		{
 		return(SSL_ERROR_WANT_X509_LOOKUP);
 		}
+	if ((i < 0) && SSL_want_channel_id_lookup(s))
+		{
+		return(SSL_ERROR_WANT_CHANNEL_ID_LOOKUP);
+		}
 
 	if (i == 0)
 		{
@@ -3315,54 +3311,32 @@ int SSL_use_psk_identity_hint(SSL *s, const char *identity_hint)
 	if (s == NULL)
 		return 0;
 
+	if (s->session == NULL)
+		return 1; /* session not created yet, ignored */
+
 	if (identity_hint != NULL && strlen(identity_hint) > PSK_MAX_IDENTITY_LEN)
 		{
 		SSLerr(SSL_F_SSL_USE_PSK_IDENTITY_HINT, SSL_R_DATA_LENGTH_TOO_LONG);
 		return 0;
 		}
-
-	/* Clear hint in SSL and associated SSL_SESSION (if any). */
-	if (s->psk_identity_hint != NULL)
-		{
-		OPENSSL_free(s->psk_identity_hint);
-		s->psk_identity_hint = NULL;
-		}
-	if (s->session != NULL && s->session->psk_identity_hint != NULL)
-		{
+	if (s->session->psk_identity_hint != NULL)
 		OPENSSL_free(s->session->psk_identity_hint);
-		s->session->psk_identity_hint = NULL;
-		}
-
 	if (identity_hint != NULL)
 		{
-		/* The hint is stored in SSL and SSL_SESSION with the one in
-		 * SSL_SESSION taking precedence. Thus, if SSL_SESSION is avaiable,
-		 * we store the hint there, otherwise we store it in SSL. */
-		if (s->session != NULL)
-			{
-			s->session->psk_identity_hint = BUF_strdup(identity_hint);
-			if (s->session->psk_identity_hint == NULL)
-				return 0;
-			}
-		else
-			{
-			s->psk_identity_hint = BUF_strdup(identity_hint);
-			if (s->psk_identity_hint == NULL)
-				return 0;
-			}
+		s->session->psk_identity_hint = BUF_strdup(identity_hint);
+		if (s->session->psk_identity_hint == NULL)
+			return 0;
 		}
+	else
+		s->session->psk_identity_hint = NULL;
 	return 1;
 	}
 
 const char *SSL_get_psk_identity_hint(const SSL *s)
 	{
-	if (s == NULL)
+	if (s == NULL || s->session == NULL)
 		return NULL;
-	/* The hint is stored in SSL and SSL_SESSION with the one in SSL_SESSION
-	 * taking precedence. */
-	if (s->session != NULL)
-		return(s->session->psk_identity_hint);
-	return(s->psk_identity_hint);
+	return(s->session->psk_identity_hint);
 	}
 
 const char *SSL_get_psk_identity(const SSL *s)
@@ -3419,10 +3393,39 @@ int SSL_cutthrough_complete(const SSL *s)
 		s->version >= SSL3_VERSION &&
 		s->s3->in_read_app_data == 0 &&   /* cutthrough only applies to write() */
 		(SSL_get_mode((SSL*)s) & SSL_MODE_HANDSHAKE_CUTTHROUGH) &&  /* cutthrough enabled */
-		SSL_get_cipher_bits(s, NULL) >= 128 &&                      /* strong cipher choosen */
+		ssl3_can_cutthrough(s) &&                                   /* cutthrough allowed */
 		s->s3->previous_server_finished_len == 0 &&                 /* not a renegotiation handshake */
 		(s->state == SSL3_ST_CR_SESSION_TICKET_A ||                 /* ready to write app-data*/
 			s->state == SSL3_ST_CR_FINISHED_A));
+	}
+
+int ssl3_can_cutthrough(const SSL *s)
+	{
+	const SSL_CIPHER *c;
+
+	/* require a strong enough cipher */
+	if (SSL_get_cipher_bits(s, NULL) < 128)
+		return 0;
+
+	/* require ALPN or NPN extension */
+	if (!s->s3->alpn_selected
+#ifndef OPENSSL_NO_NEXTPROTONEG
+		&& !s->s3->next_proto_neg_seen
+#endif
+	)
+		{
+		return 0;
+		}
+
+	/* require a forward-secret cipher */
+	c = SSL_get_current_cipher(s);
+	if (!c || (c->algorithm_mkey != SSL_kEDH &&
+			c->algorithm_mkey != SSL_kEECDH))
+		{
+		return 0;
+		}
+
+	return 1;
 	}
 
 /* Allocates new EVP_MD_CTX and sets pointer to it into given pointer
