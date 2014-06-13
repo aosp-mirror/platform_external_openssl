@@ -1,4 +1,4 @@
-From 53ed330060d3e9e386cad114fae871b4506adb62 Mon Sep 17 00:00:00 2001
+From c8b1f7ec56704c1116795aec9ca61db654b433bf Mon Sep 17 00:00:00 2001
 From: Alex Klyubin <klyubin@google.com>
 Date: Mon, 19 May 2014 11:27:33 -0700
 Subject: psk_client_callback, 128-byte id bug.
@@ -24,10 +24,10 @@ handshake if the identity (without the NULL terminator) is longer than
  1 file changed, 14 insertions(+), 6 deletions(-)
 
 diff --git a/ssl/s3_clnt.c b/ssl/s3_clnt.c
-index 745c41d..84b51e9 100644
+index 03b96e8..0e22afc 100644
 --- a/ssl/s3_clnt.c
 +++ b/ssl/s3_clnt.c
-@@ -2326,7 +2326,8 @@ int ssl3_send_client_key_exchange(SSL *s)
+@@ -2328,7 +2328,8 @@ int ssl3_send_client_key_exchange(SSL *s)
  #ifndef OPENSSL_NO_PSK
  		if (alg_a & SSL_aPSK)
  			{
@@ -37,7 +37,7 @@ index 745c41d..84b51e9 100644
  			unsigned char *t = NULL;
  			unsigned char pre_ms[PSK_MAX_PSK_LEN*2+4];
  			unsigned int pre_ms_len = 0;
-@@ -2340,8 +2341,9 @@ int ssl3_send_client_key_exchange(SSL *s)
+@@ -2342,8 +2343,9 @@ int ssl3_send_client_key_exchange(SSL *s)
  				goto err;
  				}
  
@@ -48,7 +48,7 @@ index 745c41d..84b51e9 100644
  			if (psk_len > PSK_MAX_PSK_LEN)
  				{
  				SSLerr(SSL_F_SSL3_SEND_CLIENT_KEY_EXCHANGE,
-@@ -2354,6 +2356,13 @@ int ssl3_send_client_key_exchange(SSL *s)
+@@ -2356,6 +2358,13 @@ int ssl3_send_client_key_exchange(SSL *s)
  					SSL_R_PSK_IDENTITY_NOT_FOUND);
  				goto psk_err;
  				}
@@ -62,7 +62,7 @@ index 745c41d..84b51e9 100644
  
  			if (!(alg_k & SSL_kEECDH))
  				{
-@@ -2370,10 +2379,9 @@ int ssl3_send_client_key_exchange(SSL *s)
+@@ -2372,10 +2381,9 @@ int ssl3_send_client_key_exchange(SSL *s)
  					s->method->ssl3_enc->generate_master_secret(s,
  						s->session->master_key,
  						pre_ms, pre_ms_len);
@@ -77,5 +77,5 @@ index 745c41d..84b51e9 100644
  
  			if (s->session->psk_identity != NULL)
 -- 
-1.9.1.423.g4596e3a
+2.0.0.526.g5318336
 
