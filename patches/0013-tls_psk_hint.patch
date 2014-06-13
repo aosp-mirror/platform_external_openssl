@@ -1,4 +1,4 @@
-From bcba3efc4c4276f8f7437c078d125756537aa790 Mon Sep 17 00:00:00 2001
+From 9c14752f8872401de413fb46a96146b0d6bf926e Mon Sep 17 00:00:00 2001
 From: Alex Klyubin <klyubin@google.com>
 Date: Tue, 8 Apr 2014 16:02:24 -0700
 Subject: tls_psk_hint
@@ -84,7 +84,7 @@ index f857946..b017139 100644
  				OPENSSL_free(s->session->psk_identity);
  			s->session->psk_identity = BUF_strdup(identity);
 diff --git a/ssl/d1_srvr.c b/ssl/d1_srvr.c
-index 9975e20..09f4762 100644
+index 1384ab0..c181db6 100644
 --- a/ssl/d1_srvr.c
 +++ b/ssl/d1_srvr.c
 @@ -471,7 +471,7 @@ int dtls1_accept(SSL *s)
@@ -105,7 +105,7 @@ index 9975e20..09f4762 100644
  				}
  			else
  #endif /* !OPENSSL_NO_PSK */
-@@ -1364,9 +1364,9 @@ int dtls1_send_server_key_exchange(SSL *s)
+@@ -1365,9 +1365,9 @@ int dtls1_send_server_key_exchange(SSL *s)
  		if (type & SSL_kPSK)
  			{
  			/* copy PSK identity hint */
@@ -119,10 +119,10 @@ index 9975e20..09f4762 100644
  #endif
  
 diff --git a/ssl/s3_clnt.c b/ssl/s3_clnt.c
-index 34a3342..51556e6 100644
+index 12c3fe8..17367a2 100644
 --- a/ssl/s3_clnt.c
 +++ b/ssl/s3_clnt.c
-@@ -1372,9 +1372,11 @@ int ssl3_get_key_exchange(SSL *s)
+@@ -1374,9 +1374,11 @@ int ssl3_get_key_exchange(SSL *s)
  		if (s->s3->tmp.new_cipher->algorithm_auth & SSL_aPSK)
  			{
  			s->session->sess_cert=ssl_sess_cert_new();
@@ -137,7 +137,7 @@ index 34a3342..51556e6 100644
  			}
  #endif
  		s->s3->tmp.reuse_message=1;
-@@ -1424,7 +1426,11 @@ int ssl3_get_key_exchange(SSL *s)
+@@ -1426,7 +1428,11 @@ int ssl3_get_key_exchange(SSL *s)
  		al=SSL_AD_HANDSHAKE_FAILURE;
  		n2s(p,i);
  		param_len=i+2;
@@ -150,7 +150,7 @@ index 34a3342..51556e6 100644
  		if (i != 0)
  			{
  			/* Store PSK identity hint for later use, hint is used
-@@ -1450,10 +1456,8 @@ int ssl3_get_key_exchange(SSL *s)
+@@ -1452,10 +1458,8 @@ int ssl3_get_key_exchange(SSL *s)
  			 * NULL-terminated string. */
  			memcpy(tmp_id_hint, p, i);
  			memset(tmp_id_hint+i, 0, PSK_MAX_IDENTITY_LEN+1-i);
@@ -163,7 +163,7 @@ index 34a3342..51556e6 100644
  				{
  				SSLerr(SSL_F_SSL3_GET_KEY_EXCHANGE, ERR_R_MALLOC_FAILURE);
  				goto f_err;
-@@ -2336,7 +2340,7 @@ int ssl3_send_client_key_exchange(SSL *s)
+@@ -2338,7 +2342,7 @@ int ssl3_send_client_key_exchange(SSL *s)
  				goto err;
  				}
  
@@ -172,7 +172,7 @@ index 34a3342..51556e6 100644
  				identity, PSK_MAX_IDENTITY_LEN, psk, sizeof(psk));
  			if (psk_len > PSK_MAX_PSK_LEN)
  				{
-@@ -2372,21 +2376,6 @@ int ssl3_send_client_key_exchange(SSL *s)
+@@ -2374,21 +2378,6 @@ int ssl3_send_client_key_exchange(SSL *s)
  				n += 2;
  				}
  
@@ -195,7 +195,7 @@ index 34a3342..51556e6 100644
  				OPENSSL_free(s->session->psk_identity);
  			s->session->psk_identity = BUF_strdup(identity);
 diff --git a/ssl/s3_srvr.c b/ssl/s3_srvr.c
-index 77015e6..fd5c9bc 100644
+index d6f1a35..c360337 100644
 --- a/ssl/s3_srvr.c
 +++ b/ssl/s3_srvr.c
 @@ -492,7 +492,7 @@ int ssl3_accept(SSL *s)
@@ -207,7 +207,7 @@ index 77015e6..fd5c9bc 100644
  #endif
  #ifndef OPENSSL_NO_SRP
  			    /* SRP: send ServerKeyExchange */
-@@ -1700,6 +1700,10 @@ int ssl3_send_server_key_exchange(SSL *s)
+@@ -1702,6 +1702,10 @@ int ssl3_send_server_key_exchange(SSL *s)
  	int curve_id = 0;
  	BN_CTX *bn_ctx = NULL; 
  #endif
@@ -218,7 +218,7 @@ index 77015e6..fd5c9bc 100644
  	EVP_PKEY *pkey;
  	const EVP_MD *md = NULL;
  	unsigned char *p,*d;
-@@ -1728,9 +1732,12 @@ int ssl3_send_server_key_exchange(SSL *s)
+@@ -1730,9 +1734,12 @@ int ssl3_send_server_key_exchange(SSL *s)
  		if (alg_a & SSL_aPSK)
  			{
  			/* size for PSK identity hint */
@@ -234,7 +234,7 @@ index 77015e6..fd5c9bc 100644
  			}
  #endif /* !OPENSSL_NO_PSK */
  #ifndef OPENSSL_NO_RSA
-@@ -2023,20 +2030,12 @@ int ssl3_send_server_key_exchange(SSL *s)
+@@ -2025,20 +2032,12 @@ int ssl3_send_server_key_exchange(SSL *s)
  #ifndef OPENSSL_NO_PSK
  		if (alg_a & SSL_aPSK)
  			{
@@ -260,7 +260,7 @@ index 77015e6..fd5c9bc 100644
  				}
  			}
  #endif /* OPENSSL_NO_PSK */
-@@ -2386,17 +2385,6 @@ int ssl3_get_client_key_exchange(SSL *s)
+@@ -2393,17 +2392,6 @@ int ssl3_get_client_key_exchange(SSL *s)
  			goto psk_err;
  			}
  
@@ -279,10 +279,10 @@ index 77015e6..fd5c9bc 100644
  		n -= (i + 2);
  		psk_err = 0;
 diff --git a/ssl/ssl.h b/ssl/ssl.h
-index c5675c0..c2fb716 100644
+index a7e1455..f044cd1 100644
 --- a/ssl/ssl.h
 +++ b/ssl/ssl.h
-@@ -1439,6 +1439,10 @@ struct ssl_st
+@@ -1441,6 +1441,10 @@ struct ssl_st
  #endif	/* OPENSSL_NO_KRB5 */
  
  #ifndef OPENSSL_NO_PSK
@@ -294,7 +294,7 @@ index c5675c0..c2fb716 100644
  		unsigned int max_identity_len, unsigned char *psk,
  		unsigned int max_psk_len);
 diff --git a/ssl/ssl_lib.c b/ssl/ssl_lib.c
-index b8bebb4..e17bb55 100644
+index 3e49cab..cf24292 100644
 --- a/ssl/ssl_lib.c
 +++ b/ssl/ssl_lib.c
 @@ -388,6 +388,13 @@ SSL *SSL_new(SSL_CTX *ctx)
@@ -323,7 +323,7 @@ index b8bebb4..e17bb55 100644
  	if (s->client_CA != NULL)
  		sk_X509_NAME_pop_free(s->client_CA,X509_NAME_free);
  
-@@ -3357,32 +3369,54 @@ int SSL_use_psk_identity_hint(SSL *s, const char *identity_hint)
+@@ -3361,32 +3373,54 @@ int SSL_use_psk_identity_hint(SSL *s, const char *identity_hint)
  	if (s == NULL)
  		return 0;
  
@@ -413,5 +413,5 @@ index 44268e7..cdd198c 100644
  	else
  		{
 -- 
-1.9.1.423.g4596e3a
+2.0.0.526.g5318336
 
