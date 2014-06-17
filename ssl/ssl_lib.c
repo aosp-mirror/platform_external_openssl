@@ -2792,6 +2792,8 @@ const char *SSL_SESSION_get_version(const SSL_SESSION *s)
 		return ssl_get_version(s->ssl_version);
 	}
 
+extern const char* SSL_CIPHER_authentication_method(const SSL_CIPHER*);
+
 const char* SSL_authentication_method(const SSL* ssl)
 	{
 	if (ssl->cert != NULL && ssl->cert->rsa_tmp != NULL)
