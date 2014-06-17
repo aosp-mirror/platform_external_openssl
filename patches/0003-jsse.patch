@@ -10,6 +10,14 @@
  	/* Default generate session ID callback. */
  	GEN_SESSION_CB generate_session_id;
  
+@@ -1545,6 +1548,7 @@
+ char *	SSL_CIPHER_get_version(const SSL_CIPHER *c);
+ const char *	SSL_CIPHER_get_name(const SSL_CIPHER *c);
+ unsigned long 	SSL_CIPHER_get_id(const SSL_CIPHER *c);
++const char *	SSL_CIPHER_authentication_method(const SSL_CIPHER* cipher);
+ 
+ int	SSL_get_fd(const SSL *s);
+ int	SSL_get_rfd(const SSL *s);
 @@ -1554,6 +1558,7 @@ const char  * SSL_get_cipher_list(const 
  char *	SSL_get_shared_ciphers(const SSL *s, char *buf, int len);
  int	SSL_get_read_ahead(const SSL * s);
