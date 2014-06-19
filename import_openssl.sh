@@ -452,6 +452,12 @@ function import() {
   gen_asm_arm crypto/sha/asm/sha256-armv4.pl
   gen_asm_arm crypto/sha/asm/sha512-armv4.pl
 
+  # Generate armv8 asm
+  gen_asm_arm crypto/aes/asm/aesv8-armx.pl
+  gen_asm_arm crypto/modes/asm/ghashv8-armx.pl
+  gen_asm_arm crypto/sha/asm/sha1-armv8.pl
+  gen_asm_arm crypto/sha/asm/sha512-armv8.pl
+
   # Generate mips asm
   gen_asm_mips crypto/aes/asm/aes-mips.pl
   gen_asm_mips crypto/bn/asm/mips.pl crypto/bn/asm/bn-mips.S
