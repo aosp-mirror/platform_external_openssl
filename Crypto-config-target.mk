@@ -556,12 +556,14 @@ arm_cflags := \
 
 arm_src_files := \
   crypto/aes/asm/aes-armv4.S \
+  crypto/aes/asm/aesv8-armx.S \
   crypto/aes/asm/bsaes-armv7.S \
   crypto/armcap.c \
   crypto/armv4cpuid.S \
   crypto/bn/asm/armv4-gf2m.S \
   crypto/bn/asm/armv4-mont.S \
   crypto/modes/asm/ghash-armv4.S \
+  crypto/modes/asm/ghashv8-armx.S \
   crypto/sha/asm/sha1-armv4-large.S \
   crypto/sha/asm/sha256-armv4.S \
   crypto/sha/asm/sha512-armv4.S \
@@ -571,9 +573,19 @@ arm_exclude_files := \
   crypto/mem_clr.c \
 
 arm64_cflags := \
-  -DOPENSSL_NO_ASM \
+  -DOPENSSL_CPUID_OBJ \
+  -DSHA1_ASM \
+  -DSHA256_ASM \
+  -DSHA512_ASM \
 
-arm64_src_files :=
+arm64_src_files := \
+  crypto/aes/asm/aesv8-armx-64.S \
+  crypto/arm64cpuid.S \
+  crypto/armcap.c \
+  crypto/modes/asm/ghashv8-armx-64.S \
+  crypto/sha/asm/sha1-armv8.S \
+  crypto/sha/asm/sha256-armv8.S \
+  crypto/sha/asm/sha512-armv8.S \
 
 arm64_exclude_files :=
 
