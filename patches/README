@@ -53,6 +53,13 @@ ecdhe_psk.patch
 
 Adds support for ECDHE Pre-Shared Key (PSK) TLS cipher suites.
 
+arm_asm.patch
+
+Adds newer ARM assembly pack with BSAES for ARMv7 and acceleration for ARMv8
+Based on branch available at:
+https://git.linaro.org/people/ard.biesheuvel/openssl.git/shortlog/refs/heads/openssl-1.0.1f-with-arm-patches
+c7b582ef23eb6f4386664e841e6e406d984c38d3^..cb8b1ab03e5c179a719afe83f03fecb1c2c78730
+
 tls_psk_hint.patch
 
 Fixes issues with TLS-PSK identity hint implementation where
