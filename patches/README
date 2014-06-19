@@ -53,6 +53,10 @@ ecdhe_psk.patch
 
 Adds support for ECDHE Pre-Shared Key (PSK) TLS cipher suites.
 
+arm_asm.patch
+
+Adds newer ARM assembly pack with BSAES for ARMv7 and acceleration for ARMv8
+
 tls_psk_hint.patch
 
 Fixes issues with TLS-PSK identity hint implementation where
