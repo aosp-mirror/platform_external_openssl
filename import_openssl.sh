@@ -128,7 +128,16 @@ function default_asm_file () {
 function gen_asm_arm () {
   local OUT
   OUT=$(default_asm_file "$@")
-  $PERL_EXE "$1" > "$OUT"
+  $PERL_EXE "$1" void "$OUT" > "$OUT"
+}
+
+# Generate an ARMv8 64-bit assembly file.
+# $1: generator (perl script)
+# $2: [optional] output file name
+function gen_asm_arm64 () {
+  local OUT
+  OUT=$(default_asm_file "$@")
+  $PERL_EXE "$1" linux64 "$OUT" > "$OUT"
 }
 
 function gen_asm_mips () {
@@ -444,13 +453,22 @@ function import() {
 
   # Generate arm asm
   gen_asm_arm crypto/aes/asm/aes-armv4.pl
+  gen_asm_arm crypto/aes/asm/aesv8-armx.pl
   gen_asm_arm crypto/aes/asm/bsaes-armv7.pl
   gen_asm_arm crypto/bn/asm/armv4-gf2m.pl
   gen_asm_arm crypto/bn/asm/armv4-mont.pl
   gen_asm_arm crypto/modes/asm/ghash-armv4.pl
+  gen_asm_arm crypto/modes/asm/ghashv8-armx.pl
   gen_asm_arm crypto/sha/asm/sha1-armv4-large.pl
   gen_asm_arm crypto/sha/asm/sha256-armv4.pl
   gen_asm_arm crypto/sha/asm/sha512-armv4.pl
+
+  # Generate armv8 asm
+  gen_asm_arm64 crypto/aes/asm/aesv8-armx.pl crypto/aes/asm/aesv8-armx-64.S
+  gen_asm_arm64 crypto/modes/asm/ghashv8-armx.pl crypto/modes/asm/ghashv8-armx-64.S
+  gen_asm_arm64 crypto/sha/asm/sha1-armv8.pl
+  gen_asm_arm64 crypto/sha/asm/sha512-armv8.pl crypto/sha/asm/sha256-armv8.S
+  gen_asm_arm64 crypto/sha/asm/sha512-armv8.pl
 
   # Generate mips asm
   gen_asm_mips crypto/aes/asm/aes-mips.pl
