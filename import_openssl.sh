@@ -424,6 +424,7 @@ function import() {
   declare -r OPENSSL_SOURCE=$1
   untar $OPENSSL_SOURCE readonly
   applypatches $OPENSSL_DIR
+  convert_iso8859_to_utf8 $OPENSSL_DIR
 
   cd $OPENSSL_DIR
   generate_build_config_mk
@@ -585,7 +586,6 @@ function untar() {
 
   # Process new source
   tar -zxf $OPENSSL_SOURCE
-  convert_iso8859_to_utf8 $OPENSSL_DIR
   cp -RfP $OPENSSL_DIR $OPENSSL_DIR_ORIG
   if [ ! -z $readonly ]; then
     find $OPENSSL_DIR_ORIG -type f -print0 | xargs -0 chmod a-w
