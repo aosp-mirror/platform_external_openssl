@@ -22,6 +22,30 @@
       "revId": "de4ef2b8f5cfe2abd63b65009a0feaa52c78dff4",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "24570143_7a7a9595",
+        "filename": "openssl.config",
+        "patchSetId": 1
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2014-06-20T06:35:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "242541ef_8ac8eb57",
+      "range": {
+        "startLine": 222,
+        "startChar": 1,
+        "endLine": 222,
+        "endChar": 2
+      },
+      "revId": "de4ef2b8f5cfe2abd63b65009a0feaa52c78dff4",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
