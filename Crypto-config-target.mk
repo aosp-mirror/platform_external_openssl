@@ -332,7 +332,6 @@ common_src_files := \
   crypto/evp/m_md5.c \
   crypto/evp/m_mdc2.c \
   crypto/evp/m_null.c \
-  crypto/evp/m_ripemd.c \
   crypto/evp/m_sha1.c \
   crypto/evp/m_sigver.c \
   crypto/evp/m_wp.c \
@@ -438,8 +437,6 @@ common_src_files := \
   crypto/rc4/rc4_enc.c \
   crypto/rc4/rc4_skey.c \
   crypto/rc4/rc4_utl.c \
-  crypto/ripemd/rmd_dgst.c \
-  crypto/ripemd/rmd_one.c \
   crypto/rsa/rsa_ameth.c \
   crypto/rsa/rsa_asn1.c \
   crypto/rsa/rsa_chk.c \
