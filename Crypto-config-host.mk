@@ -543,6 +543,7 @@ common_c_includes := \
 arm_cflags := \
   -DAES_ASM \
   -DBSAES_ASM \
+  -DDES_UNROLL \
   -DGHASH_ASM \
   -DOPENSSL_BN_ASM_GF2m \
   -DOPENSSL_BN_ASM_MONT \
@@ -570,6 +571,7 @@ arm_exclude_files := \
   crypto/mem_clr.c \
 
 arm64_cflags := \
+  -DDES_UNROLL \
   -DOPENSSL_CPUID_OBJ \
   -DSHA1_ASM \
   -DSHA256_ASM \
@@ -598,6 +600,8 @@ x86_cflags := \
   -DOPENSSL_BN_ASM_PART_WORDS \
   -DOPENSSL_CPUID_OBJ \
   -DOPENSSL_IA32_SSE2 \
+  -DRC4_INDEX \
+  -DRMD160_ASM \
   -DSHA1_ASM \
   -DSHA256_ASM \
   -DSHA512_ASM \
@@ -633,8 +637,6 @@ x86_exclude_files := \
 x86_64_cflags := \
   -DAES_ASM \
   -DBSAES_ASM \
-  -DDES_PTR \
-  -DDES_RISC1 \
   -DDES_UNROLL \
   -DGHASH_ASM \
   -DMD5_ASM \
@@ -642,6 +644,7 @@ x86_64_cflags := \
   -DOPENSSL_BN_ASM_MONT \
   -DOPENSSL_BN_ASM_MONT5 \
   -DOPENSSL_CPUID_OBJ \
+  -DOPENSSL_IA32_SSE2 \
   -DSHA1_ASM \
   -DSHA256_ASM \
   -DSHA512_ASM \
