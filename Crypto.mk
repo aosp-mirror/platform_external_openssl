@@ -8,7 +8,7 @@ LOCAL_SHARED_LIBRARIES := $(log_shared_libraries)
 LOCAL_SDK_VERSION := 9
 
 LOCAL_MODULE_TAGS := optional
-LOCAL_MODULE:= libcrypto_static
+LOCAL_MODULE := libcrypto_static
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/android-config.mk $(LOCAL_PATH)/Crypto.mk
 include $(LOCAL_PATH)/Crypto-config-target.mk
 include $(LOCAL_PATH)/android-config.mk
@@ -38,7 +38,7 @@ endif
 LOCAL_LDFLAGS += -ldl
 
 LOCAL_MODULE_TAGS := optional
-LOCAL_MODULE:= libcrypto
+LOCAL_MODULE := libcrypto
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/android-config.mk $(LOCAL_PATH)/Crypto.mk
 include $(LOCAL_PATH)/Crypto-config-target.mk
 include $(LOCAL_PATH)/android-config.mk
@@ -51,7 +51,7 @@ LOCAL_SHARED_LIBRARIES := $(log_shared_libraries)
 LOCAL_CFLAGS += -DPURIFY
 LOCAL_LDLIBS += -ldl
 LOCAL_MODULE_TAGS := optional
-LOCAL_MODULE:= libcrypto-host
+LOCAL_MODULE := libcrypto-host
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/android-config.mk $(LOCAL_PATH)/Crypto.mk
 include $(LOCAL_PATH)/Crypto-config-host.mk
 include $(LOCAL_PATH)/android-config.mk
@@ -65,7 +65,7 @@ LOCAL_SHARED_LIBRARIES := $(log_shared_libraries)
 LOCAL_CFLAGS += -DPURIFY
 LOCAL_LDLIBS += -ldl
 LOCAL_MODULE_TAGS := optional
-LOCAL_MODULE:= libcrypto_static
+LOCAL_MODULE := libcrypto_static
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/android-config.mk $(LOCAL_PATH)/Crypto.mk
 include $(LOCAL_PATH)/Crypto-config-host.mk
 include $(LOCAL_PATH)/android-config.mk
