@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c4e8e5cd_bf50b38e",
+        "filename": "crypto/rand/rand_lib.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 1043663
+      },
+      "writtenOn": "2014-06-22T04:59:30Z",
+      "side": 1,
+      "message": "I would prefer to call rand_bytes_hw_alt here, rather than call it indirectly through RAND_bytes. I think that\u0027s clearer.",
+      "range": {
+        "startLine": 379,
+        "startChar": 1,
+        "endLine": 379,
+        "endChar": 11
+      },
+      "revId": "bb8c9e76fe4ced725d104dc07febda22f796fa17",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c4e8e5cd_df5d7fa5",
+        "filename": "crypto/rand/rand_lib.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 1043663
+      },
+      "writtenOn": "2014-06-22T04:59:30Z",
+      "side": 1,
+      "message": "May as well just use ECB mode here. Then you don\u0027t have to mess with creating and nulling an IV. The effect is identical (single-block CBC with all-zero IV is exactly the same as single-block ECB).\n\nI\u0027d also skip the EVP abstraction layer and just call the AES_* functions directly, but this is fine, too.",
+      "range": {
+        "startLine": 413,
+        "startChar": 26,
+        "endLine": 413,
+        "endChar": 41
+      },
+      "revId": "bb8c9e76fe4ced725d104dc07febda22f796fa17",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
