@@ -70,6 +70,24 @@
       "revId": "34d8639d5ac9f8223fca0cde1e646af0684c3e1e",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "649e596e_108b5d5a",
+        "filename": "Crypto.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1003981
+      },
+      "writtenOn": "2014-06-24T16:12:10Z",
+      "side": 1,
+      "message": "You\u0027ll need the same for libssl-host, if both 32-bit and 64-bit are required.",
+      "parentUuid": "44a315b3_7f7abbfc",
+      "revId": "34d8639d5ac9f8223fca0cde1e646af0684c3e1e",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
