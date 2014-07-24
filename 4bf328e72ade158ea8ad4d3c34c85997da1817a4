@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "193d089f_5f01f4d3",
+        "filename": "crypto/x86cpuid.S",
+        "patchSetId": 1
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 1003224
+      },
+      "writtenOn": "2014-07-24T20:28:39Z",
+      "side": 1,
+      "message": "looks like the x86_64 version is already okay.",
+      "revId": "4bf328e72ade158ea8ad4d3c34c85997da1817a4",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
