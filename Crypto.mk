@@ -40,12 +40,6 @@ LOCAL_LDFLAGS += -ldl
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE := libcrypto
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/android-config.mk $(LOCAL_PATH)/Crypto.mk
-# Bug: 14296739
-# This library is possibly pulling in assembly that has text relocations.
-# Disable the warning in the meantime.
-ifeq ($(TARGET_ARCH),$(filter $(TARGET_ARCH), x86 x86_64))
-LOCAL_LDFLAGS += -Wl,--no-fatal-warnings
-endif
 include $(LOCAL_PATH)/Crypto-config-target.mk
 include $(LOCAL_PATH)/android-config.mk
 include $(BUILD_SHARED_LIBRARY)
@@ -60,12 +54,6 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE := libcrypto-host
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/android-config.mk $(LOCAL_PATH)/Crypto.mk
 LOCAL_MULTILIB := both
-# Bug: 14296739
-# This library is possibly pulling in assembly that has text relocations.
-# Disable the warning in the meantime.
-ifeq ($(TARGET_ARCH),$(filter $(TARGET_ARCH), x86 x86_64))
-LOCAL_LDFLAGS += -Wl,--no-fatal-warnings
-endif
 include $(LOCAL_PATH)/Crypto-config-host.mk
 include $(LOCAL_PATH)/android-config.mk
 include $(BUILD_HOST_SHARED_LIBRARY)
