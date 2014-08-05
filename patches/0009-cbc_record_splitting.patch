@@ -1,4 +1,4 @@
-From 6d65fc2d2bd6d6f4a5de364ff2cf7ec2da8f5037 Mon Sep 17 00:00:00 2001
+From e6102d2ac84a55e4a50d9edfc36ec894c6174fb7 Mon Sep 17 00:00:00 2001
 From: Adam Langley <agl@chromium.org>
 Date: Thu, 31 Oct 2013 13:22:54 -0400
 
@@ -16,12 +16,12 @@ cipher suite).
  apps/s_client.c |  16 +++++---
  ssl/d1_pkt.c    |  50 ++++---------------------
  ssl/s3_enc.c    |  17 ++++-----
- ssl/s3_pkt.c    | 112 +++++++++++++++++++++++++++++++-------------------------
- ssl/ssl.h       |  19 +++++++---
+ ssl/s3_pkt.c    | 113 +++++++++++++++++++++++++++++++-------------------------
+ ssl/ssl.h       |  20 +++++++---
  ssl/ssl3.h      |   4 +-
  ssl/ssl_locl.h  |   2 -
  ssl/t1_enc.c    |  10 ++---
- 8 files changed, 109 insertions(+), 121 deletions(-)
+ 8 files changed, 110 insertions(+), 122 deletions(-)
 
 diff --git a/apps/s_client.c b/apps/s_client.c
 index cb1efcd..0c70580 100644
@@ -83,7 +83,7 @@ index cb1efcd..0c70580 100644
  	if (state) SSL_CTX_set_info_callback(ctx,apps_ssl_info_callback);
  	if (cipher != NULL)
 diff --git a/ssl/d1_pkt.c b/ssl/d1_pkt.c
-index 0bf87be..cb0f8f0 100644
+index 438c091..363fc8c 100644
 --- a/ssl/d1_pkt.c
 +++ b/ssl/d1_pkt.c
 @@ -179,6 +179,8 @@ static int dtls1_record_needs_buffering(SSL *s, SSL3_RECORD *rr,
@@ -95,7 +95,7 @@ index 0bf87be..cb0f8f0 100644
  
  /* copy buffered record into SSL structure */
  static int
-@@ -1456,11 +1458,12 @@ int dtls1_write_bytes(SSL *s, int type, const void *buf, int len)
+@@ -1464,11 +1466,12 @@ int dtls1_write_bytes(SSL *s, int type, const void *buf, int len)
  
  	OPENSSL_assert(len <= SSL3_RT_MAX_PLAIN_LENGTH);
  	s->rwstate=SSL_NOTHING;
@@ -110,7 +110,7 @@ index 0bf87be..cb0f8f0 100644
  	{
  	unsigned char *p,*pseq;
  	int i,mac_size,clear=0;
-@@ -1487,7 +1490,7 @@ int do_dtls1_write(SSL *s, int type, const unsigned char *buf, unsigned int len,
+@@ -1495,7 +1498,7 @@ int do_dtls1_write(SSL *s, int type, const unsigned char *buf, unsigned int len,
  		/* if it went, fall through and send more stuff */
  		}
  
@@ -119,7 +119,7 @@ index 0bf87be..cb0f8f0 100644
  		return 0;
  
  	wr= &(s->s3->wrec);
-@@ -1508,37 +1511,6 @@ int do_dtls1_write(SSL *s, int type, const unsigned char *buf, unsigned int len,
+@@ -1516,37 +1519,6 @@ int do_dtls1_write(SSL *s, int type, const unsigned char *buf, unsigned int len,
  			goto err;
  		}
  
@@ -157,7 +157,7 @@ index 0bf87be..cb0f8f0 100644
  	p = wb->buf + prefix_len;
  
  	/* write the header */
-@@ -1644,14 +1616,6 @@ int do_dtls1_write(SSL *s, int type, const unsigned char *buf, unsigned int len,
+@@ -1652,14 +1624,6 @@ int do_dtls1_write(SSL *s, int type, const unsigned char *buf, unsigned int len,
  
  	ssl3_record_sequence_update(&(s->s3->write_sequence[0]));
  
@@ -172,7 +172,7 @@ index 0bf87be..cb0f8f0 100644
  	/* now let's set up wb */
  	wb->left = prefix_len + wr->length;
  	wb->offset = 0;
-@@ -1748,7 +1712,7 @@ int dtls1_dispatch_alert(SSL *s)
+@@ -1756,7 +1720,7 @@ int dtls1_dispatch_alert(SSL *s)
  		}
  #endif
  
@@ -222,10 +222,10 @@ index 191b86b..6358e1b 100644
  	SSLerr(SSL_F_SSL3_SETUP_KEY_BLOCK,ERR_R_MALLOC_FAILURE);
  	return(0);
 diff --git a/ssl/s3_pkt.c b/ssl/s3_pkt.c
-index 04b474d..d690493 100644
+index 706ef1f..957d7c6 100644
 --- a/ssl/s3_pkt.c
 +++ b/ssl/s3_pkt.c
-@@ -118,7 +118,7 @@
+@@ -119,7 +119,7 @@
  #include <openssl/rand.h>
  
  static int do_ssl3_write(SSL *s, int type, const unsigned char *buf,
@@ -234,7 +234,7 @@ index 04b474d..d690493 100644
  static int ssl3_get_record(SSL *s);
  
  int ssl3_read_n(SSL *s, int n, int max, int extend)
-@@ -618,12 +618,34 @@ int ssl3_write_bytes(SSL *s, int type, const void *buf_, int len)
+@@ -636,15 +636,36 @@ int ssl3_write_bytes(SSL *s, int type, const void *buf_, int len)
  	n=(len-tot);
  	for (;;)
  		{
@@ -253,9 +253,6 @@ index 04b474d..d690493 100644
 +		    !s->s3->record_split_done)
 +			{
 +			fragment = 1;
-+			/* The first byte will be in its own record, so we
-+			 * can write an extra byte. */
-+			max++;
 +			/* record_split_done records that the splitting has
 +			 * been done in case we hit an SSL_WANT_WRITE condition.
 +			 * In that case, we don't need to do the split again. */
@@ -272,7 +269,12 @@ index 04b474d..d690493 100644
  		if (i <= 0)
  			{
  			s->s3->wnum=tot;
-@@ -634,10 +656,10 @@ int ssl3_write_bytes(SSL *s, int type, const void *buf_, int len)
++			/* Try to write the fragment next time. */
++			s->s3->record_split_done = 0;
+ 			return i;
+ 			}
+ 
+@@ -652,10 +673,10 @@ int ssl3_write_bytes(SSL *s, int type, const void *buf_, int len)
  			(type == SSL3_RT_APPLICATION_DATA &&
  			 (s->mode & SSL_MODE_ENABLE_PARTIAL_WRITE)))
  			{
@@ -287,7 +289,7 @@ index 04b474d..d690493 100644
  			return tot+i;
  			}
  
-@@ -646,11 +668,16 @@ int ssl3_write_bytes(SSL *s, int type, const void *buf_, int len)
+@@ -664,11 +685,16 @@ int ssl3_write_bytes(SSL *s, int type, const void *buf_, int len)
  		}
  	}
  
@@ -306,16 +308,21 @@ index 04b474d..d690493 100644
  	int prefix_len=0;
  	int eivlen;
  	long align=0;
-@@ -676,7 +703,7 @@ static int do_ssl3_write(SSL *s, int type, const unsigned char *buf,
+@@ -691,11 +717,11 @@ static int do_ssl3_write(SSL *s, int type, const unsigned char *buf,
  		/* if it went, fall through and send more stuff */
  		}
+ 
+- 	if (wb->buf == NULL)
++	if (wb->buf == NULL)
+ 		if (!ssl3_setup_write_buffer(s))
+ 			return -1;
  
 -	if (len == 0 && !create_empty_fragment)
 +	if (len == 0)
  		return 0;
  
  	wr= &(s->s3->wrec);
-@@ -686,11 +713,6 @@ static int do_ssl3_write(SSL *s, int type, const unsigned char *buf,
+@@ -705,11 +731,6 @@ static int do_ssl3_write(SSL *s, int type, const unsigned char *buf,
  		(s->enc_write_ctx == NULL) ||
  		(EVP_MD_CTX_md(s->write_hash) == NULL))
  		{
@@ -327,7 +334,7 @@ index 04b474d..d690493 100644
  		mac_size=0;
  		}
  	else
-@@ -700,42 +722,33 @@ static int do_ssl3_write(SSL *s, int type, const unsigned char *buf,
+@@ -719,42 +740,33 @@ static int do_ssl3_write(SSL *s, int type, const unsigned char *buf,
  			goto err;
  		}
  
@@ -387,7 +394,7 @@ index 04b474d..d690493 100644
  		align = (-align)&(SSL3_ALIGN_PAYLOAD-1);
  #endif
  		p = wb->buf + align;
-@@ -772,7 +785,7 @@ static int do_ssl3_write(SSL *s, int type, const unsigned char *buf,
+@@ -791,7 +803,7 @@ static int do_ssl3_write(SSL *s, int type, const unsigned char *buf,
  		*(p++)=s->version&0xff;
  
  	/* field where we are to write out packet length */
@@ -396,7 +403,7 @@ index 04b474d..d690493 100644
  	p+=2;
  	/* Explicit IV length, block ciphers and TLS version 1.1 or later */
  	if (s->enc_write_ctx && s->version >= TLS1_1_VERSION)
-@@ -800,8 +813,8 @@ static int do_ssl3_write(SSL *s, int type, const unsigned char *buf,
+@@ -819,8 +831,8 @@ static int do_ssl3_write(SSL *s, int type, const unsigned char *buf,
  
  	/* lets setup the record stuff. */
  	wr->data=p + eivlen;
@@ -407,7 +414,7 @@ index 04b474d..d690493 100644
  
  	/* we now 'read' from wr->input, wr->length bytes into
  	 * wr->data */
-@@ -854,11 +867,10 @@ static int do_ssl3_write(SSL *s, int type, const unsigned char *buf,
+@@ -873,11 +885,10 @@ static int do_ssl3_write(SSL *s, int type, const unsigned char *buf,
  	wr->type=type; /* not needed but helps for debugging */
  	wr->length+=SSL3_RT_HEADER_LENGTH;
  
@@ -422,7 +429,7 @@ index 04b474d..d690493 100644
  		return wr->length;
  		}
  
-@@ -1514,7 +1526,7 @@ int ssl3_dispatch_alert(SSL *s)
+@@ -1548,7 +1559,7 @@ int ssl3_dispatch_alert(SSL *s)
  	void (*cb)(const SSL *ssl,int type,int val)=NULL;
  
  	s->s3->alert_dispatch=0;
@@ -432,12 +439,12 @@ index 04b474d..d690493 100644
  		{
  		s->s3->alert_dispatch=1;
 diff --git a/ssl/ssl.h b/ssl/ssl.h
-index b289bc2..8564484 100644
+index ef85428..ce65664 100644
 --- a/ssl/ssl.h
 +++ b/ssl/ssl.h
-@@ -580,11 +580,15 @@ struct ssl_session_st
- #define SSL_OP_TLS_D5_BUG				0x00000100L
- #define SSL_OP_TLS_BLOCK_PADDING_BUG			0x00000200L
+@@ -578,11 +578,15 @@ struct ssl_session_st
+ /* Refers to ancient SSLREF and SSLv2, retained for compatibility */
+ #define SSL_OP_SSLREF2_REUSE_CERT_TYPE_BUG		0x0
  
 -/* Disable SSL 3.0/TLS 1.0 CBC vulnerability workaround that was added
 - * in OpenSSL 0.9.6d.  Usually (depending on the application protocol)
@@ -456,23 +463,24 @@ index b289bc2..8564484 100644
  #define SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS              0x00000800L /* added in 0.9.6e */
  
  /* SSL_OP_ALL: various bug workarounds that should be rather harmless.
-@@ -668,6 +672,11 @@ struct ssl_session_st
-  * and Finished.  This mode enables full-handshakes to 'complete' in
+@@ -675,6 +679,12 @@ struct ssl_session_st
   * one RTT. */
  #define SSL_MODE_HANDSHAKE_CUTTHROUGH 0x00000080L
+ 
 +/* When set, TLS 1.0 and SSLv3, multi-byte, CBC records will be split in two:
 + * the first record will contain a single byte and the second will contain the
 + * rest of the bytes. This effectively randomises the IV and prevents BEAST
 + * attacks. */
 +#define SSL_MODE_CBC_RECORD_SPLITTING 0x00000100L
- 
++
  /* Note: SSL[_CTX]_set_{options,mode} use |= op on the previous value,
   * they cannot be used to clear bits. */
+ 
 diff --git a/ssl/ssl3.h b/ssl/ssl3.h
-index 6a5cdbe..65f58a7 100644
+index 16c389d..8e3e449 100644
 --- a/ssl/ssl3.h
 +++ b/ssl/ssl3.h
-@@ -418,8 +418,8 @@ typedef struct ssl3_state_st
+@@ -419,8 +419,8 @@ typedef struct ssl3_state_st
  	unsigned char client_random[SSL3_RANDOM_SIZE];
  
  	/* flags for countermeasure against known-IV weakness */
@@ -484,10 +492,10 @@ index 6a5cdbe..65f58a7 100644
  	/* The value of 'extra' when the buffers were initialized */
  	int init_extra;
 diff --git a/ssl/ssl_locl.h b/ssl/ssl_locl.h
-index b83d8cd..dac33e2 100644
+index 10baaee..6d4bc14 100644
 --- a/ssl/ssl_locl.h
 +++ b/ssl/ssl_locl.h
-@@ -1091,8 +1091,6 @@ int dtls1_shutdown(SSL *s);
+@@ -1093,8 +1093,6 @@ int dtls1_shutdown(SSL *s);
  
  long dtls1_get_message(SSL *s, int st1, int stn, int mt, long max, int *ok);
  int dtls1_get_record(SSL *s);
@@ -497,10 +505,10 @@ index b83d8cd..dac33e2 100644
  int dtls1_enc(SSL *s, int snd);
  
 diff --git a/ssl/t1_enc.c b/ssl/t1_enc.c
-index 15800af..b2686f4 100644
+index 9963a80..4ca1549 100644
 --- a/ssl/t1_enc.c
 +++ b/ssl/t1_enc.c
-@@ -762,22 +762,22 @@ printf("\nkey block\n");
+@@ -774,22 +774,22 @@ printf("\nkey block\n");
  { int z; for (z=0; z<num; z++) printf("%02X%c",p1[z],((z+1)%16)?' ':'\n'); }
  #endif
  
@@ -529,5 +537,5 @@ index 15800af..b2686f4 100644
  			}
  		}
 -- 
-1.8.4.1
+2.0.0.526.g5318336
 
