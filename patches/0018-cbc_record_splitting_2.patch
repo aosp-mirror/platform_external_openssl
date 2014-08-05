@@ -1,0 +1,56 @@
+From 5e688f88deac2f0fd1ed9a9af23c0c74c9d1232c Mon Sep 17 00:00:00 2001
+From: Kenny Root <kroot@google.com>
+Date: Tue, 5 Aug 2014 15:50:32 -0700
+Subject: [PATCH] Retry sending record split fragment when SSL write fails
+
+When the write size was exactly SSL3_RT_MAX_PLAIN_LENGTH+1 and record
+splitting is needed, an extra byte would be added to the max size of the
+message to be written. This would cause the requested size to not exceed
+the max. If the SSL_WANT_WRITE error were returned, the next packet
+would not get the extra byte added to the max packet size since
+record_split_done is set. Since a different set of arguments
+(SSL3_RT_MAX_PLAIN_LENGTH+1 vs SSL3_RT_MAX_PLAIN_LENGTH) would be passed
+to do_ssl3_write, it would get an "SSL3_WRITE_PENDING:bad write retry"
+error.
+
+To avoid a failure in the opposite direction, the max variable increment
+is removed as well. This can happen when SSL_MODE_ENABLE_PARTIAL_WRITE
+is not enabled, the call to ssl3_write_bytes contains, e.g., buffer of
+2*SSL3_RT_MAX_PLAIN_LENGTH where the first call into do_ssl3_write
+succeeds writing the first SSL3_RT_MAX_PLAIN_LENGTH bytes, but the
+writing the second SSL3_RT_MAX_PLAIN_LENGTH bytes fails. This means the
+first time the the second section of SSL3_RT_MAX_PLAIN_LENGTH bytes has
+called do_ssl3_write with "max" bytes, but next call to ssl3_write_bytes
+in turn calls into do_ssl3_write with "max+1" bytes.
+
+Bug: 16482963
+Change-Id: I28a515a970d535a7fbba9c0ba325c9aed633d1cc
+---
+ ssl/s3_pkt.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/ssl/s3_pkt.c b/ssl/s3_pkt.c
+index 60c4f1a..3978e17 100644
+--- a/ssl/s3_pkt.c
++++ b/ssl/s3_pkt.c
+@@ -632,9 +632,6 @@ int ssl3_write_bytes(SSL *s, int type, const void *buf_, int len)
+ 		    !s->s3->record_split_done)
+ 			{
+ 			fragment = 1;
+-			/* The first byte will be in its own record, so we
+-			 * can write an extra byte. */
+-			max++;
+ 			/* record_split_done records that the splitting has
+ 			 * been done in case we hit an SSL_WANT_WRITE condition.
+ 			 * In that case, we don't need to do the split again. */
+@@ -650,6 +647,7 @@ int ssl3_write_bytes(SSL *s, int type, const void *buf_, int len)
+ 		if (i <= 0)
+ 			{
+ 			s->s3->wnum=tot;
++			s->s3->record_split_done = 0;
+ 			return i;
+ 			}
+ 
+-- 
+2.0.0.526.g5318336
+
