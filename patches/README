@@ -37,3 +37,8 @@ alpn.patch
 This change adds support for ALPN in OpenSSL. ALPN is the IETF
 blessed version of NPN and we'll be supporting both ALPN and NPN for
 some time yet.
+
+tls_fallback_scsv.patch
+
+Adds the signalling cipher suite value (SCSV) from
+https://tools.ietf.org/html/draft-ietf-tls-downgrade-scsv-00
