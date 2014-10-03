@@ -26,3 +26,8 @@ Fixes the case of having multiple DIR_ADD commands sent to eng_dyn
 fix_clang_build.patch
 
 Fixes the Clang based build.
+
+tls_fallback_scsv.patch
+
+Adds the signalling cipher suite value (SCSV) from
+https://tools.ietf.org/html/draft-ietf-tls-downgrade-scsv-00
