@@ -29,7 +29,10 @@ LOCAL_C_INCLUDES := $(log_c_includes)
 # in the NDK yet. This can be removed when a clang version that is fast enough
 # in the NDK.
 ifeq (,$(TARGET_BUILD_APPS))
+# clang generates broken code for MIPS (rand_unix.o) b/17898168
+ifneq ($(TARGET_ARCH),mips)
 LOCAL_CLANG := true
+endif
 ifeq ($(HOST_OS), darwin)
 LOCAL_ASFLAGS += -no-integrated-as
 LOCAL_CFLAGS += -no-integrated-as
