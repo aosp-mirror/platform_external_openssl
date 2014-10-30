@@ -540,6 +540,9 @@ common_c_includes := \
   external/openssl/include \
   external/openssl/include/openssl \
 
+arm_clang_asflags := \
+  -no-integrated-as \
+
 arm_cflags := \
   -DAES_ASM \
   -DBSAES_ASM \
@@ -570,6 +573,9 @@ arm_exclude_files := \
   crypto/aes/aes_core.c \
   crypto/mem_clr.c \
 
+arm64_clang_asflags := \
+  -no-integrated-as \
+
 arm64_cflags := \
   -DDES_UNROLL \
   -DOPENSSL_CPUID_OBJ \
@@ -587,6 +593,8 @@ arm64_src_files := \
   crypto/sha/asm/sha512-armv8.S \
 
 arm64_exclude_files :=
+
+x86_clang_asflags :=
 
 x86_cflags := \
   -DAES_ASM \
@@ -634,6 +642,8 @@ x86_exclude_files := \
   crypto/des/fcrypt_b.c \
   crypto/mem_clr.c \
 
+x86_64_clang_asflags :=
+
 x86_64_cflags := \
   -DAES_ASM \
   -DBSAES_ASM \
@@ -677,6 +687,8 @@ x86_64_exclude_files := \
   crypto/mem_clr.c \
   crypto/rc4/rc4_enc.c \
   crypto/rc4/rc4_skey.c \
+
+mips_clang_asflags :=
 
 mips_cflags := \
   -DAES_ASM \
