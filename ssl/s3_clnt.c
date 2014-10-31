@@ -2820,7 +2820,7 @@ int ssl3_send_client_key_exchange(SSL *s)
 			/* ECDHE PSK ciphersuites from RFC 5489 */
 			if ((alg_a & SSL_aPSK) && psk_len != 0)
 				{
-				pre_ms_len = 2+psk_len+2+n;
+				pre_ms_len = 2+n+2+psk_len;
 				pre_ms = OPENSSL_malloc(pre_ms_len);
 				if (pre_ms == NULL)
 					{
@@ -2830,11 +2830,11 @@ int ssl3_send_client_key_exchange(SSL *s)
 					}
 				memset(pre_ms, 0, pre_ms_len);
 				t = pre_ms;
-				s2n(psk_len, t);
-				memcpy(t, psk, psk_len);
-				t += psk_len;
 				s2n(n, t);
 				memcpy(t, p, n);
+				t += n;
+				s2n(psk_len, t);
+				memcpy(t, psk, psk_len);
 				s->session->master_key_length = s->method->ssl3_enc \
 					-> generate_master_secret(s,
 						s->session->master_key, pre_ms, pre_ms_len);
