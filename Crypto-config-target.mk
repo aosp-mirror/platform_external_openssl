@@ -1,6 +1,6 @@
 # Auto-generated - DO NOT EDIT!
 # To regenerate, edit openssl.config, then run:
-#     ./import_openssl.sh import /path/to/openssl-1.0.1h.tar.gz
+#     ./import_openssl.sh import /path/to/openssl-1.0.1j.tar.gz
 #
 # This script will append to the following variables:
 #
@@ -184,6 +184,7 @@ common_src_files := \
   crypto/conf/conf_mall.c \
   crypto/conf/conf_mod.c \
   crypto/conf/conf_sap.c \
+  crypto/constant_time_locl.h \
   crypto/cpt_err.c \
   crypto/cryptlib.c \
   crypto/cversion.c \
