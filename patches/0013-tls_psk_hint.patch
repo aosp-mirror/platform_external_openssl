@@ -138,9 +138,9 @@ index 12c3fe8..17367a2 100644
  #endif
  		s->s3->tmp.reuse_message=1;
 @@ -1426,7 +1428,11 @@ int ssl3_get_key_exchange(SSL *s)
- 		al=SSL_AD_HANDSHAKE_FAILURE;
- 		n2s(p,i);
- 		param_len=i+2;
+			}
+		n2s(p,i);
+
 -		s->ctx->psk_identity_hint = NULL;
 +		if (s->session->psk_identity_hint)
 +			{
@@ -163,13 +163,14 @@ index 12c3fe8..17367a2 100644
  				{
  				SSLerr(SSL_F_SSL3_GET_KEY_EXCHANGE, ERR_R_MALLOC_FAILURE);
  				goto f_err;
-@@ -2338,7 +2342,7 @@ int ssl3_send_client_key_exchange(SSL *s)
+@@ -2338,7 +2342,8 @@ int ssl3_send_client_key_exchange(SSL *s)
  				goto err;
  				}
  
++			memset(identity, 0, sizeof(identity));
 -			psk_len = s->psk_client_callback(s, s->ctx->psk_identity_hint,
 +			psk_len = s->psk_client_callback(s, s->session->psk_identity_hint,
- 				identity, PSK_MAX_IDENTITY_LEN, psk, sizeof(psk));
+				identity, sizeof(identity - 1), psk, sizeof(psk));
  			if (psk_len > PSK_MAX_PSK_LEN)
  				{
 @@ -2374,21 +2378,6 @@ int ssl3_send_client_key_exchange(SSL *s)
