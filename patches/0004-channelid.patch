@@ -1331,7 +1331,7 @@ index bddffd9..1a56a97 100644
 +		s2n(0,ret);
 +		}
 +
- 	if ((extdatalen = ret-p-2)== 0) 
+ 	if ((extdatalen = ret-orig-2)== 0) 
  		return p;
  
 @@ -1442,6 +1468,16 @@ int ssl_parse_clienthello_tlsext(SSL *s, unsigned char **p, unsigned char *d, in
