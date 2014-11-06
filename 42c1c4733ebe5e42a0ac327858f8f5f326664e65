@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3572d691_d7e07ea7",
+        "filename": "ssl/ssl_lib.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 3148,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2014-11-06T19:07:48Z",
+      "side": 0,
+      "message": "Need to restore this in 0007-tls12_digests.patch",
+      "range": {
+        "startLine": 3147,
+        "startChar": 1,
+        "endLine": 3148,
+        "endChar": 27
+      },
+      "revId": "42c1c4733ebe5e42a0ac327858f8f5f326664e65",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
