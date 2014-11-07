@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d5809a7b_81addaf8",
+        "filename": "patches/0007-tls12_digests.patch",
+        "patchSetId": 2
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 1019036
+      },
+      "writtenOn": "2014-11-07T01:41:33Z",
+      "side": 1,
+      "message": "I don\u0027t know where this chunk has come from. What\u0027s weird is that SSL_set_SSL_CTX (in ssl_lib.c) isn\u0027t changed in this commit.",
+      "revId": "ad78b6e364499cf064f15497766c7fe0f2a2e015",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b585e68b_43df5867",
+        "filename": "patches/0011-ecdhe_psk.patch",
+        "patchSetId": 2
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1019036
+      },
+      "writtenOn": "2014-11-07T01:41:33Z",
+      "side": 1,
+      "message": "I don\u0027t see this in our internal repo.",
+      "revId": "ad78b6e364499cf064f15497766c7fe0f2a2e015",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d5809a7b_218fae87",
+        "filename": "patches/0011-ecdhe_psk.patch",
+        "patchSetId": 2
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 1019036
+      },
+      "writtenOn": "2014-11-07T01:41:33Z",
+      "side": 1,
+      "message": "Having -1 inside the sizeof call seems odd.",
+      "revId": "ad78b6e364499cf064f15497766c7fe0f2a2e015",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
