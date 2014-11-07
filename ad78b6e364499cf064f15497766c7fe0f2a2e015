@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "753d2e9e_94426cda",
+        "filename": "patches/0007-tls12_digests.patch",
+        "patchSetId": 2
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2014-11-07T16:32:02Z",
+      "side": 1,
+      "message": "It seems they\u0027re copying the digests under pkeys, but that has moved to s3-\u003edigest_{rsa,dsa,ecdsa} in this patch. Here is the diff from 1.0.1h to 1.0.1j:\n\n@@ -2939,15 +2976,26 @@\n \n SSL_CTX *SSL_set_SSL_CTX(SSL *ssl, SSL_CTX* ctx)\n        {\n+       CERT *ocert \u003d ssl-\u003ecert;\n        if (ssl-\u003ectx \u003d\u003d ctx)\n                return ssl-\u003ectx;\n #ifndef OPENSSL_NO_TLSEXT\n        if (ctx \u003d\u003d NULL)\n                ctx \u003d ssl-\u003einitial_ctx;\n #endif\n-       if (ssl-\u003ecert !\u003d NULL)\n-               ssl_cert_free(ssl-\u003ecert);\n        ssl-\u003ecert \u003d ssl_cert_dup(ctx-\u003ecert);\n+       if (ocert !\u003d NULL)\n+               {\n+               int i;\n+               /* Copy negotiated digests from original */\n+               for (i \u003d 0; i \u003c SSL_PKEY_NUM; i++)\n+                       {\n+                       CERT_PKEY *cpk \u003d ocert-\u003epkeys + i;\n+                       CERT_PKEY *rpk \u003d ssl-\u003ecert-\u003epkeys + i;\n+                       rpk-\u003edigest \u003d cpk-\u003edigest;\n+                       }\n+               ssl_cert_free(ocert);\n+               }\n        CRYPTO_add(\u0026ctx-\u003ereferences,1,CRYPTO_LOCK_SSL_CTX);\n        if (ssl-\u003ectx !\u003d NULL)\n                SSL_CTX_free(ssl-\u003ectx); /* decrement reference count */",
+      "parentUuid": "d5809a7b_81addaf8",
+      "revId": "ad78b6e364499cf064f15497766c7fe0f2a2e015",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b585e68b_43df5867",
         "filename": "patches/0011-ecdhe_psk.patch",
         "patchSetId": 2
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "753d2e9e_94a7cc4e",
+        "filename": "patches/0011-ecdhe_psk.patch",
+        "patchSetId": 2
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2014-11-07T16:32:02Z",
+      "side": 1,
+      "message": "I think they integrated klyubin\u0027s patch for identity length in 1.0.1j and added some extra comments. I just integrated their changes.",
+      "parentUuid": "b585e68b_43df5867",
+      "revId": "ad78b6e364499cf064f15497766c7fe0f2a2e015",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d5809a7b_218fae87",
         "filename": "patches/0011-ecdhe_psk.patch",
         "patchSetId": 2
@@ -47,6 +83,24 @@
       "writtenOn": "2014-11-07T01:41:33Z",
       "side": 1,
       "message": "Having -1 inside the sizeof call seems odd.",
+      "revId": "ad78b6e364499cf064f15497766c7fe0f2a2e015",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "15c152c3_a523d519",
+        "filename": "patches/0011-ecdhe_psk.patch",
+        "patchSetId": 2
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2014-11-07T16:32:02Z",
+      "side": 1,
+      "message": "This is a typo on my part.",
+      "parentUuid": "d5809a7b_218fae87",
       "revId": "ad78b6e364499cf064f15497766c7fe0f2a2e015",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
