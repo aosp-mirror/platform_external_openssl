@@ -1,0 +1,8 @@
+Verified+1: Kenny Root <kroot@android.com>
+Code-Review+1: Adam Langley <agl@google.com>
+Code-Review+2: Kenny Root <kroot@android.com>
+Submitted-by: Kenny Root <kroot@android.com>
+Submitted-at: Mon, 10 Nov 2014 21:12:58 +0000
+Reviewed-on: https://android-review.googlesource.com/113480
+Project: platform/external/openssl
+Branch: refs/heads/master
