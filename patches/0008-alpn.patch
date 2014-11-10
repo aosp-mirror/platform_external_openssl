@@ -388,7 +388,7 @@ index 1f93a6f..b2e049a 100644
 +		ret += len;
 +		}
 +
- 	if ((extdatalen = ret-p-2)== 0) 
+ 	if ((extdatalen = ret-orig-2)== 0) 
  		return p;
  
 @@ -966,6 +993,76 @@ static void ssl_check_for_safari(SSL *s, const unsigned char *data, const unsign

@@ -192,7 +192,7 @@ index 1f255c3..3e31fb5 100644
 +/* When set, clients may send application data before receipt of CCS
 + * and Finished.  This mode enables full-handshakes to 'complete' in
 + * one RTT. */
-+#define SSL_MODE_HANDSHAKE_CUTTHROUGH 0x00000080L
++#define SSL_MODE_HANDSHAKE_CUTTHROUGH 0x00000200L
 +
  /* Note: SSL[_CTX]_set_{options,mode} use |= op on the previous value,
   * they cannot be used to clear bits. */
