@@ -170,7 +170,7 @@ index 12c3fe8..17367a2 100644
 +			memset(identity, 0, sizeof(identity));
 -			psk_len = s->psk_client_callback(s, s->ctx->psk_identity_hint,
 +			psk_len = s->psk_client_callback(s, s->session->psk_identity_hint,
-				identity, sizeof(identity - 1), psk, sizeof(psk));
+				identity, sizeof(identity) - 1, psk, sizeof(psk));
  			if (psk_len > PSK_MAX_PSK_LEN)
  				{
 @@ -2374,21 +2378,6 @@ int ssl3_send_client_key_exchange(SSL *s)
