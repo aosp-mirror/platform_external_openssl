@@ -2490,7 +2490,7 @@ int ssl3_send_client_key_exchange(SSL *s)
 
 			memset(identity, 0, sizeof(identity));
 			psk_len = s->psk_client_callback(s, s->session->psk_identity_hint,
-				identity, sizeof(identity - 1), psk, sizeof(psk));
+				identity, sizeof(identity) - 1, psk, sizeof(psk));
 			if (psk_len > PSK_MAX_PSK_LEN)
 				{
 				SSLerr(SSL_F_SSL3_SEND_CLIENT_KEY_EXCHANGE,
