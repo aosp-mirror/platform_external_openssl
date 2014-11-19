@@ -697,6 +697,9 @@ mips_exclude_files := \
   crypto/bn/bn_asm.c \
 
 
+# "Temporary" hack until this can be fixed in openssl.config
+x86_64_cflags += -DRC4_INT="unsigned int"
+
 LOCAL_CFLAGS += $(common_cflags)
 LOCAL_C_INCLUDES += $(common_c_includes)
 
