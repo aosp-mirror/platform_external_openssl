@@ -450,6 +450,12 @@ LOCAL_ADDITIONAL_DEPENDENCIES += \$(LOCAL_PATH)/$(basename $output)
 
     done
 
+    if [ $prefix == "CRYPTO" ]; then
+      echo "
+# \"Temporary\" hack until this can be fixed in openssl.config
+x86_64_cflags += -DRC4_INT=\"unsigned int\""
+    fi
+
     if [ $3 == "target" ]; then
       echo "
 LOCAL_CFLAGS += \$(common_cflags)
