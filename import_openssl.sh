@@ -467,7 +467,10 @@ LOCAL_C_INCLUDES += \$(common_c_includes)"
         echo "
 LOCAL_SRC_FILES_${arch} += \$(filter-out \$(${arch}_exclude_files),\$(common_src_files) \$(${arch}_src_files))
 LOCAL_CFLAGS_${arch} += \$(${arch}_cflags)
-LOCAL_CLANG_ASFLAGS_${arch} += \$(${arch}_clang_asflags)"
+LOCAL_CLANG_ASFLAGS_${arch} += \$(${arch}_clang_asflags)
+ifeq (\$(HOST_OS),darwin)
+  LOCAL_CLANG_ASFLAGS_${arch} := \$(filter-out -no-integrated-as,\$(LOCAL_CLANG_ASFLAGS_${arch}))
+endif"
       done
     else
       echo "

@@ -121,19 +121,34 @@ LOCAL_C_INCLUDES += $(common_c_includes)
 LOCAL_SRC_FILES_arm += $(filter-out $(arm_exclude_files),$(common_src_files) $(arm_src_files))
 LOCAL_CFLAGS_arm += $(arm_cflags)
 LOCAL_CLANG_ASFLAGS_arm += $(arm_clang_asflags)
+ifeq ($(HOST_OS),darwin)
+  LOCAL_CLANG_ASFLAGS_arm := $(filter-out -no-integrated-as,$(LOCAL_CLANG_ASFLAGS_arm))
+endif
 
 LOCAL_SRC_FILES_arm64 += $(filter-out $(arm64_exclude_files),$(common_src_files) $(arm64_src_files))
 LOCAL_CFLAGS_arm64 += $(arm64_cflags)
 LOCAL_CLANG_ASFLAGS_arm64 += $(arm64_clang_asflags)
+ifeq ($(HOST_OS),darwin)
+  LOCAL_CLANG_ASFLAGS_arm64 := $(filter-out -no-integrated-as,$(LOCAL_CLANG_ASFLAGS_arm64))
+endif
 
 LOCAL_SRC_FILES_x86 += $(filter-out $(x86_exclude_files),$(common_src_files) $(x86_src_files))
 LOCAL_CFLAGS_x86 += $(x86_cflags)
 LOCAL_CLANG_ASFLAGS_x86 += $(x86_clang_asflags)
+ifeq ($(HOST_OS),darwin)
+  LOCAL_CLANG_ASFLAGS_x86 := $(filter-out -no-integrated-as,$(LOCAL_CLANG_ASFLAGS_x86))
+endif
 
 LOCAL_SRC_FILES_x86_64 += $(filter-out $(x86_64_exclude_files),$(common_src_files) $(x86_64_src_files))
 LOCAL_CFLAGS_x86_64 += $(x86_64_cflags)
 LOCAL_CLANG_ASFLAGS_x86_64 += $(x86_64_clang_asflags)
+ifeq ($(HOST_OS),darwin)
+  LOCAL_CLANG_ASFLAGS_x86_64 := $(filter-out -no-integrated-as,$(LOCAL_CLANG_ASFLAGS_x86_64))
+endif
 
 LOCAL_SRC_FILES_mips += $(filter-out $(mips_exclude_files),$(common_src_files) $(mips_src_files))
 LOCAL_CFLAGS_mips += $(mips_cflags)
 LOCAL_CLANG_ASFLAGS_mips += $(mips_clang_asflags)
+ifeq ($(HOST_OS),darwin)
+  LOCAL_CLANG_ASFLAGS_mips := $(filter-out -no-integrated-as,$(LOCAL_CLANG_ASFLAGS_mips))
+endif
