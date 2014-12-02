@@ -11,6 +11,7 @@
 #    LOCAL_CFLAGS_$(TARGET_ARCH)
 #    LOCAL_CFLAGS_$(TARGET_2ND_ARCH)
 #    LOCAL_ADDITIONAL_DEPENDENCIES
+#    LOCAL_EXPORT_C_INCLUDE_DIRS
 
 
 LOCAL_ADDITIONAL_DEPENDENCIES += $(LOCAL_PATH)/Ssl-config-host.mk
@@ -111,6 +112,7 @@ mips_exclude_files :=
 
 LOCAL_CFLAGS += $(common_cflags)
 LOCAL_C_INCLUDES += $(common_c_includes) $(local_c_includes)
+LOCAL_EXPORT_C_INCLUDE_DIRS := $(LOCAL_PATH)/include
 
 ifeq ($(HOST_OS),linux)
 LOCAL_CFLAGS_x86 += $(x86_cflags)
