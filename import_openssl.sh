@@ -423,8 +423,11 @@ function generate_config_mk() {
 #    LOCAL_SRC_FILES_\$(TARGET_2ND_ARCH)
 #    LOCAL_CFLAGS_\$(TARGET_ARCH)
 #    LOCAL_CFLAGS_\$(TARGET_2ND_ARCH)
-#    LOCAL_ADDITIONAL_DEPENDENCIES
-
+#    LOCAL_ADDITIONAL_DEPENDENCIES"
+if [ $prefix != "APPS" ] ; then
+    echo "#    LOCAL_EXPORT_C_INCLUDE_DIRS"
+fi
+echo "
 
 LOCAL_ADDITIONAL_DEPENDENCIES += \$(LOCAL_PATH)/$(basename $output)
 "
@@ -457,6 +460,11 @@ LOCAL_ADDITIONAL_DEPENDENCIES += \$(LOCAL_PATH)/$(basename $output)
       echo "
 # \"Temporary\" hack until this can be fixed in openssl.config
 x86_64_cflags += -DRC4_INT=\"unsigned int\""
+    fi
+
+    if [ $prefix != "APPS" ] ; then
+      echo "
+LOCAL_EXPORT_C_INCLUDE_DIRS := \$(LOCAL_PATH)/include"
     fi
 
     if [ $3 == "target" ]; then
