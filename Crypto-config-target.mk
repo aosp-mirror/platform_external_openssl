@@ -11,6 +11,7 @@
 #    LOCAL_CFLAGS_$(TARGET_ARCH)
 #    LOCAL_CFLAGS_$(TARGET_2ND_ARCH)
 #    LOCAL_ADDITIONAL_DEPENDENCIES
+#    LOCAL_EXPORT_C_INCLUDE_DIRS
 
 
 LOCAL_ADDITIONAL_DEPENDENCIES += $(LOCAL_PATH)/Crypto-config-target.mk
@@ -714,6 +715,7 @@ x86_64_cflags += -DRC4_INT="unsigned int"
 
 LOCAL_CFLAGS += $(common_cflags)
 LOCAL_C_INCLUDES += $(common_c_includes)
+LOCAL_EXPORT_C_INCLUDE_DIRS := $(LOCAL_PATH)/include
 
 LOCAL_SRC_FILES_arm += $(filter-out $(arm_exclude_files),$(common_src_files) $(arm_src_files))
 LOCAL_CFLAGS_arm += $(arm_cflags)
@@ -734,3 +736,4 @@ LOCAL_CLANG_ASFLAGS_x86_64 += $(x86_64_clang_asflags)
 LOCAL_SRC_FILES_mips += $(filter-out $(mips_exclude_files),$(common_src_files) $(mips_src_files))
 LOCAL_CFLAGS_mips += $(mips_cflags)
 LOCAL_CLANG_ASFLAGS_mips += $(mips_clang_asflags)
+
