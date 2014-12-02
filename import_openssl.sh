@@ -423,10 +423,12 @@ function generate_config_mk() {
 #    LOCAL_SRC_FILES_\$(TARGET_2ND_ARCH)
 #    LOCAL_CFLAGS_\$(TARGET_ARCH)
 #    LOCAL_CFLAGS_\$(TARGET_2ND_ARCH)
-#    LOCAL_ADDITIONAL_DEPENDENCIES
-
-
-LOCAL_ADDITIONAL_DEPENDENCIES += \$(LOCAL_PATH)/$(basename $output)
+#    LOCAL_ADDITIONAL_DEPENDENCIES"
+if [ $prefix != "APPS" ] ; then
+	echo "
+#    LOCAL_EXPORT_C_INCLUDE_DIRS"
+fi
+echo "LOCAL_ADDITIONAL_DEPENDENCIES += \$(LOCAL_PATH)/$(basename $output)
 "
 
     common_defines=$(var_sorted_value OPENSSL_${prefix}_DEFINES)
@@ -452,6 +454,11 @@ LOCAL_ADDITIONAL_DEPENDENCIES += \$(LOCAL_PATH)/$(basename $output)
       print_vardef_in_mk ${arch}_exclude_files $arch_exclude_sources
 
     done
+
+	if [ $prefix != "APPS" ] ; then
+		echo "
+LOCAL_EXPORT_C_INCLUDE_DIRS := \$(LOCAL_PATH)/include"
+	fi
 
     if [ $prefix == "CRYPTO" ]; then
       echo "
