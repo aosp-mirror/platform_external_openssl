@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df87d927_bd935761",
+        "filename": "Crypto-config-host.mk",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2014-12-02T17:25:01Z",
+      "side": 1,
+      "message": "This file is auto-generated as you can see up here. Look in import-openssl.sh for the place where it is generated.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 4,
+        "endChar": 1
+      },
+      "revId": "2b0fbacb9b545bfcd6c228cd5a531b9c4bafce80",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
