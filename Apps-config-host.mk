@@ -74,15 +74,11 @@ common_c_includes := \
   external/openssl/. \
   external/openssl/include \
 
-arm_clang_asflags :=
-
 arm_cflags :=
 
 arm_src_files :=
 
 arm_exclude_files :=
-
-arm64_clang_asflags :=
 
 arm64_cflags :=
 
@@ -90,23 +86,17 @@ arm64_src_files :=
 
 arm64_exclude_files :=
 
-x86_clang_asflags :=
-
 x86_cflags :=
 
 x86_src_files :=
 
 x86_exclude_files :=
 
-x86_64_clang_asflags :=
-
 x86_64_cflags :=
 
 x86_64_src_files :=
 
 x86_64_exclude_files :=
-
-mips_clang_asflags :=
 
 mips_cflags :=
 

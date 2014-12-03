@@ -542,9 +542,6 @@ common_c_includes := \
   external/openssl/include \
   external/openssl/include/openssl \
 
-arm_clang_asflags := \
-  -no-integrated-as \
-
 arm_cflags := \
   -DAES_ASM \
   -DBSAES_ASM \
@@ -575,9 +572,6 @@ arm_exclude_files := \
   crypto/aes/aes_core.c \
   crypto/mem_clr.c \
 
-arm64_clang_asflags := \
-  -no-integrated-as \
-
 arm64_cflags := \
   -DDES_UNROLL \
   -DOPENSSL_CPUID_OBJ \
@@ -595,8 +589,6 @@ arm64_src_files := \
   crypto/sha/asm/sha512-armv8.S \
 
 arm64_exclude_files :=
-
-x86_clang_asflags :=
 
 x86_cflags := \
   -DAES_ASM \
@@ -644,8 +636,6 @@ x86_exclude_files := \
   crypto/des/fcrypt_b.c \
   crypto/mem_clr.c \
 
-x86_64_clang_asflags :=
-
 x86_64_cflags := \
   -DAES_ASM \
   -DBSAES_ASM \
@@ -690,8 +680,6 @@ x86_64_exclude_files := \
   crypto/rc4/rc4_enc.c \
   crypto/rc4/rc4_skey.c \
 
-mips_clang_asflags :=
-
 mips_cflags := \
   -DAES_ASM \
   -DOPENSSL_BN_ASM_MONT \
@@ -720,20 +708,21 @@ LOCAL_C_INCLUDES += $(common_c_includes)
 
 LOCAL_SRC_FILES_arm += $(filter-out $(arm_exclude_files),$(common_src_files) $(arm_src_files))
 LOCAL_CFLAGS_arm += $(arm_cflags)
-LOCAL_CLANG_ASFLAGS_arm += $(arm_clang_asflags)
 
 LOCAL_SRC_FILES_arm64 += $(filter-out $(arm64_exclude_files),$(common_src_files) $(arm64_src_files))
 LOCAL_CFLAGS_arm64 += $(arm64_cflags)
-LOCAL_CLANG_ASFLAGS_arm64 += $(arm64_clang_asflags)
 
 LOCAL_SRC_FILES_x86 += $(filter-out $(x86_exclude_files),$(common_src_files) $(x86_src_files))
 LOCAL_CFLAGS_x86 += $(x86_cflags)
-LOCAL_CLANG_ASFLAGS_x86 += $(x86_clang_asflags)
 
 LOCAL_SRC_FILES_x86_64 += $(filter-out $(x86_64_exclude_files),$(common_src_files) $(x86_64_src_files))
 LOCAL_CFLAGS_x86_64 += $(x86_64_cflags)
-LOCAL_CLANG_ASFLAGS_x86_64 += $(x86_64_clang_asflags)
 
 LOCAL_SRC_FILES_mips += $(filter-out $(mips_exclude_files),$(common_src_files) $(mips_src_files))
 LOCAL_CFLAGS_mips += $(mips_cflags)
-LOCAL_CLANG_ASFLAGS_mips += $(mips_clang_asflags)
+
+# ghash-armv4.S, armv4-gf2m.S have invalid instructions for clang assembler.
+LOCAL_CLANG_ASFLAGS_arm += -no-integrated-as
+# aesv8-armx-64.S, arm64cpuid.S, ghashv8-armx-64.S, sha1-armv8.S, sha256-armv8.S do not compile with clang.
+LOCAL_CLANG_ASFLAGS_arm64 += -no-integrated-as
+
