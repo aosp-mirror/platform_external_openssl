@@ -442,9 +442,6 @@ LOCAL_ADDITIONAL_DEPENDENCIES += \$(LOCAL_PATH)/$(basename $output)
     print_vardef_with_prefix_in_mk common_c_includes external/openssl/ $common_includes
 
     for arch in $all_archs; do
-      arch_clang_asflags=$(var_sorted_value OPENSSL_${prefix}_CLANG_ASFLAGS_${arch})
-      print_vardef_in_mk ${arch}_clang_asflags $arch_clang_asflags
-
       arch_defines=$(var_sorted_value OPENSSL_${prefix}_DEFINES_${arch})
       print_defines_in_mk ${arch}_cflags $arch_defines
 
@@ -474,9 +471,15 @@ LOCAL_C_INCLUDES += \$(common_c_includes)"
       for arch in $all_archs; do
         echo "
 LOCAL_SRC_FILES_${arch} += \$(filter-out \$(${arch}_exclude_files),\$(common_src_files) \$(${arch}_src_files))
-LOCAL_CFLAGS_${arch} += \$(${arch}_cflags)
-LOCAL_CLANG_ASFLAGS_${arch} += \$(${arch}_clang_asflags)"
+LOCAL_CFLAGS_${arch} += \$(${arch}_cflags)"
       done
+      # More potentially host and target dependent flags.
+      echo "
+# ghash-armv4.S, armv4-gf2m.S have invalid instructions for clang assembler.
+LOCAL_CLANG_ASFLAGS_arm += -no-integrated-as
+# aesv8-armx-64.S, arm64cpuid.S, ghashv8-armx-64.S, sha1-armv8.S, sha256-armv8.S do not compile with clang.
+LOCAL_CLANG_ASFLAGS_arm64 += -no-integrated-as
+"
     else
       echo "
 LOCAL_CFLAGS += \$(common_cflags)
