@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c488eee4_302a561a",
+        "filename": "CleanSpec.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1002975
+      },
+      "writtenOn": "2014-12-08T20:07:29Z",
+      "side": 1,
+      "message": "Does this need libssl as well? Those also get exported, but I\u0027m not sure if anyone uses it.",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 172
+      },
+      "revId": "e2f2bb3e3aa175b28350476b48c34614731f6732",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
