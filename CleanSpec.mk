@@ -56,6 +56,7 @@ $(call add-clean-step, rm -rf $(PRODUCT_OUT)/obj/STATIC_LIBRARIES/libssl_static_
 $(call add-clean-step, rm -rf $(PRODUCT_OUT)/obj/STATIC_LIBRARIES/libcrypto_static_intermediates)
 $(call add-clean-step, rm -rf $(PRODUCT_OUT)/obj/EXECUTABLES/*ssl*_intermediates $(PRODUCT_OUT)/obj/*/libssl_*intermediates $(PRODUCT_OUT)/obj/*/libcrypto_*intermediates)
 $(call add-clean-step, rm -rf $(PRODUCT_OUT)/obj/*/libcrypto*intermediates/export_includes $(PRODUCT_OUT)/obj/*/libssl*intermediates/export_includes $(OUT_DIR)/host/*/obj*/SHARED_LIBRARIES/libcrypto*intermediates/export_includes $(OUT_DIR)/host/*/obj*/SHARED_LIBRARIES/libssl*intermediates/export_includes)
+$(call add-clean-step, rm -rf $(OUT_DIR)/host/*/obj/*/libcrypto*intermediates $(OUT_DIR)/host/*/obj/libssl*intermediates)
 
 # ************************************************
 # NEWER CLEAN STEPS MUST BE AT THE END OF THE LIST
