@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4e17bd8b_087247d1",
+        "filename": "src/tool/tool.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1003224
+      },
+      "writtenOn": "2015-01-08T00:50:07Z",
+      "side": 1,
+      "message": "what are your long-term plans for the command-line boringssl tool?\n\nmy specific interest is in the md*sum(1) and sha*sum(1) family. toybox currently has its own implementation of a subset of these hashes. i have a patch (for us; upstream doesn\u0027t want the extra library dependency) that just uses openssl (and implements the full coreutils set since you\u0027ve already done the hard work for me).\n\nbut if i could just symlink to boringssl and have it look at argv[0] i could get out of the business completely.",
+      "revId": "2484279f8e1dfbead424f6b983ce751c08073fa3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
