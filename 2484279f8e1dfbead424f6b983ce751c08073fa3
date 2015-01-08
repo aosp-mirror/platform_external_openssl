@@ -16,6 +16,24 @@
       "revId": "2484279f8e1dfbead424f6b983ce751c08073fa3",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4e17bd8b_08c40772",
+        "filename": "src/tool/tool.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1019036
+      },
+      "writtenOn": "2015-01-08T00:55:54Z",
+      "side": 1,
+      "message": "Internally I think openssl(1) is used quite a lot so this will probably grow to contain a fairly complete implementation of the common openssl(1) options.\n\nAdding support for the *sum functions, and for triggering based on argv[0] is no problem. I\u0027ll see about doing that tomorrow.\n\n(Although first I\u0027ll have to see whether the tool builds on Android. I don\u0027t have it building in the .mk file because I didn\u0027t expect to need it, and it uses C++11 features—the status of which I\u0027ve not tested in Android.)",
+      "parentUuid": "4e17bd8b_087247d1",
+      "revId": "2484279f8e1dfbead424f6b983ce751c08073fa3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
