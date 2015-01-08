@@ -34,6 +34,24 @@
       "revId": "2484279f8e1dfbead424f6b983ce751c08073fa3",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2e144987_84fbc649",
+        "filename": "src/tool/tool.cc",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1003224
+      },
+      "writtenOn": "2015-01-08T00:57:22Z",
+      "side": 1,
+      "message": "(many projects are already using C++11 so it should work fine. if you have trouble, mail android-bionic@.)",
+      "parentUuid": "4e17bd8b_08c40772",
+      "revId": "2484279f8e1dfbead424f6b983ce751c08073fa3",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
