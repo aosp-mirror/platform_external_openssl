@@ -293,10 +293,12 @@ diff --git a/ssl/ssltest.c b/ssl/ssltest.c
 index 4f80be8..28fa223 100644
 --- a/ssl/ssltest.c
 +++ b/ssl/ssltest.c
-@@ -369,6 +369,7 @@ static void sv_usage(void)
+@@ -369,8 +369,9 @@ static void sv_usage(void)
  	               "                 (default is sect163r2).\n");
  #endif
- 	fprintf(stderr," -test_cipherlist - verifies the order of the ssl cipher lists\n");
+ 	fprintf(stderr," -test_cipherlist - Verifies the order of the ssl cipher lists.\n"
+ 		       "                    When this option is requested, the cipherlist\n"
+ 		       "                    tests are run instead of handshake tests.\n");
 +	fprintf(stderr," -cutthrough      - enable 1-RTT full-handshake for strong ciphers\n");
  	}
  
