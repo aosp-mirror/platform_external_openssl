@@ -36,7 +36,7 @@ index 8f3740f..3672cce 100644
  		   omitted if no identity hint is sent. Set
  		   session->sess_cert anyway to avoid problems
  		   later.*/
--		if (s->s3->tmp.new_cipher->algorithm_mkey & SSL_kPSK)
+-		if (alg_k & SSL_kPSK)
 +		if (s->s3->tmp.new_cipher->algorithm_auth & SSL_aPSK)
  			{
  			s->session->sess_cert=ssl_sess_cert_new();
@@ -657,7 +657,7 @@ index 9335eda..fe70124 100644
 @@ -478,10 +482,12 @@ int ssl3_accept(SSL *s)
  			 * public key for key exchange.
  			 */
- 			if (s->s3->tmp.use_rsa_tmp
+ 			if (0
 -			/* PSK: send ServerKeyExchange if PSK identity
 -			 * hint if provided */
 +			/* PSK: send ServerKeyExchange if either:
