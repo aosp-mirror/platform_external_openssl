@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0ef945d6_43f10670",
+        "filename": "Crypto-config-target.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 716,
+      "author": {
+        "id": 1003224
+      },
+      "writtenOn": "2015-01-09T19:31:10Z",
+      "side": 0,
+      "message": "this is the magic line. as long as boringssl has this, you\u0027re good.\n\nyou can also remove any reference to openssl/include you find in the tree because this made it obsolete.",
+      "revId": "4c4295f0f9eb277604cb1edb1fa4b177c887ede1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
