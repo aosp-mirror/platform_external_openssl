@@ -219,9 +219,9 @@ index 5f8b0b0..e360550 100644
 -			}
 -		ssl_cert_free(ocert);
 -		}
-	CRYPTO_add(&ctx->references,1,CRYPTO_LOCK_SSL_CTX);
-	if (ssl->ctx != NULL)
-		SSL_CTX_free(ssl->ctx); /* decrement reference count */
+ 
+ 	/*
+ 	 * Program invariant: |sid_ctx| has fixed size (SSL_MAX_SID_CTX_LENGTH),
 diff --git a/ssl/ssl_locl.h b/ssl/ssl_locl.h
 index 6d38f0f..3e89fcb 100644
 --- a/ssl/ssl_locl.h
