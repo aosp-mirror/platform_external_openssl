@@ -1,0 +1,9 @@
+Verified+1: Deckard Autoverifier <deckard@android.com>
+Code-Review+1: Alex Klyubin <klyubin@google.com>
+Code-Review+1: Adam Langley <agl@google.com>
+Code-Review+2: Brian Carlstrom <bdc@google.com>
+Submitted-by: Kenny Root <kroot@google.com>
+Submitted-at: Thu, 15 Jan 2015 16:56:17 +0000
+Reviewed-on: https://android-review.googlesource.com/122603
+Project: platform/external/openssl
+Branch: refs/heads/master
