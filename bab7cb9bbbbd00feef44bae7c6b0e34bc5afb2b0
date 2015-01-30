@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b7ea53ed_f1256826",
+        "filename": "crypto/armcap.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1003224
+      },
+      "writtenOn": "2015-01-30T17:24:10Z",
+      "side": 1,
+      "message": "\"versions of Android up to and including L\", so future generations know when it\u0027s safe to remove this. (and the embarrassing truth that we\u0027re not just talking about gingerbread here!)",
+      "revId": "bab7cb9bbbbd00feef44bae7c6b0e34bc5afb2b0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
+    }
+  ]
+}
