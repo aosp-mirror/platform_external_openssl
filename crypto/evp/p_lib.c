@@ -202,8 +202,7 @@ EVP_PKEY *EVP_PKEY_new(void)
 
 EVP_PKEY *EVP_PKEY_dup(EVP_PKEY *pkey)
 	{
-	CRYPTO_add(&pkey->references,1,CRYPTO_LOCK_EVP_PKEY);
-	return pkey;
+	return EVP_PKEY_up_ref(pkey);
 	}
 
 /* Setup a public key ASN1 method and ENGINE from a NID or a string.
@@ -412,6 +411,12 @@ void EVP_PKEY_free(EVP_PKEY *x)
 	if (x->attributes)
 		sk_X509_ATTRIBUTE_pop_free(x->attributes, X509_ATTRIBUTE_free);
 	OPENSSL_free(x);
+	}
+
+EVP_PKEY *EVP_PKEY_up_ref(EVP_PKEY *pkey)
+	{
+	CRYPTO_add(&pkey->references,1,CRYPTO_LOCK_EVP_PKEY);
+	return pkey;
 	}
 
 static void EVP_PKEY_free_it(EVP_PKEY *x)
