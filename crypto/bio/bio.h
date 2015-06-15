@@ -645,6 +645,7 @@ BIO *	BIO_new(BIO_METHOD *type);
 int	BIO_set(BIO *a,BIO_METHOD *type);
 int	BIO_free(BIO *a);
 void	BIO_vfree(BIO *a);
+BIO *	BIO_up_ref(BIO *bio);
 int	BIO_read(BIO *b, void *data, int len);
 int	BIO_gets(BIO *bp,char *buf, int size);
 int	BIO_write(BIO *b, const void *data, int len);
