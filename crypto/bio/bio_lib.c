@@ -141,6 +141,12 @@ int BIO_free(BIO *a)
 void BIO_vfree(BIO *a)
     { BIO_free(a); }
 
+BIO *BIO_up_ref(BIO *bio)
+{
+    CRYPTO_add(&bio->references, 1, CRYPTO_LOCK_BIO);
+    return bio;
+}
+
 void BIO_clear_flags(BIO *b, int flags)
 	{
 	b->flags &= ~flags;
