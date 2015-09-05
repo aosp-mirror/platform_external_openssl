@@ -11,13 +11,13 @@ Porting New Versions of OpenSSL.
 The following steps are recommended for porting new OpenSSL versions.
 
 1) Retrieve the appropriate version of the OpenSSL source from
-   www.openssl.org/source (in openssl-*.tar.gz file). Check the PGP
-   signature (found in matching openssl-*.tar.gz.asc file) with:
+   www.openssl.org/source (in openssl-*.tar.gz file) or ftp://ftp.openssl.org/source/ .
+   And click on PGP sign button:
 
      gpg openssl-*.tar.gz.asc
 
    If the public key is not found, import the the one with the
-   matching RSA key ID from http://www.openssl.org/about/, using:
+   matching RSA key ID from https://www.openssl.org/community/team.html, using:
 
      gpg --import # paste PGP public key block on stdin
 
