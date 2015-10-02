@@ -14,9 +14,14 @@
 #
 #		hardware-assisted	software(*)
 # Apple A7	2.31			4.13 (+14%)
-# Cortex-A5x	n/a			n/a
+# Cortex-A53	2.24			8.03 (+97%)
+# Cortex-A57	2.35			7.88 (+74%)
+# Denver	2.13			3.97 (+0%)(**)
+# X-Gene				8.80 (+200%)
 #
 # (*)	Software results are presented mostly for reference purposes.
+# (**)	Keep in mind that Denver relies on binary translation, which
+#	optimizes compiler output at run-time.
 
 $flavour = shift;
 open STDOUT,">".shift;

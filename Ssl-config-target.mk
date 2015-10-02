@@ -1,6 +1,6 @@
 # Auto-generated - DO NOT EDIT!
 # To regenerate, edit openssl.config, then run:
-#     ./import_openssl.sh import /path/to/openssl-1.0.1l.tar.gz
+#     ./import_openssl.sh import /path/to/openssl-1.0.2d.tar.gz
 #
 # This script will append to the following variables:
 #
@@ -21,10 +21,12 @@ common_cflags :=
 common_src_files := \
   ssl/bio_ssl.c \
   ssl/d1_both.c \
-  ssl/d1_enc.c \
+  ssl/d1_clnt.c \
   ssl/d1_lib.c \
+  ssl/d1_meth.c \
   ssl/d1_pkt.c \
   ssl/d1_srtp.c \
+  ssl/d1_srvr.c \
   ssl/kssl.c \
   ssl/s23_clnt.c \
   ssl/s23_lib.c \
@@ -58,6 +60,7 @@ common_src_files := \
   ssl/ssl_txt.c \
   ssl/t1_clnt.c \
   ssl/t1_enc.c \
+  ssl/t1_ext.c \
   ssl/t1_lib.c \
   ssl/t1_meth.c \
   ssl/t1_reneg.c \

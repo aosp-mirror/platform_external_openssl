@@ -1,6 +1,6 @@
 # Auto-generated - DO NOT EDIT!
 # To regenerate, edit openssl.config, then run:
-#     ./import_openssl.sh import /path/to/openssl-1.0.1l.tar.gz
+#     ./import_openssl.sh import /path/to/openssl-1.0.2d.tar.gz
 #
 # This script will append to the following variables:
 #
@@ -71,8 +71,8 @@ common_src_files := \
   apps/x509.c \
 
 common_c_includes := \
-  external/openssl/. \
-  external/openssl/include \
+  openssl/. \
+  openssl/include \
 
 arm_clang_asflags :=
 

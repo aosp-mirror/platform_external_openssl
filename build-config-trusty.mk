@@ -1,6 +1,6 @@
 # Auto-generated - DO NOT EDIT!
 # To regenerate, edit openssl.config, then run:
-#     ./import_openssl.sh import /path/to/openssl-1.0.1l.tar.gz
+#     ./import_openssl.sh import /path/to/openssl-1.0.2d.tar.gz
 #
 openssl_cflags_trusty := \
   -DL_ENDIAN \
@@ -19,6 +19,7 @@ openssl_cflags_trusty := \
   -DOPENSSL_NO_HEARTBEATS \
   -DOPENSSL_NO_IDEA \
   -DOPENSSL_NO_JPAKE \
+  -DOPENSSL_NO_LIBUNBOUND \
   -DOPENSSL_NO_LOCKING \
   -DOPENSSL_NO_MD2 \
   -DOPENSSL_NO_MD4 \
@@ -39,6 +40,7 @@ openssl_cflags_trusty := \
   -DOPENSSL_NO_SEED \
   -DOPENSSL_NO_SHA0 \
   -DOPENSSL_NO_SRP \
+  -DOPENSSL_NO_SSL_TRACE \
   -DOPENSSL_NO_SSL2 \
   -DOPENSSL_NO_SSL3 \
   -DOPENSSL_NO_STATIC_ENGINE \
@@ -68,6 +70,7 @@ openssl_cflags_static_trusty := \
   -DOPENSSL_NO_HEARTBEATS \
   -DOPENSSL_NO_IDEA \
   -DOPENSSL_NO_JPAKE \
+  -DOPENSSL_NO_LIBUNBOUND \
   -DOPENSSL_NO_LOCKING \
   -DOPENSSL_NO_MD2 \
   -DOPENSSL_NO_MD4 \
@@ -88,6 +91,7 @@ openssl_cflags_static_trusty := \
   -DOPENSSL_NO_SEED \
   -DOPENSSL_NO_SHA0 \
   -DOPENSSL_NO_SRP \
+  -DOPENSSL_NO_SSL_TRACE \
   -DOPENSSL_NO_SSL2 \
   -DOPENSSL_NO_SSL3 \
   -DOPENSSL_NO_STATIC_ENGINE \

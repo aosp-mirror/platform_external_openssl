@@ -219,6 +219,7 @@ function check_asm_flags() {
   local actual_flags
   local defines="OPENSSL_CRYPTO_DEFINES_$arch"
 
+  chmod +x ./Configure
   PERL=/usr/bin/perl run_verbose ./Configure $CONFIGURE_ARGS $target
 
   unsorted_flags="$(awk '/^CFLAG=/ { sub(/^CFLAG= .*-Wall /, ""); gsub(/-D/, ""); print; }' Makefile)"
@@ -353,7 +354,7 @@ print_values_with_prefix() {
     echo -n " $prefix$src "
   done
 }
-
+ 
 # Print the definition of a given variable in a GNU Make build file.
 # $1: Variable name (e.g. common_src_files)
 # $2: prefix for each variable contents
@@ -442,7 +443,7 @@ LOCAL_ADDITIONAL_DEPENDENCIES += \$(LOCAL_PATH)/$(basename $output)
     print_vardef_in_mk common_src_files $common_sources
 
     common_includes=$(var_sorted_value OPENSSL_${prefix}_INCLUDES)
-    print_vardef_with_prefix_in_mk common_c_includes external/openssl/ $common_includes
+    print_vardef_with_prefix_in_mk common_c_includes openssl/ $common_includes
 
     for arch in $all_archs $variant_archs; do
       arch_clang_asflags=$(var_sorted_value OPENSSL_${prefix}_CLANG_ASFLAGS_${arch})
@@ -583,24 +584,37 @@ function import() {
   gen_asm_x86 crypto/bf/asm/bf-586.pl
 
   # Generate x86_64 asm
+  
   gen_asm_x86_64 crypto/x86_64cpuid.pl
   gen_asm_x86_64 crypto/sha/asm/sha1-x86_64.pl
+  gen_asm_x86_64 crypto/sha/asm/sha1-mb-x86_64.pl
+  gen_asm_x86_64 crypto/sha/asm/sha256-mb-x86_64.pl
+
   gen_asm_x86_64 crypto/sha/asm/sha512-x86_64.pl crypto/sha/asm/sha256-x86_64.S
   gen_asm_x86_64 crypto/sha/asm/sha512-x86_64.pl
   gen_asm_x86_64 crypto/modes/asm/ghash-x86_64.pl
+  gen_asm_x86_64 crypto/modes/asm/aesni-gcm-x86_64.pl
+
   gen_asm_x86_64 crypto/aes/asm/aesni-x86_64.pl
   gen_asm_x86_64 crypto/aes/asm/vpaes-x86_64.pl
   gen_asm_x86_64 crypto/aes/asm/bsaes-x86_64.pl
   gen_asm_x86_64 crypto/aes/asm/aes-x86_64.pl
   gen_asm_x86_64 crypto/aes/asm/aesni-sha1-x86_64.pl
+  gen_asm_x86_64 crypto/aes/asm/aesni-mb-x86_64.pl
+  gen_asm_x86_64 crypto/aes/asm/aesni-sha256-x86_64.pl
+  gen_asm_x86_64 crypto/aes/asm/aesni-x86_64.pl
+
   gen_asm_x86_64 crypto/md5/asm/md5-x86_64.pl
-  gen_asm_x86_64 crypto/bn/asm/modexp512-x86_64.pl
   gen_asm_x86_64 crypto/bn/asm/x86_64-mont.pl
   gen_asm_x86_64 crypto/bn/asm/x86_64-gf2m.pl
   gen_asm_x86_64 crypto/bn/asm/x86_64-mont5.pl
+  gen_asm_x86_64 crypto/bn/asm/rsaz-x86_64.pl
+  gen_asm_x86_64 crypto/bn/asm/rsaz-avx2.pl
+  gen_asm_x86_64 crypto/ec/asm/ecp_nistz256-x86_64.pl
   gen_asm_x86_64 crypto/rc4/asm/rc4-x86_64.pl
   gen_asm_x86_64 crypto/rc4/asm/rc4-md5-x86_64.pl
 
+  
   # Setup android.testssl directory
   mkdir android.testssl
   cat test/testssl | \

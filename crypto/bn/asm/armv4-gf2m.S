@@ -2,10 +2,6 @@
 
 .text
 .code	32
-
-#if __ARM_ARCH__>=7
-.fpu	neon
-#endif
 .type	mul_1x1_ialu,%function
 .align	5
 mul_1x1_ialu:
@@ -89,12 +85,62 @@ mul_1x1_ialu:
 .type	bn_GF2m_mul_2x2,%function
 .align	5
 bn_GF2m_mul_2x2:
-#if __ARM_ARCH__>=7
+#if __ARM_MAX_ARCH__>=7
 	ldr	r12,.LOPENSSL_armcap
 .Lpic:	ldr	r12,[pc,r12]
 	tst	r12,#1
-	beq	.Lialu
+	bne	.LNEON
+#endif
+	stmdb	sp!,{r4-r10,lr}
+	mov	r10,r0			@ reassign 1st argument
+	mov	r0,r3			@ r0=b1
+	ldr	r3,[sp,#32]		@ load b0
+	mov	r12,#7<<2
+	sub	sp,sp,#32		@ allocate tab[8]
 
+	bl	mul_1x1_ialu		@ a1·b1
+	str	r5,[r10,#8]
+	str	r4,[r10,#12]
+
+	eor	r0,r0,r3		@ flip b0 and b1
+	 eor	r1,r1,r2		@ flip a0 and a1
+	eor	r3,r3,r0
+	 eor	r2,r2,r1
+	eor	r0,r0,r3
+	 eor	r1,r1,r2
+	bl	mul_1x1_ialu		@ a0·b0
+	str	r5,[r10]
+	str	r4,[r10,#4]
+
+	eor	r1,r1,r2
+	eor	r0,r0,r3
+	bl	mul_1x1_ialu		@ (a1+a0)·(b1+b0)
+	ldmia	r10,{r6-r9}
+	eor	r5,r5,r4
+	eor	r4,r4,r7
+	eor	r5,r5,r6
+	eor	r4,r4,r8
+	eor	r5,r5,r9
+	eor	r4,r4,r9
+	str	r4,[r10,#8]
+	eor	r5,r5,r4
+	add	sp,sp,#32		@ destroy tab[8]
+	str	r5,[r10,#4]
+
+#if __ARM_ARCH__>=5
+	ldmia	sp!,{r4-r10,pc}
+#else
+	ldmia	sp!,{r4-r10,lr}
+	tst	lr,#1
+	moveq	pc,lr			@ be binary compatible with V4, yet
+	.word	0xe12fff1e			@ interoperable with Thumb ISA:-)
+#endif
+#if __ARM_MAX_ARCH__>=7
+.arch	armv7-a
+.fpu	neon
+
+.align	5
+.LNEON:
 	ldr		r12, [sp]		@ 5th argument
 	vmov.32		d26, r2, r1
 	vmov.32		d27, r12, r3
@@ -142,55 +188,9 @@ bn_GF2m_mul_2x2:
 
 	vst1.32		{q0}, [r0]
 	bx	lr		@ bx lr
-.align	4
-.Lialu:
-#endif
-	stmdb	sp!,{r4-r10,lr}
-	mov	r10,r0			@ reassign 1st argument
-	mov	r0,r3			@ r0=b1
-	ldr	r3,[sp,#32]		@ load b0
-	mov	r12,#7<<2
-	sub	sp,sp,#32		@ allocate tab[8]
-
-	bl	mul_1x1_ialu		@ a1·b1
-	str	r5,[r10,#8]
-	str	r4,[r10,#12]
-
-	eor	r0,r0,r3		@ flip b0 and b1
-	 eor	r1,r1,r2		@ flip a0 and a1
-	eor	r3,r3,r0
-	 eor	r2,r2,r1
-	eor	r0,r0,r3
-	 eor	r1,r1,r2
-	bl	mul_1x1_ialu		@ a0·b0
-	str	r5,[r10]
-	str	r4,[r10,#4]
-
-	eor	r1,r1,r2
-	eor	r0,r0,r3
-	bl	mul_1x1_ialu		@ (a1+a0)·(b1+b0)
-	ldmia	r10,{r6-r9}
-	eor	r5,r5,r4
-	eor	r4,r4,r7
-	eor	r5,r5,r6
-	eor	r4,r4,r8
-	eor	r5,r5,r9
-	eor	r4,r4,r9
-	str	r4,[r10,#8]
-	eor	r5,r5,r4
-	add	sp,sp,#32		@ destroy tab[8]
-	str	r5,[r10,#4]
-
-#if __ARM_ARCH__>=5
-	ldmia	sp!,{r4-r10,pc}
-#else
-	ldmia	sp!,{r4-r10,lr}
-	tst	lr,#1
-	moveq	pc,lr			@ be binary compatible with V4, yet
-	.word	0xe12fff1e			@ interoperable with Thumb ISA:-)
 #endif
 .size	bn_GF2m_mul_2x2,.-bn_GF2m_mul_2x2
-#if __ARM_ARCH__>=7
+#if __ARM_MAX_ARCH__>=7
 .align	5
 .LOPENSSL_armcap:
 .word	OPENSSL_armcap_P-(.Lpic+8)
@@ -198,4 +198,6 @@ bn_GF2m_mul_2x2:
 .asciz	"GF(2^m) Multiplication for ARMv4/NEON, CRYPTOGAMS by <appro@openssl.org>"
 .align	5
 
+#if __ARM_MAX_ARCH__>=7
 .comm	OPENSSL_armcap_P,4,4
+#endif

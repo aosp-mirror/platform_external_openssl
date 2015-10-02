@@ -1,6 +1,6 @@
 # Auto-generated - DO NOT EDIT!
 # To regenerate, edit openssl.config, then run:
-#     ./import_openssl.sh import /path/to/openssl-1.0.1l.tar.gz
+#     ./import_openssl.sh import /path/to/openssl-1.0.2d.tar.gz
 #
 # This script will append to the following variables:
 #
@@ -155,6 +155,7 @@ common_src_files := \
   crypto/bn/bn_sqr.c \
   crypto/bn/bn_sqrt.c \
   crypto/bn/bn_word.c \
+  crypto/bn/rsaz_exp.c \
   crypto/buffer/buf_err.c \
   crypto/buffer/buf_str.c \
   crypto/buffer/buffer.c \
@@ -170,6 +171,7 @@ common_src_files := \
   crypto/cms/cms_err.c \
   crypto/cms/cms_ess.c \
   crypto/cms/cms_io.c \
+  crypto/cms/cms_kari.c \
   crypto/cms/cms_lib.c \
   crypto/cms/cms_pwri.c \
   crypto/cms/cms_sd.c \
@@ -220,9 +222,11 @@ common_src_files := \
   crypto/dh/dh_depr.c \
   crypto/dh/dh_err.c \
   crypto/dh/dh_gen.c \
+  crypto/dh/dh_kdf.c \
   crypto/dh/dh_key.c \
   crypto/dh/dh_lib.c \
   crypto/dh/dh_pmeth.c \
+  crypto/dh/dh_rfc5114.c \
   crypto/dsa/dsa_ameth.c \
   crypto/dsa/dsa_asn1.c \
   crypto/dsa/dsa_depr.c \
@@ -263,6 +267,7 @@ common_src_files := \
   crypto/ec/ecp_oct.c \
   crypto/ec/ecp_smpl.c \
   crypto/ecdh/ech_err.c \
+  crypto/ecdh/ech_kdf.c \
   crypto/ecdh/ech_key.c \
   crypto/ecdh/ech_lib.c \
   crypto/ecdh/ech_ossl.c \
@@ -307,6 +312,7 @@ common_src_files := \
   crypto/evp/digest.c \
   crypto/evp/e_aes.c \
   crypto/evp/e_aes_cbc_hmac_sha1.c \
+  crypto/evp/e_aes_cbc_hmac_sha256.c \
   crypto/evp/e_bf.c \
   crypto/evp/e_des.c \
   crypto/evp/e_des3.c \
@@ -369,6 +375,7 @@ common_src_files := \
   crypto/modes/ctr128.c \
   crypto/modes/gcm128.c \
   crypto/modes/ofb128.c \
+  crypto/modes/wrap128.c \
   crypto/modes/xts128.c \
   crypto/o_dir.c \
   crypto/o_init.c \
@@ -527,19 +534,20 @@ common_src_files := \
   crypto/x509v3/v3_pmaps.c \
   crypto/x509v3/v3_prn.c \
   crypto/x509v3/v3_purp.c \
+  crypto/x509v3/v3_scts.c \
   crypto/x509v3/v3_skey.c \
   crypto/x509v3/v3_sxnet.c \
   crypto/x509v3/v3_utl.c \
   crypto/x509v3/v3err.c \
 
 common_c_includes := \
-  external/openssl/. \
-  external/openssl/crypto \
-  external/openssl/crypto/asn1 \
-  external/openssl/crypto/evp \
-  external/openssl/crypto/modes \
-  external/openssl/include \
-  external/openssl/include/openssl \
+  openssl/. \
+  openssl/crypto \
+  openssl/crypto/asn1 \
+  openssl/crypto/evp \
+  openssl/crypto/modes \
+  openssl/include \
+  openssl/include/openssl \
 
 arm_clang_asflags := \
   -no-integrated-as \
@@ -649,6 +657,7 @@ x86_64_cflags := \
   -DAES_ASM \
   -DBSAES_ASM \
   -DDES_UNROLL \
+  -DECP_NISTZ256_ASM \
   -DGHASH_ASM \
   -DMD5_ASM \
   -DOPENSSL_BN_ASM_GF2m \
@@ -663,20 +672,28 @@ x86_64_cflags := \
 
 x86_64_src_files := \
   crypto/aes/asm/aes-x86_64.S \
+  crypto/aes/asm/aesni-mb-x86_64.S \
   crypto/aes/asm/aesni-sha1-x86_64.S \
+  crypto/aes/asm/aesni-sha256-x86_64.S \
   crypto/aes/asm/aesni-x86_64.S \
   crypto/aes/asm/bsaes-x86_64.S \
   crypto/aes/asm/vpaes-x86_64.S \
-  crypto/bn/asm/modexp512-x86_64.S \
+  crypto/bn/asm/rsaz-avx2.S \
+  crypto/bn/asm/rsaz-x86_64.S \
   crypto/bn/asm/x86_64-gcc.c \
   crypto/bn/asm/x86_64-gf2m.S \
   crypto/bn/asm/x86_64-mont.S \
   crypto/bn/asm/x86_64-mont5.S \
+  crypto/ec/asm/ecp_nistz256-x86_64.S \
+  crypto/ec/ecp_nistz256.c \
   crypto/md5/asm/md5-x86_64.S \
+  crypto/modes/asm/aesni-gcm-x86_64.S \
   crypto/modes/asm/ghash-x86_64.S \
   crypto/rc4/asm/rc4-md5-x86_64.S \
   crypto/rc4/asm/rc4-x86_64.S \
+  crypto/sha/asm/sha1-mb-x86_64.S \
   crypto/sha/asm/sha1-x86_64.S \
+  crypto/sha/asm/sha256-mb-x86_64.S \
   crypto/sha/asm/sha256-x86_64.S \
   crypto/sha/asm/sha512-x86_64.S \
   crypto/x86_64cpuid.S \

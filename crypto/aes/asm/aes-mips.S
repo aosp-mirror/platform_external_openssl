@@ -3,7 +3,11 @@
 # include <openssl/fipssyms.h>
 #endif
 
-#if !defined(__vxworks) || defined(__pic__)
+#if defined(__mips_smartmips) && !defined(_MIPS_ARCH_MIPS32R2)
+#define _MIPS_ARCH_MIPS32R2
+#endif
+
+#if !defined(__mips_eabi) && (!defined(__vxworks) || defined(__pic__))
 .option	pic2
 #endif
 .set	noat
@@ -25,94 +29,65 @@ _mips_AES_encrypt:
 	xor	$11,$15
 
 	sub	$30,1
-	srl	$1,$9,6
+#if defined(__mips_smartmips)
+	ext	$1,$9,8,8
 .Loop_enc:
-	srl	$2,$10,6
-	srl	$24,$11,6
-	srl	$25,$8,6
-	and	$1,0x3fc
-	and	$2,0x3fc
-	and	$24,0x3fc
-	and	$25,0x3fc
-	add $1,$7
-	add $2,$7
-	add $24,$7
-	add $25,$7
-	lwl	$12,2($1)		# Te1[s1>>16]
-	lwl	$13,2($2)		# Te1[s2>>16]
-	lwl	$14,2($24)		# Te1[s3>>16]
-	lwl	$15,2($25)		# Te1[s0>>16]
-	lwr	$12,3($1)		# Te1[s1>>16]
-	lwr	$13,3($2)		# Te1[s2>>16]
-	lwr	$14,3($24)		# Te1[s3>>16]
-	lwr	$15,3($25)		# Te1[s0>>16]
+	ext	$2,$10,8,8
+	ext	$24,$11,8,8
+	ext	$25,$8,8,8
+	lwxs	$12,$1($7)		# Te1[s1>>16]
+	ext	$1,$10,16,8
+	lwxs	$13,$2($7)		# Te1[s2>>16]
+	ext	$2,$11,16,8
+	lwxs	$14,$24($7)		# Te1[s3>>16]
+	ext	$24,$8,16,8
+	lwxs	$15,$25($7)		# Te1[s0>>16]
+	ext	$25,$9,16,8
 
-	srl	$1,$10,14
-	srl	$2,$11,14
-	srl	$24,$8,14
-	srl	$25,$9,14
-	and	$1,0x3fc
-	and	$2,0x3fc
-	and	$24,0x3fc
-	and	$25,0x3fc
-	add $1,$7
-	add $2,$7
-	add $24,$7
-	add $25,$7
-	lwl	$16,1($1)		# Te2[s2>>8]
-	lwl	$17,1($2)		# Te2[s3>>8]
-	lwl	$18,1($24)		# Te2[s0>>8]
-	lwl	$19,1($25)		# Te2[s1>>8]
-	lwr	$16,2($1)		# Te2[s2>>8]
-	lwr	$17,2($2)		# Te2[s3>>8]
-	lwr	$18,2($24)		# Te2[s0>>8]
-	lwr	$19,2($25)		# Te2[s1>>8]
+	lwxs	$16,$1($7)		# Te2[s2>>8]
+	ext	$1,$11,24,8
+	lwxs	$17,$2($7)		# Te2[s3>>8]
+	ext	$2,$8,24,8
+	lwxs	$18,$24($7)		# Te2[s0>>8]
+	ext	$24,$9,24,8
+	lwxs	$19,$25($7)		# Te2[s1>>8]
+	ext	$25,$10,24,8
 
-	srl	$1,$11,22
-	srl	$2,$8,22
-	srl	$24,$9,22
-	srl	$25,$10,22
-	and	$1,0x3fc
-	and	$2,0x3fc
-	and	$24,0x3fc
-	and	$25,0x3fc
-	add $1,$7
-	add $2,$7
-	add $24,$7
-	add $25,$7
-	lwl	$20,0($1)		# Te3[s3]
-	lwl	$21,0($2)		# Te3[s0]
-	lwl	$22,0($24)		# Te3[s1]
-	lwl	$23,0($25)		# Te3[s2]
-	lwr	$20,1($1)		# Te3[s3]
-	lwr	$21,1($2)		# Te3[s0]
-	lwr	$22,1($24)		# Te3[s1]
-	lwr	$23,1($25)		# Te3[s2]
+	lwxs	$20,$1($7)		# Te3[s3]
+	ext	$1,$8,0,8
+	lwxs	$21,$2($7)		# Te3[s0]
+	ext	$2,$9,0,8
+	lwxs	$22,$24($7)		# Te3[s1]
+	ext	$24,$10,0,8
+	lwxs	$23,$25($7)		# Te3[s2]
+	ext	$25,$11,0,8
 
-	sll	$1,$8,2
-	sll	$2,$9,2
-	sll	$24,$10,2
-	sll	$25,$11,2
-	and	$1,0x3fc
-	and	$2,0x3fc
-	and	$24,0x3fc
-	and	$25,0x3fc
-	add $1,$7
-	add $2,$7
-	add $24,$7
-	add $25,$7
+	rotr	$12,$12,24
+	rotr	$13,$13,24
+	rotr	$14,$14,24
+	rotr	$15,$15,24
+
+	rotr	$16,$16,16
+	rotr	$17,$17,16
+	rotr	$18,$18,16
+	rotr	$19,$19,16
+
 	xor	$12,$16
+	lwxs	$16,$1($7)		# Te0[s0>>24]
 	xor	$13,$17
+	lwxs	$17,$2($7)		# Te0[s1>>24]
 	xor	$14,$18
+	lwxs	$18,$24($7)		# Te0[s2>>24]
 	xor	$15,$19
-	lw	$16,0($1)		# Te0[s0>>24]
-	lw	$17,0($2)		# Te0[s1>>24]
-	lw	$18,0($24)		# Te0[s2>>24]
-	lw	$19,0($25)		# Te0[s3>>24]
+	lwxs	$19,$25($7)		# Te0[s3>>24]
 
+	rotr	$20,$20,8
 	lw	$8,0($3)
+	rotr	$21,$21,8
 	lw	$9,4($3)
+	rotr	$22,$22,8
 	lw	$10,8($3)
+	rotr	$23,$23,8
 	lw	$11,12($3)
 
 	xor	$12,$20
@@ -133,7 +108,199 @@ _mips_AES_encrypt:
 	xor	$11,$15
 	.set	noreorder
 	bnez	$30,.Loop_enc
+	ext	$1,$9,8,8
+
 	srl	$1,$9,6
+#else
+	srl	$1,$9,6
+.Loop_enc:
+	srl	$2,$10,6
+	srl	$24,$11,6
+	srl	$25,$8,6
+	and	$1,0x3fc
+	and	$2,0x3fc
+	and	$24,0x3fc
+	and	$25,0x3fc
+	add $1,$7
+	add $2,$7
+	add $24,$7
+	add $25,$7
+#if defined(_MIPS_ARCH_MIPS32R2) || defined(_MIPS_ARCH_MIPS64R2)
+	lw	$12,0($1)		# Te1[s1>>16]
+	srl	$1,$10,14
+	lw	$13,0($2)		# Te1[s2>>16]
+	srl	$2,$11,14
+	lw	$14,0($24)		# Te1[s3>>16]
+	srl	$24,$8,14
+	lw	$15,0($25)		# Te1[s0>>16]
+	srl	$25,$9,14
+#else
+	lwl	$12,2($1)		# Te1[s1>>16]
+	lwl	$13,2($2)		# Te1[s2>>16]
+	lwl	$14,2($24)		# Te1[s3>>16]
+	lwl	$15,2($25)		# Te1[s0>>16]
+	lwr	$12,3($1)		# Te1[s1>>16]
+	srl	$1,$10,14
+	lwr	$13,3($2)		# Te1[s2>>16]
+	srl	$2,$11,14
+	lwr	$14,3($24)		# Te1[s3>>16]
+	srl	$24,$8,14
+	lwr	$15,3($25)		# Te1[s0>>16]
+	srl	$25,$9,14
+#endif
+	and	$1,0x3fc
+	and	$2,0x3fc
+	and	$24,0x3fc
+	and	$25,0x3fc
+	add $1,$7
+	add $2,$7
+	add $24,$7
+	add $25,$7
+#if defined(_MIPS_ARCH_MIPS32R2) || defined(_MIPS_ARCH_MIPS64R2)
+	rotr	$12,$12,24
+	rotr	$13,$13,24
+	rotr	$14,$14,24
+	rotr	$15,$15,24
+# if defined(_MIPSEL)
+	lw	$16,0($1)		# Te2[s2>>8]
+	srl	$1,$11,22
+	lw	$17,0($2)		# Te2[s3>>8]
+	srl	$2,$8,22
+	lw	$18,0($24)		# Te2[s0>>8]
+	srl	$24,$9,22
+	lw	$19,0($25)		# Te2[s1>>8]
+	srl	$25,$10,22
+
+	and	$1,0x3fc
+	and	$2,0x3fc
+	and	$24,0x3fc
+	and	$25,0x3fc
+	add $1,$7
+	add $2,$7
+	add $24,$7
+	add $25,$7
+	lw	$20,0($1)		# Te3[s3]
+	ins $1,$8,2,8
+	lw	$21,0($2)		# Te3[s0]
+	ins $2,$9,2,8
+	lw	$22,0($24)		# Te3[s1]
+	ins $24,$10,2,8
+	lw	$23,0($25)		# Te3[s2]
+	ins $25,$11,2,8
+# else
+	lw	$16,0($1)		# Te2[s2>>8]
+	ins $1,$11,2,8
+	lw	$17,0($2)		# Te2[s3>>8]
+	ins $2,$8,2,8
+	lw	$18,0($24)		# Te2[s0>>8]
+	ins $24,$9,2,8
+	lw	$19,0($25)		# Te2[s1>>8]
+	ins $25,$10,2,8
+
+	lw	$20,0($1)		# Te3[s3]
+	sll	$1,$8,2
+	lw	$21,0($2)		# Te3[s0]
+	sll	$2,$9,2
+	lw	$22,0($24)		# Te3[s1]
+	sll	$24,$10,2
+	lw	$23,0($25)		# Te3[s2]
+	sll	$25,$11,2
+
+	and	$1,0x3fc
+	and	$2,0x3fc
+	and	$24,0x3fc
+	and	$25,0x3fc
+	add $1,$7
+	add $2,$7
+	add $24,$7
+	add $25,$7
+# endif
+	rotr	$16,$16,16
+	rotr	$17,$17,16
+	rotr	$18,$18,16
+	rotr	$19,$19,16
+
+	rotr	$20,$20,8
+	rotr	$21,$21,8
+	rotr	$22,$22,8
+	rotr	$23,$23,8
+#else
+	lwl	$16,1($1)		# Te2[s2>>8]
+	lwl	$17,1($2)		# Te2[s3>>8]
+	lwl	$18,1($24)		# Te2[s0>>8]
+	lwl	$19,1($25)		# Te2[s1>>8]
+	lwr	$16,2($1)		# Te2[s2>>8]
+	srl	$1,$11,22
+	lwr	$17,2($2)		# Te2[s3>>8]
+	srl	$2,$8,22
+	lwr	$18,2($24)		# Te2[s0>>8]
+	srl	$24,$9,22
+	lwr	$19,2($25)		# Te2[s1>>8]
+	srl	$25,$10,22
+
+	and	$1,0x3fc
+	and	$2,0x3fc
+	and	$24,0x3fc
+	and	$25,0x3fc
+	add $1,$7
+	add $2,$7
+	add $24,$7
+	add $25,$7
+	lwl	$20,0($1)		# Te3[s3]
+	lwl	$21,0($2)		# Te3[s0]
+	lwl	$22,0($24)		# Te3[s1]
+	lwl	$23,0($25)		# Te3[s2]
+	lwr	$20,1($1)		# Te3[s3]
+	sll	$1,$8,2
+	lwr	$21,1($2)		# Te3[s0]
+	sll	$2,$9,2
+	lwr	$22,1($24)		# Te3[s1]
+	sll	$24,$10,2
+	lwr	$23,1($25)		# Te3[s2]
+	sll	$25,$11,2
+
+	and	$1,0x3fc
+	and	$2,0x3fc
+	and	$24,0x3fc
+	and	$25,0x3fc
+	add $1,$7
+	add $2,$7
+	add $24,$7
+	add $25,$7
+#endif
+	xor	$12,$16
+	lw	$16,0($1)		# Te0[s0>>24]
+	xor	$13,$17
+	lw	$17,0($2)		# Te0[s1>>24]
+	xor	$14,$18
+	lw	$18,0($24)		# Te0[s2>>24]
+	xor	$15,$19
+	lw	$19,0($25)		# Te0[s3>>24]
+
+	xor	$12,$20
+	lw	$8,0($3)
+	xor	$13,$21
+	lw	$9,4($3)
+	xor	$14,$22
+	lw	$10,8($3)
+	xor	$15,$23
+	lw	$11,12($3)
+
+	xor	$12,$16
+	xor	$13,$17
+	xor	$14,$18
+	xor	$15,$19
+
+	sub	$30,1
+	add $3,16
+	xor	$8,$12
+	xor	$9,$13
+	xor	$10,$14
+	xor	$11,$15
+	.set	noreorder
+	bnez	$30,.Loop_enc
+	srl	$1,$9,6
+#endif
 
 	.set	reorder
 	srl	$2,$10,6
@@ -148,14 +315,14 @@ _mips_AES_encrypt:
 	add $24,$7
 	add $25,$7
 	lbu	$12,2($1)		# Te4[s1>>16]
-	lbu	$13,2($2)		# Te4[s2>>16]
-	lbu	$14,2($24)		# Te4[s3>>16]
-	lbu	$15,2($25)		# Te4[s0>>16]
-
 	srl	$1,$10,14
+	lbu	$13,2($2)		# Te4[s2>>16]
 	srl	$2,$11,14
+	lbu	$14,2($24)		# Te4[s3>>16]
 	srl	$24,$8,14
+	lbu	$15,2($25)		# Te4[s0>>16]
 	srl	$25,$9,14
+
 	and	$1,0x3fc
 	and	$2,0x3fc
 	and	$24,0x3fc
@@ -164,15 +331,44 @@ _mips_AES_encrypt:
 	add $2,$7
 	add $24,$7
 	add $25,$7
+#if defined(_MIPS_ARCH_MIPS32R2) || defined(_MIPS_ARCH_MIPS64R2)
+# if defined(_MIPSEL)
 	lbu	$16,2($1)		# Te4[s2>>8]
+	ins $1,$8,2,8
 	lbu	$17,2($2)		# Te4[s3>>8]
+	ins $2,$9,2,8
 	lbu	$18,2($24)		# Te4[s0>>8]
+	ins $24,$10,2,8
 	lbu	$19,2($25)		# Te4[s1>>8]
+	ins $25,$11,2,8
 
+	lbu	$20,2($1)		# Te4[s0>>24]
+	srl	$1,$11,22
+	lbu	$21,2($2)		# Te4[s1>>24]
+	srl	$2,$8,22
+	lbu	$22,2($24)		# Te4[s2>>24]
+	srl	$24,$9,22
+	lbu	$23,2($25)		# Te4[s3>>24]
+	srl	$25,$10,22
+
+	and	$1,0x3fc
+	and	$2,0x3fc
+	and	$24,0x3fc
+	and	$25,0x3fc
+	add $1,$7
+	add $2,$7
+	add $24,$7
+	add $25,$7
+# else
+	lbu	$16,2($1)		# Te4[s2>>8]
 	sll	$1,$8,2
+	lbu	$17,2($2)		# Te4[s3>>8]
 	sll	$2,$9,2
+	lbu	$18,2($24)		# Te4[s0>>8]
 	sll	$24,$10,2
+	lbu	$19,2($25)		# Te4[s1>>8]
 	sll	$25,$11,2
+
 	and	$1,0x3fc
 	and	$2,0x3fc
 	and	$24,0x3fc
@@ -182,18 +378,76 @@ _mips_AES_encrypt:
 	add $24,$7
 	add $25,$7
 	lbu	$20,2($1)		# Te4[s0>>24]
+	ins $1,$11,2,8
 	lbu	$21,2($2)		# Te4[s1>>24]
+	ins $2,$8,2,8
 	lbu	$22,2($24)		# Te4[s2>>24]
+	ins $24,$9,2,8
 	lbu	$23,2($25)		# Te4[s3>>24]
+	ins $25,$10,2,8
+# endif
+	sll	$12,$12,8
+	sll	$13,$13,8
+	sll	$14,$14,8
+	sll	$15,$15,8
 
-	srl	$1,$11,22
-	srl	$2,$8,22
-	srl	$24,$9,22
-	srl	$25,$10,22
+	ins	$12,$16,16,8
+	lbu	$16,2($1)		# Te4[s3]
+	ins	$13,$17,16,8
+	lbu	$17,2($2)		# Te4[s0]
+	ins	$14,$18,16,8
+	lbu	$18,2($24)		# Te4[s1]
+	ins	$15,$19,16,8
+	lbu	$19,2($25)		# Te4[s2]
+
+	ins	$12,$20,0,8
+	lw	$8,0($3)
+	ins	$13,$21,0,8
+	lw	$9,4($3)
+	ins	$14,$22,0,8
+	lw	$10,8($3)
+	ins	$15,$23,0,8
+	lw	$11,12($3)
+
+	ins	$12,$16,24,8
+	ins	$13,$17,24,8
+	ins	$14,$18,24,8
+	ins	$15,$19,24,8
+#else
+	lbu	$16,2($1)		# Te4[s2>>8]
+	sll	$1,$8,2
+	lbu	$17,2($2)		# Te4[s3>>8]
+	sll	$2,$9,2
+	lbu	$18,2($24)		# Te4[s0>>8]
+	sll	$24,$10,2
+	lbu	$19,2($25)		# Te4[s1>>8]
+	sll	$25,$11,2
+
 	and	$1,0x3fc
 	and	$2,0x3fc
 	and	$24,0x3fc
 	and	$25,0x3fc
+	add $1,$7
+	add $2,$7
+	add $24,$7
+	add $25,$7
+	lbu	$20,2($1)		# Te4[s0>>24]
+	srl	$1,$11,22
+	lbu	$21,2($2)		# Te4[s1>>24]
+	srl	$2,$8,22
+	lbu	$22,2($24)		# Te4[s2>>24]
+	srl	$24,$9,22
+	lbu	$23,2($25)		# Te4[s3>>24]
+	srl	$25,$10,22
+
+	and	$1,0x3fc
+	and	$2,0x3fc
+	and	$24,0x3fc
+	and	$25,0x3fc
+	add $1,$7
+	add $2,$7
+	add $24,$7
+	add $25,$7
 
 	sll	$12,$12,8
 	sll	$13,$13,8
@@ -206,27 +460,21 @@ _mips_AES_encrypt:
 	sll	$19,$19,16
 
 	xor	$12,$16
-	xor	$13,$17
-	xor	$14,$18
-	xor	$15,$19
-
-	add $1,$7
-	add $2,$7
-	add $24,$7
-	add $25,$7
 	lbu	$16,2($1)		# Te4[s3]
+	xor	$13,$17
 	lbu	$17,2($2)		# Te4[s0]
+	xor	$14,$18
 	lbu	$18,2($24)		# Te4[s1]
+	xor	$15,$19
 	lbu	$19,2($25)		# Te4[s2]
 
 	#sll	$20,$20,0
-	#sll	$21,$21,0
-	#sll	$22,$22,0
-	#sll	$23,$23,0
-
 	lw	$8,0($3)
+	#sll	$21,$21,0
 	lw	$9,4($3)
+	#sll	$22,$22,0
 	lw	$10,8($3)
+	#sll	$23,$23,0
 	lw	$11,12($3)
 
 	xor	$12,$20
@@ -243,7 +491,7 @@ _mips_AES_encrypt:
 	xor	$13,$17
 	xor	$14,$18
 	xor	$15,$19
-
+#endif
 	xor	$8,$12
 	xor	$9,$13
 	xor	$10,$14
@@ -326,97 +574,65 @@ _mips_AES_decrypt:
 	xor	$11,$15
 
 	sub	$30,1
-	srl	$1,$11,6
+#if defined(__mips_smartmips)
+	ext	$1,$11,8,8
 .Loop_dec:
-	srl	$2,$8,6
-	srl	$24,$9,6
-	srl	$25,$10,6
-	and	$1,0x3fc
-	and	$2,0x3fc
-	and	$24,0x3fc
-	and	$25,0x3fc
-	add $1,$7
-	add $2,$7
-	add $24,$7
-	add $25,$7
-	lwl	$12,2($1)		# Td1[s3>>16]
-	lwl	$13,2($2)		# Td1[s0>>16]
-	lwl	$14,2($24)		# Td1[s1>>16]
-	lwl	$15,2($25)		# Td1[s2>>16]
-	lwr	$12,3($1)		# Td1[s3>>16]
-	lwr	$13,3($2)		# Td1[s0>>16]
-	lwr	$14,3($24)		# Td1[s1>>16]
-	lwr	$15,3($25)		# Td1[s2>>16]
+	ext	$2,$8,8,8
+	ext	$24,$9,8,8
+	ext	$25,$10,8,8
+	lwxs	$12,$1($7)		# Td1[s3>>16]
+	ext	$1,$10,16,8
+	lwxs	$13,$2($7)		# Td1[s0>>16]
+	ext	$2,$11,16,8
+	lwxs	$14,$24($7)		# Td1[s1>>16]
+	ext	$24,$8,16,8
+	lwxs	$15,$25($7)		# Td1[s2>>16]
+	ext	$25,$9,16,8
 
-	srl	$1,$10,14
-	srl	$2,$11,14
-	srl	$24,$8,14
-	srl	$25,$9,14
-	and	$1,0x3fc
-	and	$2,0x3fc
-	and	$24,0x3fc
-	and	$25,0x3fc
-	add $1,$7
-	add $2,$7
-	add $24,$7
-	add $25,$7
-	lwl	$16,1($1)		# Td2[s2>>8]
-	lwl	$17,1($2)		# Td2[s3>>8]
-	lwl	$18,1($24)		# Td2[s0>>8]
-	lwl	$19,1($25)		# Td2[s1>>8]
-	lwr	$16,2($1)		# Td2[s2>>8]
-	lwr	$17,2($2)		# Td2[s3>>8]
-	lwr	$18,2($24)		# Td2[s0>>8]
-	lwr	$19,2($25)		# Td2[s1>>8]
+	lwxs	$16,$1($7)		# Td2[s2>>8]
+	ext	$1,$9,24,8
+	lwxs	$17,$2($7)		# Td2[s3>>8]
+	ext	$2,$10,24,8
+	lwxs	$18,$24($7)		# Td2[s0>>8]
+	ext	$24,$11,24,8
+	lwxs	$19,$25($7)		# Td2[s1>>8]
+	ext	$25,$8,24,8
 
-	srl	$1,$9,22
-	srl	$2,$10,22
-	srl	$24,$11,22
-	srl	$25,$8,22
-	and	$1,0x3fc
-	and	$2,0x3fc
-	and	$24,0x3fc
-	and	$25,0x3fc
-	add $1,$7
-	add $2,$7
-	add $24,$7
-	add $25,$7
-	lwl	$20,0($1)		# Td3[s1]
-	lwl	$21,0($2)		# Td3[s2]
-	lwl	$22,0($24)		# Td3[s3]
-	lwl	$23,0($25)		# Td3[s0]
-	lwr	$20,1($1)		# Td3[s1]
-	lwr	$21,1($2)		# Td3[s2]
-	lwr	$22,1($24)		# Td3[s3]
-	lwr	$23,1($25)		# Td3[s0]
+	lwxs	$20,$1($7)		# Td3[s1]
+	ext	$1,$8,0,8
+	lwxs	$21,$2($7)		# Td3[s2]
+	ext	$2,$9,0,8
+	lwxs	$22,$24($7)		# Td3[s3]
+	ext	$24,$10,0,8
+	lwxs	$23,$25($7)		# Td3[s0]
+	ext	$25,$11,0,8
 
-	sll	$1,$8,2
-	sll	$2,$9,2
-	sll	$24,$10,2
-	sll	$25,$11,2
-	and	$1,0x3fc
-	and	$2,0x3fc
-	and	$24,0x3fc
-	and	$25,0x3fc
-	add $1,$7
-	add $2,$7
-	add $24,$7
-	add $25,$7
+	rotr	$12,$12,24
+	rotr	$13,$13,24
+	rotr	$14,$14,24
+	rotr	$15,$15,24
+
+	rotr	$16,$16,16
+	rotr	$17,$17,16
+	rotr	$18,$18,16
+	rotr	$19,$19,16
 
 	xor	$12,$16
+	lwxs	$16,$1($7)		# Td0[s0>>24]
 	xor	$13,$17
+	lwxs	$17,$2($7)		# Td0[s1>>24]
 	xor	$14,$18
+	lwxs	$18,$24($7)		# Td0[s2>>24]
 	xor	$15,$19
+	lwxs	$19,$25($7)		# Td0[s3>>24]
 
-
-	lw	$16,0($1)		# Td0[s0>>24]
-	lw	$17,0($2)		# Td0[s1>>24]
-	lw	$18,0($24)		# Td0[s2>>24]
-	lw	$19,0($25)		# Td0[s3>>24]
-
+	rotr	$20,$20,8
 	lw	$8,0($3)
+	rotr	$21,$21,8
 	lw	$9,4($3)
+	rotr	$22,$22,8
 	lw	$10,8($3)
+	rotr	$23,$23,8
 	lw	$11,12($3)
 
 	xor	$12,$20
@@ -437,39 +653,233 @@ _mips_AES_decrypt:
 	xor	$11,$15
 	.set	noreorder
 	bnez	$30,.Loop_dec
+	ext	$1,$11,8,8
+
 	srl	$1,$11,6
+#else
+	srl	$1,$11,6
+.Loop_dec:
+	srl	$2,$8,6
+	srl	$24,$9,6
+	srl	$25,$10,6
+	and	$1,0x3fc
+	and	$2,0x3fc
+	and	$24,0x3fc
+	and	$25,0x3fc
+	add $1,$7
+	add $2,$7
+	add $24,$7
+	add $25,$7
+#if defined(_MIPS_ARCH_MIPS32R2) || defined(_MIPS_ARCH_MIPS64R2)
+	lw	$12,0($1)		# Td1[s3>>16]
+	srl	$1,$10,14
+	lw	$13,0($2)		# Td1[s0>>16]
+	srl	$2,$11,14
+	lw	$14,0($24)		# Td1[s1>>16]
+	srl	$24,$8,14
+	lw	$15,0($25)		# Td1[s2>>16]
+	srl	$25,$9,14
+#else
+	lwl	$12,2($1)		# Td1[s3>>16]
+	lwl	$13,2($2)		# Td1[s0>>16]
+	lwl	$14,2($24)		# Td1[s1>>16]
+	lwl	$15,2($25)		# Td1[s2>>16]
+	lwr	$12,3($1)		# Td1[s3>>16]
+	srl	$1,$10,14
+	lwr	$13,3($2)		# Td1[s0>>16]
+	srl	$2,$11,14
+	lwr	$14,3($24)		# Td1[s1>>16]
+	srl	$24,$8,14
+	lwr	$15,3($25)		# Td1[s2>>16]
+	srl	$25,$9,14
+#endif
+
+	and	$1,0x3fc
+	and	$2,0x3fc
+	and	$24,0x3fc
+	and	$25,0x3fc
+	add $1,$7
+	add $2,$7
+	add $24,$7
+	add $25,$7
+#if defined(_MIPS_ARCH_MIPS32R2) || defined(_MIPS_ARCH_MIPS64R2)
+	rotr	$12,$12,24
+	rotr	$13,$13,24
+	rotr	$14,$14,24
+	rotr	$15,$15,24
+# if defined(_MIPSEL)
+	lw	$16,0($1)		# Td2[s2>>8]
+	srl	$1,$9,22
+	lw	$17,0($2)		# Td2[s3>>8]
+	srl	$2,$10,22
+	lw	$18,0($24)		# Td2[s0>>8]
+	srl	$24,$11,22
+	lw	$19,0($25)		# Td2[s1>>8]
+	srl	$25,$8,22
+
+	and	$1,0x3fc
+	and	$2,0x3fc
+	and	$24,0x3fc
+	and	$25,0x3fc
+	add $1,$7
+	add $2,$7
+	add $24,$7
+	add $25,$7
+	lw	$20,0($1)		# Td3[s1]
+	ins $1,$8,2,8
+	lw	$21,0($2)		# Td3[s2]
+	ins $2,$9,2,8
+	lw	$22,0($24)		# Td3[s3]
+	ins $24,$10,2,8
+	lw	$23,0($25)		# Td3[s0]
+	ins $25,$11,2,8
+#else
+	lw	$16,0($1)		# Td2[s2>>8]
+	ins $1,$9,2,8
+	lw	$17,0($2)		# Td2[s3>>8]
+	ins $2,$10,2,8
+	lw	$18,0($24)		# Td2[s0>>8]
+	ins $24,$11,2,8
+	lw	$19,0($25)		# Td2[s1>>8]
+	ins $25,$8,2,8
+
+	lw	$20,0($1)		# Td3[s1]
+	sll	$1,$8,2
+	lw	$21,0($2)		# Td3[s2]
+	sll	$2,$9,2
+	lw	$22,0($24)		# Td3[s3]
+	sll	$24,$10,2
+	lw	$23,0($25)		# Td3[s0]
+	sll	$25,$11,2
+
+	and	$1,0x3fc
+	and	$2,0x3fc
+	and	$24,0x3fc
+	and	$25,0x3fc
+	add $1,$7
+	add $2,$7
+	add $24,$7
+	add $25,$7
+#endif
+	rotr	$16,$16,16
+	rotr	$17,$17,16
+	rotr	$18,$18,16
+	rotr	$19,$19,16
+
+	rotr	$20,$20,8
+	rotr	$21,$21,8
+	rotr	$22,$22,8
+	rotr	$23,$23,8
+#else
+	lwl	$16,1($1)		# Td2[s2>>8]
+	lwl	$17,1($2)		# Td2[s3>>8]
+	lwl	$18,1($24)		# Td2[s0>>8]
+	lwl	$19,1($25)		# Td2[s1>>8]
+	lwr	$16,2($1)		# Td2[s2>>8]
+	srl	$1,$9,22
+	lwr	$17,2($2)		# Td2[s3>>8]
+	srl	$2,$10,22
+	lwr	$18,2($24)		# Td2[s0>>8]
+	srl	$24,$11,22
+	lwr	$19,2($25)		# Td2[s1>>8]
+	srl	$25,$8,22
+
+	and	$1,0x3fc
+	and	$2,0x3fc
+	and	$24,0x3fc
+	and	$25,0x3fc
+	add $1,$7
+	add $2,$7
+	add $24,$7
+	add $25,$7
+	lwl	$20,0($1)		# Td3[s1]
+	lwl	$21,0($2)		# Td3[s2]
+	lwl	$22,0($24)		# Td3[s3]
+	lwl	$23,0($25)		# Td3[s0]
+	lwr	$20,1($1)		# Td3[s1]
+	sll	$1,$8,2
+	lwr	$21,1($2)		# Td3[s2]
+	sll	$2,$9,2
+	lwr	$22,1($24)		# Td3[s3]
+	sll	$24,$10,2
+	lwr	$23,1($25)		# Td3[s0]
+	sll	$25,$11,2
+
+	and	$1,0x3fc
+	and	$2,0x3fc
+	and	$24,0x3fc
+	and	$25,0x3fc
+	add $1,$7
+	add $2,$7
+	add $24,$7
+	add $25,$7
+#endif
+
+	xor	$12,$16
+	lw	$16,0($1)		# Td0[s0>>24]
+	xor	$13,$17
+	lw	$17,0($2)		# Td0[s1>>24]
+	xor	$14,$18
+	lw	$18,0($24)		# Td0[s2>>24]
+	xor	$15,$19
+	lw	$19,0($25)		# Td0[s3>>24]
+
+	xor	$12,$20
+	lw	$8,0($3)
+	xor	$13,$21
+	lw	$9,4($3)
+	xor	$14,$22
+	lw	$10,8($3)
+	xor	$15,$23
+	lw	$11,12($3)
+
+	xor	$12,$16
+	xor	$13,$17
+	xor	$14,$18
+	xor	$15,$19
+
+	sub	$30,1
+	add $3,16
+	xor	$8,$12
+	xor	$9,$13
+	xor	$10,$14
+	xor	$11,$15
+	.set	noreorder
+	bnez	$30,.Loop_dec
+	srl	$1,$11,6
+#endif
 
 	.set	reorder
 	lw	$16,1024($7)		# prefetch Td4
-	lw	$17,1024+32($7)
-	lw	$18,1024+64($7)
-	lw	$19,1024+96($7)
-	lw	$20,1024+128($7)
-	lw	$21,1024+160($7)
-	lw	$22,1024+192($7)
-	lw	$23,1024+224($7)
-
 	srl	$1,$11,8
+	lw	$17,1024+32($7)
 	srl	$2,$8,8
+	lw	$18,1024+64($7)
 	srl	$24,$9,8
+	lw	$19,1024+96($7)
 	srl	$25,$10,8
+	lw	$20,1024+128($7)
 	and	$1,0xff
+	lw	$21,1024+160($7)
 	and	$2,0xff
+	lw	$22,1024+192($7)
 	and	$24,0xff
+	lw	$23,1024+224($7)
 	and	$25,0xff
+
 	add $1,$7
 	add $2,$7
 	add $24,$7
 	add $25,$7
 	lbu	$12,1024($1)		# Td4[s3>>16]
-	lbu	$13,1024($2)		# Td4[s0>>16]
-	lbu	$14,1024($24)		# Td4[s1>>16]
-	lbu	$15,1024($25)		# Td4[s2>>16]
-
 	srl	$1,$10,16
+	lbu	$13,1024($2)		# Td4[s0>>16]
 	srl	$2,$11,16
+	lbu	$14,1024($24)		# Td4[s1>>16]
 	srl	$24,$8,16
+	lbu	$15,1024($25)		# Td4[s2>>16]
 	srl	$25,$9,16
+
 	and	$1,0xff
 	and	$2,0xff
 	and	$24,0xff
@@ -478,28 +888,107 @@ _mips_AES_decrypt:
 	add $2,$7
 	add $24,$7
 	add $25,$7
+#if defined(_MIPS_ARCH_MIPS32R2) || defined(_MIPS_ARCH_MIPS64R2)
+# if defined(_MIPSEL)
 	lbu	$16,1024($1)		# Td4[s2>>8]
+	ins $1,$8,0,8
 	lbu	$17,1024($2)		# Td4[s3>>8]
+	ins $2,$9,0,8
 	lbu	$18,1024($24)		# Td4[s0>>8]
+	ins $24,$10,0,8
 	lbu	$19,1024($25)		# Td4[s1>>8]
+	ins $25,$11,0,8
 
+	lbu	$20,1024($1)		# Td4[s0>>24]
+	srl	$1,$9,24
+	lbu	$21,1024($2)		# Td4[s1>>24]
+	srl	$2,$10,24
+	lbu	$22,1024($24)		# Td4[s2>>24]
+	srl	$24,$11,24
+	lbu	$23,1024($25)		# Td4[s3>>24]
+	srl	$25,$8,24
+
+	add $1,$7
+	add $2,$7
+	add $24,$7
+	add $25,$7
+# else
+	lbu	$16,1024($1)		# Td4[s2>>8]
 	and	$1,$8,0xff
+	lbu	$17,1024($2)		# Td4[s3>>8]
 	and	$2,$9,0xff
+	lbu	$18,1024($24)		# Td4[s0>>8]
 	and	$24,$10,0xff
+	lbu	$19,1024($25)		# Td4[s1>>8]
 	and	$25,$11,0xff
+
 	add $1,$7
 	add $2,$7
 	add $24,$7
 	add $25,$7
 	lbu	$20,1024($1)		# Td4[s0>>24]
+	ins $1,$9,0,8
 	lbu	$21,1024($2)		# Td4[s1>>24]
+	ins $2,$10,0,8
 	lbu	$22,1024($24)		# Td4[s2>>24]
+	ins $24,$11,0,8
 	lbu	$23,1024($25)		# Td4[s3>>24]
+	ins $25,$8,0,8
+# endif
+	sll	$12,$12,8
+	sll	$13,$13,8
+	sll	$14,$14,8
+	sll	$15,$15,8
 
+	ins	$12,$16,16,8
+	lbu	$16,1024($1)		# Td4[s1]
+	ins	$13,$17,16,8
+	lbu	$17,1024($2)		# Td4[s2]
+	ins	$14,$18,16,8
+	lbu	$18,1024($24)		# Td4[s3]
+	ins	$15,$19,16,8
+	lbu	$19,1024($25)		# Td4[s0]
+
+	ins	$12,$20,0,8
+	lw	$8,0($3)
+	ins	$13,$21,0,8
+	lw	$9,4($3)
+	ins	$14,$22,0,8
+	lw	$10,8($3)
+	ins	$15,$23,0,8
+	lw	$11,12($3)
+
+	ins	$12,$16,24,8
+	ins	$13,$17,24,8
+	ins	$14,$18,24,8
+	ins	$15,$19,24,8
+#else
+	lbu	$16,1024($1)		# Td4[s2>>8]
+	and	$1,$8,0xff
+	lbu	$17,1024($2)		# Td4[s3>>8]
+	and	$2,$9,0xff
+	lbu	$18,1024($24)		# Td4[s0>>8]
+	and	$24,$10,0xff
+	lbu	$19,1024($25)		# Td4[s1>>8]
+	and	$25,$11,0xff
+
+	add $1,$7
+	add $2,$7
+	add $24,$7
+	add $25,$7
+	lbu	$20,1024($1)		# Td4[s0>>24]
 	srl	$1,$9,24
+	lbu	$21,1024($2)		# Td4[s1>>24]
 	srl	$2,$10,24
+	lbu	$22,1024($24)		# Td4[s2>>24]
 	srl	$24,$11,24
+	lbu	$23,1024($25)		# Td4[s3>>24]
 	srl	$25,$8,24
+
+	add $1,$7
+	add $2,$7
+	add $24,$7
+	add $25,$7
 
 	sll	$12,$12,8
 	sll	$13,$13,8
@@ -512,44 +1001,38 @@ _mips_AES_decrypt:
 	sll	$19,$19,16
 
 	xor	$12,$16
-	xor	$13,$17
-	xor	$14,$18
-	xor	$15,$19
-
-	add $1,$7
-	add $2,$7
-	add $24,$7
-	add $25,$7
 	lbu	$16,1024($1)		# Td4[s1]
+	xor	$13,$17
 	lbu	$17,1024($2)		# Td4[s2]
+	xor	$14,$18
 	lbu	$18,1024($24)		# Td4[s3]
+	xor	$15,$19
 	lbu	$19,1024($25)		# Td4[s0]
 
 	#sll	$20,$20,0
-	#sll	$21,$21,0
-	#sll	$22,$22,0
-	#sll	$23,$23,0
-
 	lw	$8,0($3)
+	#sll	$21,$21,0
 	lw	$9,4($3)
+	#sll	$22,$22,0
 	lw	$10,8($3)
+	#sll	$23,$23,0
 	lw	$11,12($3)
-
-	sll	$16,$16,24
-	sll	$17,$17,24
-	sll	$18,$18,24
-	sll	$19,$19,24
-
 
 	xor	$12,$20
 	xor	$13,$21
 	xor	$14,$22
 	xor	$15,$23
 
+	sll	$16,$16,24
+	sll	$17,$17,24
+	sll	$18,$18,24
+	sll	$19,$19,24
+
 	xor	$12,$16
 	xor	$13,$17
 	xor	$14,$18
 	xor	$15,$19
+#endif
 
 	xor	$8,$12
 	xor	$9,$13
@@ -623,7 +1106,7 @@ _mips_AES_set_encrypt_key:
 	beqz	$4,.Lekey_done
 	li	$2,-1
 	beqz	$6,.Lekey_done
-	add $3,$7,1024+256
+	add $3,$7,256
 
 	.set	reorder
 	lwl	$8,0+3($4)	# load 128 bits
@@ -675,10 +1158,10 @@ _mips_AES_set_encrypt_key:
 	add $2,$7
 	add $24,$7
 	add $25,$7
-	lbu	$1,1024($1)
-	lbu	$2,1024($2)
-	lbu	$24,1024($24)
-	lbu	$25,1024($25)
+	lbu	$1,0($1)
+	lbu	$2,0($2)
+	lbu	$24,0($24)
+	lbu	$25,0($25)
 
 	sw	$8,0($6)
 	sw	$9,4($6)
@@ -730,10 +1213,10 @@ _mips_AES_set_encrypt_key:
 	add $2,$7
 	add $24,$7
 	add $25,$7
-	lbu	$1,1024($1)
-	lbu	$2,1024($2)
-	lbu	$24,1024($24)
-	lbu	$25,1024($25)
+	lbu	$1,0($1)
+	lbu	$2,0($2)
+	lbu	$24,0($24)
+	lbu	$25,0($25)
 
 	sw	$8,0($6)
 	sw	$9,4($6)
@@ -789,10 +1272,10 @@ _mips_AES_set_encrypt_key:
 	add $2,$7
 	add $24,$7
 	add $25,$7
-	lbu	$1,1024($1)
-	lbu	$2,1024($2)
-	lbu	$24,1024($24)
-	lbu	$25,1024($25)
+	lbu	$1,0($1)
+	lbu	$2,0($2)
+	lbu	$24,0($24)
+	lbu	$25,0($25)
 
 	sw	$8,0($6)
 	sw	$9,4($6)
@@ -831,10 +1314,10 @@ _mips_AES_set_encrypt_key:
 	add $2,$7
 	add $24,$7
 	add $25,$7
-	lbu	$1,1024($1)
-	lbu	$2,1024($2)
-	lbu	$24,1024($24)
-	lbu	$25,1024($25)
+	lbu	$1,0($1)
+	lbu	$2,0($2)
+	lbu	$24,0($24)
+	lbu	$25,0($25)
 	sll	$1,24
 	sll	$2,16
 	sll	$24,8
@@ -879,7 +1362,7 @@ private_AES_set_encrypt_key:
 	sw	$31,32-1*4($29)
 	sw	$30,32-2*4($29)
 	.set	reorder
-	la	$7,AES_Te		# PIC-ified 'load address'
+	la	$7,AES_Te4		# PIC-ified 'load address'
 
 	bal	_mips_AES_set_encrypt_key
 
@@ -902,7 +1385,7 @@ private_AES_set_decrypt_key:
 	sw	$31,32-1*4($29)
 	sw	$30,32-2*4($29)
 	.set	reorder
-	la	$7,AES_Te		# PIC-ified 'load address'
+	la	$7,AES_Te4		# PIC-ified 'load address'
 
 	bal	_mips_AES_set_encrypt_key
 
@@ -973,6 +1456,16 @@ private_AES_set_decrypt_key:
 	xor	$13,$12,$9
 	xor	$14,$12,$10
 
+#if defined(_MIPS_ARCH_MIPS32R2) || defined(_MIPS_ARCH_MIPS64R2)
+	rotr	$8,$14,16
+	 xor	$15,$9
+	rotr	$9,$12,24
+	xor	$15,$8
+	rotr	$10,$13,8
+	xor	$15,$9
+	lw	$8,4($6)		# modulo-scheduled
+	xor	$15,$10
+#else
 	sll	$8,$14,16
 	 xor	$15,$9
 	srl	$9,$14,16
@@ -987,6 +1480,7 @@ private_AES_set_decrypt_key:
 	xor	$15,$8
 	lw	$8,4($6)		# modulo-scheduled
 	xor	$15,$9
+#endif
 	sub	$30,1
 	sw	$15,0($6)
 	add $6,4
@@ -1002,7 +1496,7 @@ private_AES_set_decrypt_key:
 	add $29,32
 .end	private_AES_set_decrypt_key
 .rdata
-.align	6
+.align	10
 AES_Te:
 .byte	0xc6,0x63,0x63,0xa5,	0xf8,0x7c,0x7c,0x84	# Te0
 .byte	0xee,0x77,0x77,0x99,	0xf6,0x7b,0x7b,0x8d
@@ -1133,46 +1627,6 @@ AES_Te:
 .byte	0x7b,0xb0,0xb0,0xcb,	0xa8,0x54,0x54,0xfc
 .byte	0x6d,0xbb,0xbb,0xd6,	0x2c,0x16,0x16,0x3a
 
-.byte	0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5	# Te4
-.byte	0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76
-.byte	0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0
-.byte	0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0
-.byte	0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc
-.byte	0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15
-.byte	0x04, 0xc7, 0x23, 0xc3, 0x18, 0x96, 0x05, 0x9a
-.byte	0x07, 0x12, 0x80, 0xe2, 0xeb, 0x27, 0xb2, 0x75
-.byte	0x09, 0x83, 0x2c, 0x1a, 0x1b, 0x6e, 0x5a, 0xa0
-.byte	0x52, 0x3b, 0xd6, 0xb3, 0x29, 0xe3, 0x2f, 0x84
-.byte	0x53, 0xd1, 0x00, 0xed, 0x20, 0xfc, 0xb1, 0x5b
-.byte	0x6a, 0xcb, 0xbe, 0x39, 0x4a, 0x4c, 0x58, 0xcf
-.byte	0xd0, 0xef, 0xaa, 0xfb, 0x43, 0x4d, 0x33, 0x85
-.byte	0x45, 0xf9, 0x02, 0x7f, 0x50, 0x3c, 0x9f, 0xa8
-.byte	0x51, 0xa3, 0x40, 0x8f, 0x92, 0x9d, 0x38, 0xf5
-.byte	0xbc, 0xb6, 0xda, 0x21, 0x10, 0xff, 0xf3, 0xd2
-.byte	0xcd, 0x0c, 0x13, 0xec, 0x5f, 0x97, 0x44, 0x17
-.byte	0xc4, 0xa7, 0x7e, 0x3d, 0x64, 0x5d, 0x19, 0x73
-.byte	0x60, 0x81, 0x4f, 0xdc, 0x22, 0x2a, 0x90, 0x88
-.byte	0x46, 0xee, 0xb8, 0x14, 0xde, 0x5e, 0x0b, 0xdb
-.byte	0xe0, 0x32, 0x3a, 0x0a, 0x49, 0x06, 0x24, 0x5c
-.byte	0xc2, 0xd3, 0xac, 0x62, 0x91, 0x95, 0xe4, 0x79
-.byte	0xe7, 0xc8, 0x37, 0x6d, 0x8d, 0xd5, 0x4e, 0xa9
-.byte	0x6c, 0x56, 0xf4, 0xea, 0x65, 0x7a, 0xae, 0x08
-.byte	0xba, 0x78, 0x25, 0x2e, 0x1c, 0xa6, 0xb4, 0xc6
-.byte	0xe8, 0xdd, 0x74, 0x1f, 0x4b, 0xbd, 0x8b, 0x8a
-.byte	0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e
-.byte	0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e
-.byte	0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94
-.byte	0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf
-.byte	0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68
-.byte	0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
-
-.byte	0x01,0x00,0x00,0x00,	0x02,0x00,0x00,0x00	# rcon
-.byte	0x04,0x00,0x00,0x00,	0x08,0x00,0x00,0x00
-.byte	0x10,0x00,0x00,0x00,	0x20,0x00,0x00,0x00
-.byte	0x40,0x00,0x00,0x00,	0x80,0x00,0x00,0x00
-.byte	0x1B,0x00,0x00,0x00,	0x36,0x00,0x00,0x00
-
-.align	6
 AES_Td:
 .byte	0x51,0xf4,0xa7,0x50,	0x7e,0x41,0x65,0x53	# Td0
 .byte	0x1a,0x17,0xa4,0xc3,	0x3a,0x27,0x5e,0x96
@@ -1335,3 +1789,43 @@ AES_Td:
 .byte	0xc8, 0xeb, 0xbb, 0x3c, 0x83, 0x53, 0x99, 0x61
 .byte	0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26
 .byte	0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d
+
+AES_Te4:
+.byte	0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5	# Te4
+.byte	0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76
+.byte	0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0
+.byte	0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0
+.byte	0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc
+.byte	0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15
+.byte	0x04, 0xc7, 0x23, 0xc3, 0x18, 0x96, 0x05, 0x9a
+.byte	0x07, 0x12, 0x80, 0xe2, 0xeb, 0x27, 0xb2, 0x75
+.byte	0x09, 0x83, 0x2c, 0x1a, 0x1b, 0x6e, 0x5a, 0xa0
+.byte	0x52, 0x3b, 0xd6, 0xb3, 0x29, 0xe3, 0x2f, 0x84
+.byte	0x53, 0xd1, 0x00, 0xed, 0x20, 0xfc, 0xb1, 0x5b
+.byte	0x6a, 0xcb, 0xbe, 0x39, 0x4a, 0x4c, 0x58, 0xcf
+.byte	0xd0, 0xef, 0xaa, 0xfb, 0x43, 0x4d, 0x33, 0x85
+.byte	0x45, 0xf9, 0x02, 0x7f, 0x50, 0x3c, 0x9f, 0xa8
+.byte	0x51, 0xa3, 0x40, 0x8f, 0x92, 0x9d, 0x38, 0xf5
+.byte	0xbc, 0xb6, 0xda, 0x21, 0x10, 0xff, 0xf3, 0xd2
+.byte	0xcd, 0x0c, 0x13, 0xec, 0x5f, 0x97, 0x44, 0x17
+.byte	0xc4, 0xa7, 0x7e, 0x3d, 0x64, 0x5d, 0x19, 0x73
+.byte	0x60, 0x81, 0x4f, 0xdc, 0x22, 0x2a, 0x90, 0x88
+.byte	0x46, 0xee, 0xb8, 0x14, 0xde, 0x5e, 0x0b, 0xdb
+.byte	0xe0, 0x32, 0x3a, 0x0a, 0x49, 0x06, 0x24, 0x5c
+.byte	0xc2, 0xd3, 0xac, 0x62, 0x91, 0x95, 0xe4, 0x79
+.byte	0xe7, 0xc8, 0x37, 0x6d, 0x8d, 0xd5, 0x4e, 0xa9
+.byte	0x6c, 0x56, 0xf4, 0xea, 0x65, 0x7a, 0xae, 0x08
+.byte	0xba, 0x78, 0x25, 0x2e, 0x1c, 0xa6, 0xb4, 0xc6
+.byte	0xe8, 0xdd, 0x74, 0x1f, 0x4b, 0xbd, 0x8b, 0x8a
+.byte	0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e
+.byte	0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e
+.byte	0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94
+.byte	0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf
+.byte	0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68
+.byte	0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
+
+.byte	0x01,0x00,0x00,0x00,	0x02,0x00,0x00,0x00	# rcon
+.byte	0x04,0x00,0x00,0x00,	0x08,0x00,0x00,0x00
+.byte	0x10,0x00,0x00,0x00,	0x20,0x00,0x00,0x00
+.byte	0x40,0x00,0x00,0x00,	0x80,0x00,0x00,0x00
+.byte	0x1B,0x00,0x00,0x00,	0x36,0x00,0x00,0x00

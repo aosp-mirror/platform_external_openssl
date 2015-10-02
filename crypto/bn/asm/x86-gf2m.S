@@ -243,8 +243,7 @@ bn_GF2m_mul_2x2:
 	call	.L000PIC_me_up
 .L000PIC_me_up:
 	popl	%edx
-	leal	_GLOBAL_OFFSET_TABLE_+[.-.L000PIC_me_up](%edx),%edx
-	movl	OPENSSL_ia32cap_P@GOT(%edx),%edx
+	leal	OPENSSL_ia32cap_P-.L000PIC_me_up(%edx),%edx
 	movl	(%edx),%eax
 	movl	4(%edx),%edx
 	testl	$8388608,%eax
@@ -344,4 +343,4 @@ bn_GF2m_mul_2x2:
 .byte	67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97
 .byte	112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103
 .byte	62,0
-.comm	OPENSSL_ia32cap_P,8,4
+.comm	OPENSSL_ia32cap_P,16,4

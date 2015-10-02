@@ -3,7 +3,7 @@
 .text
 .code	32
 
-#if __ARM_ARCH__>=7
+#if __ARM_MAX_ARCH__>=7
 .align	5
 .LOPENSSL_armcap:
 .word	OPENSSL_armcap_P-bn_mul_mont
@@ -16,7 +16,7 @@
 bn_mul_mont:
 	ldr	ip,[sp,#4]		@ load num
 	stmdb	sp!,{r0,r2}		@ sp points at argument block
-#if __ARM_ARCH__>=7
+#if __ARM_MAX_ARCH__>=7
 	tst	ip,#7
 	bne	.Lialu
 	adr	r0,bn_mul_mont
@@ -170,7 +170,8 @@ bn_mul_mont:
 	.word	0xe12fff1e			@ interoperable with Thumb ISA:-)
 #endif
 .size	bn_mul_mont,.-bn_mul_mont
-#if __ARM_ARCH__>=7
+#if __ARM_MAX_ARCH__>=7
+.arch	armv7-a
 .fpu	neon
 
 .type	bn_mul8x_mont_neon,%function
@@ -574,6 +575,6 @@ bn_mul8x_mont_neon:
 #endif
 .asciz	"Montgomery multiplication for ARMv4/NEON, CRYPTOGAMS by <appro@openssl.org>"
 .align	2
-#if __ARM_ARCH__>=7
+#if __ARM_MAX_ARCH__>=7
 .comm	OPENSSL_armcap_P,4,4
 #endif

@@ -45,8 +45,7 @@ bn_mul_mont:
 	call	.L001PIC_me_up
 .L001PIC_me_up:
 	popl	%eax
-	leal	_GLOBAL_OFFSET_TABLE_+[.-.L001PIC_me_up](%eax),%eax
-	movl	OPENSSL_ia32cap_P@GOT(%eax),%eax
+	leal	OPENSSL_ia32cap_P-.L001PIC_me_up(%eax),%eax
 	btl	$26,(%eax)
 	jnc	.L002non_sse2
 	movl	$-1,%eax
@@ -457,4 +456,4 @@ bn_mul_mont:
 .byte	54,44,32,67,82,89,80,84,79,71,65,77,83,32,98,121
 .byte	32,60,97,112,112,114,111,64,111,112,101,110,115,115,108,46
 .byte	111,114,103,62,0
-.comm	OPENSSL_ia32cap_P,8,4
+.comm	OPENSSL_ia32cap_P,16,4

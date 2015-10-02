@@ -29,7 +29,7 @@ md5_block_asm_data_order:
 
 
 	cmpq	%rdi,%rsi
-	je	.Lend				
+	je	.Lend
 
 
 .Lloop:
@@ -648,7 +648,7 @@ md5_block_asm_data_order:
 
 	addq	$64,%rsi
 	cmpq	%rdi,%rsi
-	jb	.Lloop				
+	jb	.Lloop
 
 
 .Lend:

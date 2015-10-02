@@ -8,7 +8,7 @@
 
 .align	5
 sha1_block_data_order:
-#if __ARM_ARCH__>=7
+#if __ARM_MAX_ARCH__>=7
 	sub	r3,pc,#8		@ sha1_block_data_order
 	ldr	r12,.LOPENSSL_armcap
 	ldr	r12,[r3,r12]		@ OPENSSL_armcap_P
@@ -459,11 +459,14 @@ sha1_block_data_order:
 .LK_20_39:	.word	0x6ed9eba1
 .LK_40_59:	.word	0x8f1bbcdc
 .LK_60_79:	.word	0xca62c1d6
+#if __ARM_MAX_ARCH__>=7
 .LOPENSSL_armcap:
 .word	OPENSSL_armcap_P-sha1_block_data_order
+#endif
 .asciz	"SHA1 block transform for ARMv4/NEON/ARMv8, CRYPTOGAMS by <appro@openssl.org>"
 .align	5
-#if __ARM_ARCH__>=7
+#if __ARM_MAX_ARCH__>=7
+.arch	armv7-a
 .fpu	neon
 
 .type	sha1_block_data_order_neon,%function
@@ -1313,7 +1316,7 @@ sha1_block_data_order_neon:
 	ldmia	sp!,{r4-r12,pc}
 .size	sha1_block_data_order_neon,.-sha1_block_data_order_neon
 #endif
-#if __ARM_ARCH__>=7
+#if __ARM_MAX_ARCH__>=7
 .type	sha1_block_data_order_armv8,%function
 .align	5
 sha1_block_data_order_armv8:
@@ -1447,4 +1450,6 @@ sha1_block_data_order_armv8:
 	bx	lr					@ bx lr
 .size	sha1_block_data_order_armv8,.-sha1_block_data_order_armv8
 #endif
+#if __ARM_MAX_ARCH__>=7
 .comm	OPENSSL_armcap_P,4,4
+#endif

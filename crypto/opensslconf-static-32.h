@@ -17,6 +17,9 @@ extern "C" {
 #ifndef OPENSSL_NO_CAST
 # define OPENSSL_NO_CAST
 #endif
+#ifndef OPENSSL_NO_DTLS
+# define OPENSSL_NO_DTLS
+#endif
 #ifndef OPENSSL_NO_DTLS1
 # define OPENSSL_NO_DTLS1
 #endif
@@ -40,6 +43,9 @@ extern "C" {
 #endif
 #ifndef OPENSSL_NO_KRB5
 # define OPENSSL_NO_KRB5
+#endif
+#ifndef OPENSSL_NO_LIBUNBOUND
+# define OPENSSL_NO_LIBUNBOUND
 #endif
 #ifndef OPENSSL_NO_MD2
 # define OPENSSL_NO_MD2
@@ -70,6 +76,15 @@ extern "C" {
 #endif
 #ifndef OPENSSL_NO_SHA0
 # define OPENSSL_NO_SHA0
+#endif
+#ifndef OPENSSL_NO_SSL_TRACE
+# define OPENSSL_NO_SSL_TRACE
+#endif
+#ifndef OPENSSL_NO_SSL2
+# define OPENSSL_NO_SSL2
+#endif
+#ifndef OPENSSL_NO_SSL3
+# define OPENSSL_NO_SSL3
 #endif
 #ifndef OPENSSL_NO_STATIC_ENGINE
 # define OPENSSL_NO_STATIC_ENGINE
@@ -107,6 +122,9 @@ extern "C" {
 # if defined(OPENSSL_NO_CAST) && !defined(NO_CAST)
 #  define NO_CAST
 # endif
+# if defined(OPENSSL_NO_DTLS) && !defined(NO_DTLS)
+#  define NO_DTLS
+# endif
 # if defined(OPENSSL_NO_DTLS1) && !defined(NO_DTLS1)
 #  define NO_DTLS1
 # endif
@@ -130,6 +148,9 @@ extern "C" {
 # endif
 # if defined(OPENSSL_NO_KRB5) && !defined(NO_KRB5)
 #  define NO_KRB5
+# endif
+# if defined(OPENSSL_NO_LIBUNBOUND) && !defined(NO_LIBUNBOUND)
+#  define NO_LIBUNBOUND
 # endif
 # if defined(OPENSSL_NO_MD2) && !defined(NO_MD2)
 #  define NO_MD2
@@ -160,6 +181,15 @@ extern "C" {
 # endif
 # if defined(OPENSSL_NO_SHA0) && !defined(NO_SHA0)
 #  define NO_SHA0
+# endif
+# if defined(OPENSSL_NO_SSL_TRACE) && !defined(NO_SSL_TRACE)
+#  define NO_SSL_TRACE
+# endif
+# if defined(OPENSSL_NO_SSL2) && !defined(NO_SSL2)
+#  define NO_SSL2
+# endif
+# if defined(OPENSSL_NO_SSL3) && !defined(NO_SSL3)
+#  define NO_SSL3
 # endif
 # if defined(OPENSSL_NO_STATIC_ENGINE) && !defined(NO_STATIC_ENGINE)
 #  define NO_STATIC_ENGINE
@@ -278,7 +308,7 @@ extern "C" {
 #endif
 
 #if defined(DES_RISC1) && defined(DES_RISC2)
-YOU SHOULD NOT HAVE BOTH DES_RISC1 AND DES_RISC2 DEFINED!!!!!
+#error YOU SHOULD NOT HAVE BOTH DES_RISC1 AND DES_RISC2 DEFINED!!!!!
 #endif
 
 /* Unroll the inner loop, this sometimes helps, sometimes hinders.
