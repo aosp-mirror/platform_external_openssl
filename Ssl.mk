@@ -52,6 +52,7 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE := libssl-host
 LOCAL_MULTILIB := both
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/android-config.mk $(LOCAL_PATH)/Ssl.mk
+LOCAL_CXX_STL := none
 include $(LOCAL_PATH)/Ssl-config-host.mk
 include $(LOCAL_PATH)/android-config.mk
 include $(BUILD_HOST_SHARED_LIBRARY)
