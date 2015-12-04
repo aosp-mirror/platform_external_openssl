@@ -19,6 +19,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := openssl
 LOCAL_MODULE_TAGS := optional
 LOCAL_SHARED_LIBRARIES := libssl-host libcrypto-host
+LOCAL_CXX_STL := none
 include $(LOCAL_PATH)/Apps-config-host.mk
 include $(LOCAL_PATH)/android-config.mk
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/android-config.mk $(LOCAL_PATH)/Apps.mk
