@@ -604,16 +604,21 @@ function import() {
   # Setup android.testssl directory
   mkdir android.testssl
   cat test/testssl | \
-    sed 's#../util/shlib_wrap.sh ./ssltest#adb shell /system/bin/ssltest#' | \
-    sed 's#../util/shlib_wrap.sh ../apps/openssl#adb shell /system/bin/openssl#' | \
+    sed 's#../util/shlib_wrap.sh ./ssltest#../adb_wrap.sh /system/bin/ssltest#' | \
+    sed 's#../util/shlib_wrap.sh ../apps/openssl#../adb_wrap.sh /system/bin/openssl#' | \
     sed 's#adb shell /system/bin/openssl no-dh#[ `adb shell /system/bin/openssl no-dh` = no-dh ]#' | \
     sed 's#adb shell /system/bin/openssl no-rsa#[ `adb shell /system/bin/openssl no-rsa` = no-dh ]#' | \
     sed 's#../apps/server2.pem#/sdcard/android.testssl/server2.pem#' | \
+    sed 's#./serverinfo.pem#/sdcard/android.testssl/serverinfo.pem#' | \
     cat > \
     android.testssl/testssl
   chmod +x android.testssl/testssl
   cat test/Uss.cnf | sed 's#./.rnd#/sdcard/android.testssl/.rnd#' >> android.testssl/Uss.cnf
   cat test/CAss.cnf | sed 's#./.rnd#/sdcard/android.testssl/.rnd#' >> android.testssl/CAss.cnf
+  # openssl 1.0.2 tests require serverinfo.pem
+  if [ -f test/serverinfo.pem ] ; then
+    cp test/serverinfo.pem android.testssl/
+  fi
   cp apps/server2.pem android.testssl/
   cp ../patches/testssl.sh android.testssl/
 

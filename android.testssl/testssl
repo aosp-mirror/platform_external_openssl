@@ -10,9 +10,9 @@ if [ "$2" = "" ]; then
 else
   cert="$2"
 fi
-ssltest="adb shell /system/bin/ssltest -key $key -cert $cert -c_key $key -c_cert $cert"
+ssltest="../adb_wrap.sh /system/bin/ssltest -key $key -cert $cert -c_key $key -c_cert $cert"
 
-if adb shell /system/bin/openssl x509 -in $cert -text -noout | fgrep 'DSA Public Key' >/dev/null; then
+if ../adb_wrap.sh /system/bin/openssl x509 -in $cert -text -noout | fgrep 'DSA Public Key' >/dev/null; then
   dsa_cert=YES
 else
   dsa_cert=NO
@@ -125,7 +125,7 @@ $ssltest -bio_pair -server_auth -client_auth -app_verify $CA $extra || exit 1
 echo "Testing ciphersuites"
 for protocol in TLSv1.2 SSLv3; do
   echo "Testing ciphersuites for $protocol"
-  for cipher in `adb shell /system/bin/openssl ciphers "RSA+$protocol" | tr ':' ' '`; do
+  for cipher in `../adb_wrap.sh /system/bin/openssl ciphers "RSA+$protocol" | tr ':' ' '`; do
     echo "Testing $cipher"
     prot=""
     if [ $protocol = "SSLv3" ] ; then
@@ -141,24 +141,24 @@ done
 
 #############################################################################
 
-if [ `adb shell /system/bin/openssl no-dh` = no-dh ]; then
+if ../adb_wrap.sh /system/bin/openssl no-dh; then
   echo skipping anonymous DH tests
 else
   echo test tls1 with 1024bit anonymous DH, multiple handshakes
   $ssltest -v -bio_pair -tls1 -cipher ADH -dhe1024dsa -num 10 -f -time $extra || exit 1
 fi
 
-if [ `adb shell /system/bin/openssl no-rsa` = no-dh ]; then
+if ../adb_wrap.sh /system/bin/openssl no-rsa; then
   echo skipping RSA tests
 else
   echo 'test tls1 with 1024bit RSA, no (EC)DHE, multiple handshakes'
-  adb shell /system/bin/ssltest -v -bio_pair -tls1 -cert /sdcard/android.testssl/server2.pem -no_dhe -no_ecdhe -num 10 -f -time $extra || exit 1
+  ../adb_wrap.sh /system/bin/ssltest -v -bio_pair -tls1 -cert /sdcard/android.testssl/server2.pem -no_dhe -no_ecdhe -num 10 -f -time $extra || exit 1
 
-  if [ `adb shell /system/bin/openssl no-dh` = no-dh ]; then
+  if ../adb_wrap.sh /system/bin/openssl no-dh; then
     echo skipping RSA+DHE tests
   else
     echo test tls1 with 1024bit RSA, 1024bit DHE, multiple handshakes
-    adb shell /system/bin/ssltest -v -bio_pair -tls1 -cert /sdcard/android.testssl/server2.pem -dhe1024dsa -num 10 -f -time $extra || exit 1
+    ../adb_wrap.sh /system/bin/ssltest -v -bio_pair -tls1 -cert /sdcard/android.testssl/server2.pem -dhe1024dsa -num 10 -f -time $extra || exit 1
   fi
 fi
 
@@ -168,7 +168,7 @@ $ssltest -tls1 -cipher PSK -psk abc123 $extra || exit 1
 echo test tls1 with PSK via BIO pair
 $ssltest -bio_pair -tls1 -cipher PSK -psk abc123 $extra || exit 1
 
-if adb shell /system/bin/openssl no-srp; then
+if ../adb_wrap.sh /system/bin/openssl no-srp; then
   echo skipping SRP tests
 else
   echo test tls1 with SRP
