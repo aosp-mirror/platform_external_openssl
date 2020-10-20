@@ -1,6 +1,7 @@
 {
   "comments": [
     {
+      "unresolved": false,
       "key": {
         "uuid": "AAAI6X//9Ps\u003d",
         "filename": "Apps.mk",
@@ -14,10 +15,10 @@
       "side": 1,
       "message": "(i\u0027d been putting them directly below LOCAL_MODULE so i could grep -A1 to find anywhere i\u0027d missed, but it doesn\u0027t really matter.)",
       "revId": "6d091b123d928b0152ceb6871487a247b0f24c12",
-      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
-      "unresolved": false
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
     },
     {
+      "unresolved": false,
       "key": {
         "uuid": "AAAI6X//9Pk\u003d",
         "filename": "android-config.mk",
@@ -31,10 +32,28 @@
       "side": 1,
       "message": "excluded",
       "revId": "6d091b123d928b0152ceb6871487a247b0f24c12",
-      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
-      "unresolved": false
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "AAAI6n//92U\u003d",
+        "filename": "android-config.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1003723
+      },
+      "writtenOn": "2020-10-20T16:58:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAI6X//9Pk\u003d",
+      "revId": "6d091b123d928b0152ceb6871487a247b0f24c12",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    },
+    {
+      "unresolved": false,
       "key": {
         "uuid": "AAAI63//9gs\u003d",
         "filename": "android-config.mk",
@@ -48,8 +67,25 @@
       "side": 1,
       "message": "whitespace",
       "revId": "6d091b123d928b0152ceb6871487a247b0f24c12",
-      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
-      "unresolved": false
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "AAAI6n//92Q\u003d",
+        "filename": "android-config.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1003723
+      },
+      "writtenOn": "2020-10-20T16:58:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "AAAI63//9gs\u003d",
+      "revId": "6d091b123d928b0152ceb6871487a247b0f24c12",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
     }
   ]
 }
