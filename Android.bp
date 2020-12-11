@@ -1,3 +1,81 @@
 package {
     default_visibility: ["//external/python/cpython3"],
 }
+
+build = ["Android.gen.bp"]
+
+cc_defaults {
+    name: "libopenssl_defaults",
+
+    cflags: [
+        "-Wno-unused-parameter",
+        "-Wno-missing-field-initializers",
+
+        "-DL_ENDIAN",
+        "-DNDEBUG",
+
+        "-DOPENSSLDIR=\"\"",
+    ],
+
+    export_include_dirs: [
+        "include",
+        "android/generated/include",
+    ],
+
+    local_include_dirs: [
+        "android/include",
+        "crypto",
+        "crypto/ec/curve448",
+        "crypto/ec/curve448/arch_32",
+        "crypto/modes",
+    ],
+
+    stl: "none",
+    target: {
+        darwin: {
+            enabled: false,
+        },
+    },
+}
+
+cc_library_host_static {
+    name: "libopenssl_ssl",
+    defaults: [
+        "libopenssl_defaults",
+        "libopenssl_ssl_srcs",
+    ],
+    static_libs: ["libopenssl_crypto"],
+}
+
+cc_library_host_static {
+    name: "libopenssl_crypto",
+    defaults: [
+        "libopenssl_defaults",
+        "libopenssl_crypto_srcs",
+    ],
+}
+
+cc_library_host_static {
+    name: "libopenssl_apps",
+    defaults: [
+        "libopenssl_defaults",
+        "libopenssl_apps_srcs",
+    ],
+}
+
+cc_binary_host {
+    name: "openssl",
+    defaults: [
+        "libopenssl_defaults",
+        "openssl_app_srcs",
+    ],
+    local_include_dirs: [
+        "apps",
+        "android/generated/apps",
+    ],
+    static_libs: [
+        "libopenssl_apps",
+        "libopenssl_crypto",
+        "libopenssl_ssl",
+    ],
+}
