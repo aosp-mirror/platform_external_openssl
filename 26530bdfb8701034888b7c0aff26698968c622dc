@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9900598c_2441e3b2",
+        "filename": "README.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1003723
+      },
+      "writtenOn": "2020-12-16T06:19:07Z",
+      "side": 0,
+      "message": "I\u0027m wondering if we should keep some disclaimer. Is this going to be part of the default aosp/master manifest? or are we going to have a separate manifest for building python.",
+      "range": {
+        "startLine": 4,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 0
+      },
+      "revId": "26530bdfb8701034888b7c0aff26698968c622dc",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    }
+  ]
+}
