@@ -22,6 +22,30 @@
       },
       "revId": "26530bdfb8701034888b7c0aff26698968c622dc",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0e6260f_7412e153",
+        "filename": "README.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1074628
+      },
+      "writtenOn": "2020-12-16T06:25:46Z",
+      "side": 0,
+      "message": "I specifically put this on the build-tools branch so that the default branch still had this message. That branch is only part of the build-tools manifest, where we\u0027re already building python prebuilts for the host.\n\nFor some use cases (embedded_launcher) we\u0027re currently building the python interpreter for the host on master in addition to build-tools, but I\u0027m planning on making master use a prebuilt for that instead. An alternative if that falls through is to make the ssl support in python configurable based on the branch, but that seems too confusing for users.",
+      "parentUuid": "9900598c_2441e3b2",
+      "range": {
+        "startLine": 4,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 0
+      },
+      "revId": "26530bdfb8701034888b7c0aff26698968c622dc",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
     }
   ]
 }
