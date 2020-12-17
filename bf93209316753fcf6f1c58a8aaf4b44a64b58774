@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "48328f64_dc9259bc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1074628
+      },
+      "writtenOn": "2020-12-17T03:13:15Z",
+      "side": 1,
+      "message": "Pre-existing aosp-master-art failure",
+      "revId": "bf93209316753fcf6f1c58a8aaf4b44a64b58774",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    }
+  ]
+}
