@@ -1,0 +1,9 @@
+Code-Review+2: Colin Cross <ccross@android.com>
+Presubmit-Verified-1: Treehugger Robot <treehugger-gerrit@google.com>
+Lint+1: Lint 🤖 <ayeaye-gerrit@google.com>
+Bypass-Presubmit+1: Dan Willemsen <dwillemsen@google.com>
+Submitted-by: Dan Willemsen <dwillemsen@google.com>
+Submitted-at: Thu, 17 Dec 2020 03:13:32 +0000
+Reviewed-on: https://android-review.googlesource.com/c/platform/external/openssl/+/1529240
+Project: platform/external/openssl
+Branch: refs/heads/build-tools
