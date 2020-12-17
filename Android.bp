@@ -1,0 +1,96 @@
+package {
+    default_visibility: ["//external/python/cpython3"],
+}
+
+build = [
+    "Android-linux.gen.bp",
+    "Android-darwin.gen.bp",
+]
+
+cc_defaults {
+    name: "libopenssl_defaults",
+
+    cflags: [
+        "-Wno-unused-parameter",
+        "-Wno-missing-field-initializers",
+
+        "-DL_ENDIAN",
+        "-DNDEBUG",
+
+        "-DOPENSSLDIR=\"\"",
+    ],
+
+    export_include_dirs: ["include"],
+
+    local_include_dirs: [
+        "android/include",
+        "crypto",
+        "crypto/ec/curve448",
+        "crypto/ec/curve448/arch_32",
+        "crypto/modes",
+    ],
+
+    stl: "none",
+
+    target: {
+        linux: {
+            export_include_dirs: ["android/gen-linux/include"],
+        },
+        darwin: {
+            export_include_dirs: ["android/gen-darwin/include"],
+        },
+    },
+}
+
+cc_library_host_static {
+    name: "libopenssl_ssl",
+    defaults: [
+        "libopenssl_defaults",
+        "openssl_ssl_linux_defaults",
+        "openssl_ssl_darwin_defaults",
+    ],
+    static_libs: ["libopenssl_crypto"],
+}
+
+cc_library_host_static {
+    name: "libopenssl_crypto",
+    defaults: [
+        "libopenssl_defaults",
+        "openssl_crypto_linux_defaults",
+        "openssl_crypto_darwin_defaults",
+    ],
+}
+
+cc_library_host_static {
+    name: "libopenssl_apps",
+    defaults: [
+        "libopenssl_defaults",
+        "openssl_apps_linux_defaults",
+        "openssl_apps_darwin_defaults",
+    ],
+}
+
+cc_binary_host {
+    name: "openssl",
+    defaults: [
+        "libopenssl_defaults",
+        "openssl_app_linux_defaults",
+        "openssl_app_darwin_defaults",
+    ],
+    local_include_dirs: [
+        "apps",
+    ],
+    static_libs: [
+        "libopenssl_apps",
+        "libopenssl_crypto",
+        "libopenssl_ssl",
+    ],
+    target: {
+        linux: {
+            local_include_dirs: ["android/gen-linux/apps"],
+        },
+        darwin: {
+            local_include_dirs: ["android/gen-darwin/apps"],
+        },
+    },
+}

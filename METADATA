@@ -1,0 +1,19 @@
+name: "openssl"
+description: "TLS/SSL and crypto library"
+third_party {
+  url {
+    type: HOMEPAGE
+    value: "https://www.openssl.org/"
+  }
+  url {
+    type: GIT
+    value: "https://github.com/openssl/openssl"
+  }
+  version: "OpenSSL_1_1_1i"
+  license_type: NOTICE
+  last_upgrade_date {
+    year: 2020
+    month: 12
+    day: 10
+  }
+}
